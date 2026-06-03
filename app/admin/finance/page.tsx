@@ -11,7 +11,6 @@ import {
   History, ShieldCheck, X, FileText,
   PieChart, Activity, Wallet
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Transaction {
   id: number;
@@ -95,7 +94,7 @@ export default function AdminFinancePage() {
               </div>
               
               <div className="overflow-x-auto">
-                 <table className="w-full text-right border-collapse">
+                 <table className="w-full text-right border-collapse min-w-[800px]">
                     <thead>
                        <tr className="bg-slate-50 text-slate-500">
                           <th className="px-4 lg:px-8 py-4 text-[11px] font-bold uppercase tracking-wider">نوع العملية</th>
@@ -151,12 +150,8 @@ export default function AdminFinancePage() {
            </div>
 
            {/* 🛡️ Audit Inspector */}
-           <AnimatePresence>
               {selected ? (
-                 <motion.aside
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
+                 <aside
                     className="lg:col-span-4 bg-white rounded-2xl p-4 lg:p-8 border border-slate-200 shadow-sm lg:sticky lg:top-28 space-y-8 overflow-hidden"
                  >
                     <div className="flex items-center justify-between border-b border-slate-100 pb-6 text-slate-900">
@@ -188,14 +183,13 @@ export default function AdminFinancePage() {
                           <Download size={24} /> استخراج الفاتورة
                        </button>
                     </div>
-                 </motion.aside>
+                 </aside>
               ) : (
                 <div className="lg:col-span-4 h-[400px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 gap-4">
                    <CreditCard size={48} className="opacity-20" />
                    <p className="text-sm font-medium">اختر عملية لعرض تفاصيل التدقيق</p>
                 </div>
               )}
-           </AnimatePresence>
         </div>
       </div>
     </div>

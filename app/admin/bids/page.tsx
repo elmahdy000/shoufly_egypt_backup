@@ -52,7 +52,7 @@ export default function AdminBidsPage() {
         {/* 📊 Active Bids Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
            <div className="overflow-x-auto">
-              <table className="w-full text-right border-collapse">
+              <table className="w-full text-right border-collapse min-w-[800px]">
                  <thead>
                     <tr className="bg-slate-50 border-b border-slate-100 text-slate-500">
                        <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">الطلب النشط / المعرف</th>

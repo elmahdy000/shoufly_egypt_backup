@@ -413,7 +413,7 @@ class ModernBottomNav extends StatelessWidget {
                         style: AppTypography.labelSmall.copyWith(
                           color: isSelected ? AppColors.primary : AppColors.textSecondary,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                          fontSize: 10,
+                          fontSize: 12,
                         ),
                       ),
                     ],

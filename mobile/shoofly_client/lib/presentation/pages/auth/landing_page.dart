@@ -99,7 +99,7 @@ class LandingPage extends StatelessWidget {
                     child: Text(
                       'شوفلي مصر',
                       style: AppTypography.h1.copyWith(
-                        fontSize: 36,
+                        fontSize: 38,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.5,
                       ),
@@ -117,7 +117,7 @@ class LandingPage extends StatelessWidget {
                       style: AppTypography.bodyLarge.copyWith(
                         color: AppColors.textSecondary,
                         height: 1.6,
-                        fontSize: 17,
+                        fontSize: 19,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -155,7 +155,7 @@ class LandingPage extends StatelessWidget {
                       'بإنضمامك إلينا أنت توافق على الشروط والأحكام',
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.textDisabled,
-                        fontSize: 12,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -202,7 +202,7 @@ class LandingPage extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -220,7 +220,7 @@ class LandingPage extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ),
     );

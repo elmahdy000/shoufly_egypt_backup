@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 const SendMessageSchema = z.object({
   receiverId: z.number().int().positive(),
   content: z.string().min(1).max(2000),
-  requestId: z.number().int().positive().optional(),
+  requestId: z.number().int().positive(),
 });
 
 export async function POST(req: NextRequest) {

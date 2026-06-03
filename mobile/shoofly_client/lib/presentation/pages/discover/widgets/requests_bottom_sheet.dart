@@ -79,7 +79,7 @@ class RequestsBottomSheet extends StatelessWidget {
         children: [
           Text(
             'الطلبات القريبة',
-            style: AppTypography.h3.copyWith(fontSize: 18),
+            style: AppTypography.h3.copyWith(fontSize: 20),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

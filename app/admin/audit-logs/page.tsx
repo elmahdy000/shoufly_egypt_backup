@@ -9,7 +9,6 @@ import {
   CheckCircle, XCircle, ArrowLeftRight, CreditCard, AlertTriangle,
   ChevronLeft, ChevronRight, FileText, Clock
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 type AuditAction =
   | 'REQUEST_APPROVED'
@@ -156,7 +155,7 @@ export default function AdminAuditLogsPage() {
       <div className="px-6 lg:px-10 py-8">
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-right">
+            <table className="w-full text-right min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-500">الحدث</th>
@@ -185,10 +184,8 @@ export default function AdminAuditLogsPage() {
                   filteredLogs.map((log) => {
                     const actionConfig = getActionConfig(log.action);
                     return (
-                      <motion.tr
+                      <tr
                         key={log.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
                         className="hover:bg-slate-50 transition-colors"
                       >
                         <td className="px-6 py-4">
@@ -227,7 +224,7 @@ export default function AdminAuditLogsPage() {
                             {formatDate(log.createdAt)}
                           </div>
                         </td>
-                      </motion.tr>
+                      </tr>
                     );
                   })
                 )}

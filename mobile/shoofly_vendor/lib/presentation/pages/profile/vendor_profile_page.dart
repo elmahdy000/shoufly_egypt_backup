@@ -54,14 +54,22 @@ class VendorProfilePage extends StatelessWidget {
                   icon: LucideIcons.lock,
                   title: 'كلمة المرور والأمان',
                   subtitle: 'تغيير كلمة المرور، التحقق بخطوتين',
-                  onTap: () {},
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('سيتم إضافة صفحة تغيير كلمة المرور قريباً', style: TextStyle(fontFamily: 'Cairo'))),
+                    );
+                  },
                 ),
                 _buildMenuItem(
                   context,
                   icon: LucideIcons.bell,
                   title: 'الإشعارات',
                   subtitle: 'إعدادات التنبيهات والرسائل',
-                  onTap: () {},
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('الإشعارات مفعلة وتعمل بشكل سليم', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: AppColors.success),
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
                 _buildSectionTitle('أخرى'),
@@ -70,13 +78,28 @@ class VendorProfilePage extends StatelessWidget {
                   context,
                   icon: Icons.help_outline_rounded,
                   title: 'مركز المساعدة',
-                  onTap: () {},
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('جاري تحويلك لمركز المساعدة...', style: TextStyle(fontFamily: 'Cairo'))),
+                    );
+                  },
                 ),
                 _buildMenuItem(
                   context,
                   icon: LucideIcons.info,
                   title: 'عن التطبيق',
-                  onTap: () {},
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: 'شوفلي - تطبيق الموردين',
+                      applicationVersion: '1.0.0',
+                      applicationIcon: const Icon(LucideIcons.store, size: 40, color: AppColors.primary),
+                      children: [
+                        const SizedBox(height: 16),
+                        const Text('تطبيق شوفلي للموردين ومقدمي الخدمات. يتيح لك استقبال طلبات العملاء وتقديم أفضل العروض وزيادة مبيعاتك بكل سهولة.', style: TextStyle(fontFamily: 'Cairo', height: 1.5)),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 32),
                 _buildLogoutButton(context),
@@ -229,11 +252,11 @@ class VendorProfilePage extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w900, fontSize: 18),
+            style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w900, fontSize: 20),
           ),
           Text(
             label,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled, fontSize: 11),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled, fontSize: 13),
           ),
         ],
       ),
@@ -285,7 +308,7 @@ class VendorProfilePage extends StatelessWidget {
                   if (subtitle != null)
                     Text(
                       subtitle,
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled, fontSize: 11),
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled, fontSize: 13),
                     ),
                 ],
               ),

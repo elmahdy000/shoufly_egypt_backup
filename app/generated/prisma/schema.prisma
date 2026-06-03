@@ -324,10 +324,15 @@ model WithdrawalRequest {
 model PlatformSetting {
   id                    Int      @id @default(autoincrement())
   commissionPercent     Decimal  @default(15) @db.Decimal(5, 2)
+  vatPercent            Decimal  @default(14) @db.Decimal(5, 2)
+  minOrderAmount        Decimal  @default(100) @db.Decimal(12, 2)
   minVendorMatchCount   Int      @default(3)
   initialRadiusKm       Int      @default(5)
   maxRadiusKm           Int      @default(50)
   radiusExpansionStepKm Int      @default(5)
+  autoPayoutEnabled     Boolean  @default(true)
+  verifyRequired        Boolean  @default(true)
+  otpDeliveryEnabled    Boolean  @default(true)
   updatedAt             DateTime @updatedAt
 }
 

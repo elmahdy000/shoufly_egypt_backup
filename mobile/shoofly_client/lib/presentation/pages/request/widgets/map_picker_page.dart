@@ -860,7 +860,7 @@ class _BottomSheet extends StatelessWidget {
                           'عنوان التوصيل',
                           style: AppTypography.labelSmall.copyWith(
                             color: AppColors.textSecondary,
-                            fontSize: 11,
+                            fontSize: 13,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -887,7 +887,7 @@ class _BottomSheet extends StatelessWidget {
                           Text(
                             streetAddress,
                             style: AppTypography.labelLarge.copyWith(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.w800,
                               color: AppColors.textPrimary,
                               height: 1.2,
@@ -901,7 +901,7 @@ class _BottomSheet extends StatelessWidget {
                               districtArea,
                               style: AppTypography.bodySmall.copyWith(
                                 color: AppColors.textSecondary,
-                                fontSize: 12,
+                                fontSize: 14,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -993,7 +993,7 @@ class _BottomSheet extends StatelessWidget {
                                     ? Colors.white
                                     : AppColors.textDisabled,
                                 fontWeight: FontWeight.w900,
-                                fontSize: 16,
+                                fontSize: 18,
                               ),
                             ),
                           ],
@@ -1047,12 +1047,12 @@ class _CompactDropdown<T> extends StatelessWidget {
             isLoading ? 'جاري...' : label,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.textDisabled,
-              fontSize: 12,
+              fontSize: 14,
             ),
           ),
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.textPrimary,
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
           icon: Icon(
@@ -1068,7 +1068,7 @@ class _CompactDropdown<T> extends StatelessWidget {
                     getLabel(item),
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.bodySmall.copyWith(
-                      fontSize: 13,
+                      fontSize: 15,
                       color: AppColors.textPrimary,
                     ),
                   ),

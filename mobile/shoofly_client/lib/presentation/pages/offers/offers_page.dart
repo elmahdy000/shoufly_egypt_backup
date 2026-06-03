@@ -295,7 +295,7 @@ class _OffersPageState extends State<OffersPage> with SingleTickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('أفضل سعر متوفر', style: AppTypography.bodySmall.copyWith(color: AppColors.success)),
-                Text('${lowestBid.price.toStringAsFixed(0)} ج.م', style: AppTypography.h3.copyWith(color: AppColors.success, fontSize: 22)),
+                Text('${lowestBid.price.toStringAsFixed(0)} ج.م', style: AppTypography.h3.copyWith(color: AppColors.success, fontSize: 24)),
               ],
             ),
           ),

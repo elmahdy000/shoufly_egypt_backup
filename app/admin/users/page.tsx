@@ -1,316 +1,407 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { useDebounce } from "@/lib/hooks/use-performance";
 import { apiFetch } from "@/lib/api/client";
-import { formatCurrency, formatDate } from "@/lib/formatters";
+import { formatDate, formatCurrency } from "@/lib/formatters";
 import {
-  Search, RefreshCw, Users, ShieldCheck,
-  TrendingUp, Mail, Phone, Clock,
-  Ban, X, ExternalLink,
-  ShieldAlert, ChevronLeft, UserCircle2,
-  Filter, CheckCircle2
+  Search, RefreshCw, User, Mail, Phone, 
+  ShieldCheck, ShieldAlert, Ban, CheckCircle2, 
+  X, Filter, MoreVertical, Wallet, Calendar,
+  ArrowUpRight, TrendingUp, Users, Shield, 
+  ChevronRight, ChevronLeft, AlertCircle, Truck
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/shoofly/button";
+import { ShooflyLoader } from "@/components/shoofly/loader";
 
-type UserFilter = "ALL" | "ACTIVE" | "BLOCKED" | "VERIFIED";
-type UserAction = "block" | "unblock" | "verify" | "unverify";
-
-interface AdminUser {
+interface UserData {
   id: number;
   fullName: string;
   email: string;
-  phone?: string;
+  phone: string | null;
+  role: string;
   isActive: boolean;
   isVerified: boolean;
-  walletBalance: string | number;
+  isBlocked: boolean;
+  walletBalance: number | string;
   createdAt: string;
+  updatedAt: string;
+  _count?: {
+    clientRequests: number;
+    vendorBids: number;
+    assignedDeliveries: number;
+    transactions: number;
+    complaints: number;
+  };
 }
+
+const ROLE_OPTIONS = [
+  { value: "ALL", label: "جميع الأدوار", icon: Users },
+  { value: "CLIENT", label: "عملاء", icon: User },
+  { value: "VENDOR", label: "موردين", icon: Shield },
+  { value: "DELIVERY", label: "مناديب", icon: Truck },
+  { value: "ADMIN", label: "مديرين", icon: ShieldCheck },
+];
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<UserFilter>("ALL");
-  const [selected, setSelected] = useState<AdminUser | null>(null);
-  const [actionLoading, setActionLoading] = useState<UserAction | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("ALL");
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [page, setPage] = useState(1);
+  
+  const debouncedSearch = useDebounce(search, 200);
 
-  const { data: users, loading, setData, refresh } = useAsyncData<AdminUser[]>(
-    async () => apiFetch<AdminUser[]>("/api/admin/users?limit=100", "ADMIN"), []
+  const ITEMS_PER_PAGE = 12;
+
+  // Push role filter & pagination server-side — no more 100-row upfront load.
+  const apiRole = selectedRole !== "ALL" ? selectedRole : undefined;
+  const { data: result, loading, error, refresh } = useAsyncData<UserData[] | { data: UserData[]; total: number }>(
+    () => {
+      const params = new URLSearchParams({
+        limit: String(ITEMS_PER_PAGE),
+        offset: String((page - 1) * ITEMS_PER_PAGE),
+      });
+      if (apiRole) params.set("role", apiRole);
+      if (debouncedSearch.trim()) params.set("search", debouncedSearch.trim());
+      return apiFetch(`/api/admin/users?${params}`, "ADMIN");
+    },
+    [page, apiRole, debouncedSearch]
   );
 
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await refresh();
-    setTimeout(() => setIsRefreshing(false), 500);
-  }, [refresh]);
+  const users: UserData[] = Array.isArray(result) ? result : (result as any)?.data ?? [];
+  const totalItems: number = Array.isArray(result) ? users.length : (result as any)?.total ?? users.length;
 
-  const stats = useMemo(() => {
-    const all = users ?? [];
-    return {
-      total: all.length,
-      active: all.filter((u) => u.isActive).length,
-      verified: all.filter((u) => u.isVerified).length,
-      blocked: all.filter((u) => !u.isActive).length,
-    };
-  }, [users]);
+  // Client-side text filter fallback (when API doesn't yet support ?search)
+  const paginated = useMemo(() => {
+    if (!debouncedSearch.trim() || !Array.isArray(result)) return users;
+    const q = debouncedSearch.toLowerCase();
+    return users.filter(u =>
+      u.fullName.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      u.phone?.includes(q) ||
+      String(u.id).includes(q)
+    );
+  }, [users, debouncedSearch, result]);
 
-  const filtered = useMemo(() => {
-    let list = users ?? [];
-    if (statusFilter === "ACTIVE") list = list.filter((u) => u.isActive);
-    if (statusFilter === "BLOCKED") list = list.filter((u) => !u.isActive);
-    if (statusFilter === "VERIFIED") list = list.filter((u) => u.isVerified);
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter((u) =>
-        u.fullName.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        (u.phone ?? "").includes(q)
-      );
-    }
-    return list;
-  }, [users, statusFilter, search]);
-
-  async function doAction(userId: number, action: UserAction) {
-    setActionLoading(action);
-    try {
-      await apiFetch(`/api/admin/users/${userId}/moderation`, "ADMIN", { method: "PATCH", body: { action } });
-      const patch: Partial<AdminUser> = {};
-      if (action === "block") patch.isActive = false;
-      if (action === "unblock") patch.isActive = true;
-      if (action === "verify") patch.isVerified = true;
-      if (action === "unverify") patch.isVerified = false;
-      setData((prev) => (prev ?? []).map((u) => (u.id === userId ? { ...u, ...patch } : u)));
-      setSelected((prev) => (prev?.id === userId ? { ...prev, ...patch } : prev));
-    } catch (e) {} finally { setActionLoading(null); }
+  if (loading && !users) {
+    return <ShooflyLoader message="جاري جلب قاعدة بيانات المستخدمين..." />;
   }
 
   return (
-    <div className="admin-page admin-page--spacious" dir="rtl">
-      
-      {/* 🚀 Header: Modern & Clean */}
-      <section className="bg-white border-b border-slate-200 sticky top-0 z-40 overflow-hidden">
-        <div className="px-6 lg:px-10 py-8 relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="space-y-1">
-             <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-indigo-500" />
-                <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">نظام إدارة العضويات المركزي</span>
-             </div>
-             <h1 className="text-2xl font-bold tracking-tight text-slate-900 border-r-4 border-indigo-500 pr-4">إدارة <span className="text-indigo-600">المستخدمين</span></h1>
-             <p className="text-sm text-slate-500 font-medium max-w-xl">تحكم كامل في صلاحيات الحسابات، توثيق الأعضاء، وتابع حركتهم المالية.</p>
+    <div className="min-h-screen bg-[#f8fafc] font-cairo text-right antialiased" dir="rtl">
+      <div className="max-w-[1500px] mx-auto p-6 lg:p-10 space-y-10">
+        
+        {/* 📋 Header */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-200">
+          <div className="space-y-2">
+            <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">إدارة <span className="text-primary">المستخدمين</span></h1>
+            <p className="text-sm text-slate-500 font-medium">التحكم الكامل في حسابات العملاء، الموردين، والمناديب.</p>
           </div>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-             <div className="relative group w-full max-w-[350px]">
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-all" size={18} />
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+             <div className="relative group w-full sm:w-[320px]">
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                    value={search}
                    onChange={(e) => setSearch(e.target.value)}
-                   placeholder="بتدور على عميل أو بريد؟ اكتب هنا..."
-                   className="w-full pr-12 pl-4 h-11 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:bg-white focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                   placeholder="بحث بالاسم، الإيميل، أو الهاتف..."
+                   className="w-full pr-12 pl-4 h-11 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all"
                 />
              </div>
-             <button onClick={handleRefresh} className="p-3 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all">
-                <RefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
+             <button 
+              onClick={() => refresh()} 
+              className="h-11 px-4 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:text-primary hover:border-primary/30 transition-all shadow-sm active:scale-95"
+             >
+                <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
              </button>
           </div>
-        </div>
-      </section>
+        </header>
 
-      <div className="px-6 lg:px-10 py-8 space-y-8">
-        
-        {/* 📊 KPI Strip */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <UStat label="إحصاء العضويات" val={stats.total} icon={Users} color="text-slate-600 bg-slate-100" />
-          <UStat label="حسابات نشطة" val={stats.active} icon={CheckCircle2} color="text-emerald-600 bg-emerald-50" />
-          <UStat label="أعضاء موثقين" val={stats.verified} icon={ShieldCheck} color="text-indigo-600 bg-indigo-50" />
-          <UStat label="الموقفين إدارياً" val={stats.blocked} icon={Ban} color="text-rose-600 bg-rose-50" />
+        {/* 📊 KPI Summary */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <SmallKpiCard label="إجمالي المستخدمين" value={users?.length ?? 0} icon={Users} color="blue" />
+          <SmallKpiCard label="الموردين النشطين" value={users?.filter(u => u.role === 'VENDOR').length ?? 0} icon={Shield} color="emerald" />
+          <SmallKpiCard label="حسابات محظورة" value={users?.filter(u => u.isBlocked).length ?? 0} icon={Ban} color="rose" />
+          <SmallKpiCard label="في انتظار التوثيق" value={users?.filter(u => !u.isVerified && u.role !== 'CLIENT').length ?? 0} icon={AlertCircle} color="amber" />
         </section>
 
-        {/* 🛠 Filter Controls */}
-        <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
-           <div className="flex flex-wrap items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center ml-2 border border-slate-100">
-                 <Filter size={16} />
-              </div>
-              {([{ id: "ALL", label: "كل المستخدمين" }, { id: "ACTIVE", label: "نشط حالياً" }, { id: "VERIFIED", label: "موثقين فقط" }, { id: "BLOCKED", label: "موقوفين" }] as { id: UserFilter; label: string }[]).map((tab) => (
-                <button 
-                  key={tab.id} 
-                  onClick={() => setStatusFilter(tab.id)} 
-                  className={`px-6 py-2 rounded-lg text-xs font-bold border transition-all ${statusFilter === tab.id ? "bg-indigo-600 text-white border-indigo-600 shadow-sm" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700"}`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-           </div>
+        {/* 🏷️ Filter Bar */}
+        <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {ROLE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => { setSelectedRole(opt.value); setPage(1); }}
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                selectedRole === opt.value
+                  ? "bg-slate-900 text-white shadow-lg shadow-slate-900/10"
+                  : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300"
+              }`}
+            >
+              <opt.icon size={14} />
+              {opt.label}
+              <span className={`mr-1 px-1.5 py-0.5 rounded text-[10px] ${selectedRole === opt.value ? 'bg-white/20 text-white' : 'bg-slate-50 text-slate-400'}`}>
+                {opt.value === 'ALL' ? users?.length : users?.filter(u => u.role === opt.value).length}
+              </span>
+            </button>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-           
-           {/* 📋 User Grid */}
-           <div className="lg:col-span-8">
-              {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {[1,2,3,4].map(i => <div key={i} className="h-64 bg-white border border-slate-200 rounded-2xl animate-pulse" />)}
-                </div>
-              ) : filtered.length === 0 ? (
-                <div className="h-80 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 gap-4">
-                   <UserCircle2 size={48} className="opacity-20" />
-                   <p className="text-base font-bold">مفيش مستخدمين بالتصنيف ده دلوقتي</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <AnimatePresence mode="popLayout">
-                     {filtered.map(u => (
-                       <motion.div
-                         layout
-                         key={u.id}
-                         initial={{ opacity: 0, y: 10 }}
-                         animate={{ opacity: 1, y: 0 }}
-                         exit={{ opacity: 0, scale: 0.95 }}
-                         onClick={() => setSelected(u)}
-                         className={`p-6 rounded-2xl bg-white border transition-all cursor-pointer group flex flex-col justify-between shadow-sm min-h-[260px] ${selected?.id === u.id ? 'border-indigo-500 ring-2 ring-indigo-500/10' : 'border-slate-200 hover:border-indigo-400 hover:shadow-md'}`}
-                       >
-                         <div>
-                            <div className="flex items-start justify-between mb-6">
-                               <div className={`w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl transition-all ${selected?.id === u.id ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600'}`}>
-                                  {u.fullName?.charAt(0) || "U"}
-                               </div>
-                               <div className="flex flex-col items-end gap-2">
-                                  {u.isVerified && (
-                                    <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] font-bold border border-emerald-200 uppercase tracking-tighter">Verified <ShieldCheck size={12} /></span>
-                                  )}
-                                  {!u.isActive && (
-                                    <span className="flex items-center gap-1.5 px-3 py-1 bg-rose-100 text-rose-700 rounded-lg text-[9px] font-bold border border-rose-200 uppercase tracking-tighter">Blocked <Ban size={12} /></span>
-                                  )}
-                               </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* 👥 Users Table */}
+          <div className="lg:col-span-8 space-y-6">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm min-h-[600px]">
+              <div className="overflow-x-auto">
+                <table className="w-full text-right border-collapse min-w-[800px]">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-100 text-slate-400">
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">المستخدم</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-center">الدور</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-center">الحالة</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-left">التوازن</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {paginated.map((user) => (
+                      <tr 
+                        key={user.id} 
+                        onClick={() => setSelectedUser(user)}
+                        className={`hover:bg-slate-50/80 transition-colors cursor-pointer group ${selectedUser?.id === user.id ? 'bg-primary/5' : ''}`}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold group-hover:bg-white transition-colors">
+                              {user.fullName.charAt(0)}
                             </div>
-                            
-                            <div className="space-y-1">
-                               <h3 className="text-lg font-bold text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors">{u.fullName || "مستخدم غير مسمى"}</h3>
-                               <p className="text-xs text-slate-400 font-medium truncate">{u.email || "بدون بريد"}</p>
+                            <div>
+                              <p className="text-sm font-bold text-slate-800">{user.fullName}</p>
+                              <p className="text-[10px] font-medium text-slate-400 font-outfit uppercase tracking-tighter">{user.email}</p>
                             </div>
-                         </div>
-
-                         <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
-                            <div className="flex flex-col">
-                               <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">الرصيد</span>
-                               <span className="text-xl font-bold text-slate-900 font-jakarta">{formatCurrency(u.walletBalance)}</span>
-                            </div>
-                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300 transition-all group-hover:bg-indigo-600 group-hover:text-white">
-                               <ChevronLeft size={18} />
-                            </div>
-                         </div>
-                       </motion.div>
-                     ))}
-                   </AnimatePresence>
-                </div>
-              )}
-           </div>
-
-           {/* 🛡️ User Inspector */}
-           <AnimatePresence>
-              {selected ? (
-                 <motion.aside
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="lg:col-span-4 bg-white rounded-2xl p-4 lg:p-8 border border-slate-200 shadow-sm lg:sticky lg:top-28 space-y-8 overflow-hidden"
-                 >
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-6 text-slate-900">
-                       <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
-                             <UserCircle2 size={24} />
                           </div>
-                          <div>
-                             <h2 className="text-lg font-bold">تدقيق الحساب</h2>
-                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">AUTH_LOGS: ACTIVE</p>
-                          </div>
-                       </div>
-                       <button onClick={() => setSelected(null)} className="p-2 bg-slate-100 hover:bg-rose-100 rounded-lg text-slate-400 hover:text-rose-600 transition-all active:scale-95"><X size={18} /></button>
-                    </div>
-
-                    <div className="space-y-6">
-                       <div className="p-6 bg-slate-50 border border-slate-100 rounded-xl space-y-4">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">معلومات العضوية</p>
-                          <h3 className="text-2xl font-bold leading-tight text-slate-900">{selected.fullName}</h3>
-                          
-                          <div className="flex flex-wrap gap-2 pt-2">
-                             <div className={`px-3 py-1 rounded-lg text-[10px] font-bold border ${selected.isActive ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-rose-100 text-rose-700 border-rose-200'}`}>
-                                {selected.isActive ? 'حساب مفعّل' : 'موقوف إدارياً'}
-                             </div>
-                             {selected.isVerified && (
-                                <div className="px-3 py-1 rounded-lg text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">موثّق رسمياً</div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <RoleBadge role={user.role} />
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                           <div className="flex items-center justify-center gap-2">
+                             {user.isBlocked ? (
+                               <StatusIndicator color="rose" label="محظور" />
+                             ) : user.isActive ? (
+                               <StatusIndicator color="emerald" label="نشط" />
+                             ) : (
+                               <StatusIndicator color="slate" label="خامل" />
                              )}
-                          </div>
-                       </div>
-
-                       <div className="space-y-2">
-                          <UInfoLine icon={<Phone size={16} />} label="رقم الجوال" value={selected.phone || 'غير مدرج'} />
-                          <UInfoLine icon={<Mail size={16} />} label="البريد الإلكتروني" value={selected.email} />
-                          <UInfoLine icon={<TrendingUp size={16} />} label="إجمالي المحفظة" value={formatCurrency(selected.walletBalance)} />
-                          <UInfoLine icon={<Clock size={16} />} label="تاريخ التسجيل" value={formatDate(selected.createdAt)} />
-                       </div>
-                    </div>
-
-                    <div className="pt-8 border-t border-slate-100 space-y-3">
-                       <button 
-                         onClick={() => doAction(selected.id, selected.isVerified ? "unverify" : "verify")}
-                         className={`w-full h-14 rounded-xl font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-[0.98] border shadow-sm ${selected.isVerified ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-indigo-600 text-white border-indigo-700 hover:bg-indigo-700'}`}
-                       >
-                          {selected.isVerified ? <ShieldAlert size={20} className="text-rose-500" /> : <ShieldCheck size={20} />}
-                          {selected.isVerified ? "إلغاء توثيق الحساب" : "وثّق الحساب"}
-                       </button>
-                       
-                       <button 
-                         onClick={() => doAction(selected.id, selected.isActive ? "block" : "unblock")}
-                         className={`w-full h-12 rounded-xl font-bold text-xs border transition-all active:scale-[0.98] ${!selected.isActive ? 'bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700' : 'bg-white border-rose-200 text-rose-600 hover:bg-rose-50'}`}
-                       >
-                          {!selected.isActive ? <CheckCircle2 size={18} /> : <Ban size={18} />}
-                          {!selected.isActive ? "شغّل الحساب تاني" : "وقّف الحساب فوراً"}
-                       </button>
-
-                       <button className="w-full h-11 text-slate-400 hover:text-slate-600 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                          <ExternalLink size={14} /> فتح سجل النشاط
-                       </button>
-                    </div>
-                 </motion.aside>
-              ) : (
-                <div className="lg:col-span-4 h-[400px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 gap-4">
-                   <UserCircle2 size={48} className="opacity-20" />
-                   <p className="text-sm font-medium">اختار مستخدم عشان تشوف تفاصيل حسابه</p>
+                             {user.isVerified && <ShieldCheck size={14} className="text-blue-500" />}
+                           </div>
+                        </td>
+                        <td className="px-6 py-4 text-left font-outfit text-sm font-bold text-slate-900">
+                          {formatCurrency(Number(user.walletBalance))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Pagination Footer */}
+              {totalPages > 1 && (
+                <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    مستخدم {((page - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(page * ITEMS_PER_PAGE, totalItems)} من {totalItems}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 disabled:opacity-30 hover:text-primary transition-all shadow-sm"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                    <button
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 disabled:opacity-30 hover:text-primary transition-all shadow-sm"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                  </div>
                 </div>
               )}
-           </AnimatePresence>
+            </div>
+          </div>
+
+          {/* 🛡️ User Inspector */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+            {selectedUser ? (
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-md">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-lg ring-4 ring-slate-50">
+                        {selectedUser.fullName.charAt(0)}
+                      </div>
+                      <div>
+                        <h2 className="text-base font-black text-slate-900">{selectedUser.fullName}</h2>
+                        <RoleBadge role={selectedUser.role} />
+                      </div>
+                    </div>
+                    <button onClick={() => setSelectedUser(null)} className="text-slate-400 hover:text-rose-500 transition-colors p-1"><X size={20} /></button>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="grid gap-3">
+                      <InspectorItem icon={Mail} label="البريد الإلكتروني" value={selectedUser.email} copyable />
+                      <InspectorItem icon={Phone} label="رقم الهاتف" value={selectedUser.phone || "غير مسجل"} copyable />
+                      <InspectorItem icon={Wallet} label="رصيد المحفظة" value={formatCurrency(Number(selectedUser.walletBalance))} highlight />
+                      <InspectorItem icon={Calendar} label="تاريخ الانضمام" value={formatDate(selectedUser.createdAt)} />
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <StatMiniBox label="طلبات" value={selectedUser._count?.clientRequests ?? 0} />
+                      <StatMiniBox label="عروض" value={selectedUser._count?.vendorBids ?? 0} />
+                      <StatMiniBox label="معاملات" value={selectedUser._count?.transactions ?? 0} />
+                      <StatMiniBox label="بلاغات" value={selectedUser._count?.complaints ?? 0} color="rose" />
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-100 space-y-3">
+                      {selectedUser.isBlocked ? (
+                        <button 
+                          onClick={async () => {
+                            await apiFetch(`/api/admin/users/${selectedUser.id}/block`, "ADMIN", { method: 'DELETE' });
+                            refresh();
+                            setSelectedUser(prev => prev ? {...prev, isBlocked: false} : null);
+                          }}
+                          className="w-full h-12 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
+                        >
+                          <CheckCircle2 size={16} /> فك الحظر عن الحساب
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={async () => {
+                            await apiFetch(`/api/admin/users/${selectedUser.id}/block`, "ADMIN", { method: 'POST' });
+                            refresh();
+                            setSelectedUser(prev => prev ? {...prev, isBlocked: true} : null);
+                          }}
+                          className="w-full h-12 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl font-bold text-sm hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                        >
+                          <Ban size={16} /> حظر هذا المستخدم
+                        </button>
+                      )}
+                      
+                      {!selectedUser.isVerified && selectedUser.role !== 'CLIENT' && (
+                        <button 
+                          onClick={async () => {
+                            await apiFetch(`/api/admin/users/${selectedUser.id}/verify`, "ADMIN", { method: 'POST' });
+                            refresh();
+                            setSelectedUser(prev => prev ? {...prev, isVerified: true} : null);
+                          }}
+                          className="w-full h-12 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+                        >
+                          <ShieldCheck size={16} /> توثيق الحساب يدوياً
+                        </button>
+                      )}
+                      
+                      <button className="w-full h-11 bg-white border border-slate-200 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                        <MoreVertical size={16} /> المزيد من الإجراءات
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center space-y-4">
+                  <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-sm ring-1 ring-slate-100">
+                    <User size={32} className="text-slate-200" />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-slate-500">معاينة تفاصيل المستخدم</p>
+                    <p className="text-[11px] font-medium text-slate-400">حدد مستخدماً من القائمة لعرض إحصائياته<br/>وإدارة صلاحيات الوصول.</p>
+                  </div>
+                </div>
+              )}
+          </div>
+
         </div>
       </div>
     </div>
   );
 }
 
-function UStat({ label, val, icon: Icon, color }: { label: string; val: number; icon: React.ElementType; color: string }) {
+function SmallKpiCard({ label, value, icon: Icon, color }: any) {
+  const colors: any = {
+    blue: "text-blue-600 bg-blue-50 border-blue-100",
+    emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
+    rose: "text-rose-600 bg-rose-50 border-rose-100",
+    amber: "text-amber-600 bg-amber-50 border-amber-100",
+  };
+
   return (
-    <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center gap-5 shadow-sm hover:shadow-md transition-all">
-       <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center shadow-sm border border-black/5`}>
-          <Icon size={22} />
-       </div>
-       <div className="space-y-0.5">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">{label}</p>
-          <p className="text-2xl font-bold text-slate-900 leading-none mt-1">{val}</p>
-       </div>
+    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-5 group">
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-110 ${colors[color]}`}>
+        <Icon size={24} />
+      </div>
+      <div>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-xl font-black text-slate-900 tracking-tight font-outfit leading-none mt-1">{value}</p>
+      </div>
     </div>
   );
 }
 
-function UInfoLine({ icon, label, value, highlight }: { icon: React.ReactNode; label: string; value: string; highlight?: boolean }) {
+function RoleBadge({ role }: { role: string }) {
+  const roles: any = {
+    ADMIN: { label: "مدير", cls: "bg-slate-900 text-white" },
+    VENDOR: { label: "مورد", cls: "bg-blue-50 text-blue-700 border-blue-100" },
+    CLIENT: { label: "عميل", cls: "bg-slate-100 text-slate-600 border-slate-200" },
+    DELIVERY: { label: "مندوب", cls: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+  };
+
+  const r = roles[role] || { label: role, cls: "bg-slate-50 text-slate-500 border-slate-100" };
+
   return (
-    <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl">
-       <div className="flex items-center gap-3">
-          <span className="text-slate-400">{icon}</span>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</span>
-       </div>
-       <span className={`text-sm font-bold ${highlight ? 'text-amber-600' : 'text-slate-900'} font-jakarta`}>{value}</span>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-black border uppercase tracking-wider ${r.cls}`}>
+      {r.label}
+    </span>
+  );
+}
+
+function StatusIndicator({ color, label }: { color: string; label: string }) {
+  const colors: any = {
+    emerald: "bg-emerald-500",
+    rose: "bg-rose-500",
+    slate: "bg-slate-300",
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className={`w-1.5 h-1.5 rounded-full ${colors[color]}`} />
+      <span className="text-[10px] font-bold text-slate-500">{label}</span>
+    </div>
+  );
+}
+
+function InspectorItem({ icon: Icon, label, value, highlight, copyable }: any) {
+  return (
+    <div className="flex items-start justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-xl group hover:bg-white hover:border-slate-200 transition-all">
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+          <Icon size={14} />
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+          <p className={`text-sm font-bold ${highlight ? 'text-primary' : 'text-slate-900'} leading-tight mt-0.5`}>{value}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatMiniBox({ label, value, color }: any) {
+  return (
+    <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl text-center">
+      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+      <p className={`text-lg font-black font-outfit ${color === 'rose' ? 'text-rose-500' : 'text-slate-800'}`}>{value}</p>
     </div>
   );
 }

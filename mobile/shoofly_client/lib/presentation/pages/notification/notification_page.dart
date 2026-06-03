@@ -158,7 +158,7 @@ class NotificationPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(notification.message ?? '', style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
-                  Text(_formatDate(notification.createdAt), style: AppTypography.labelSmall.copyWith(color: AppColors.textDisabled, fontSize: 10)),
+                  Text(_formatDate(notification.createdAt), style: AppTypography.labelSmall.copyWith(color: AppColors.textDisabled, fontSize: 12)),
                 ],
               ),
             ),

@@ -8,10 +8,15 @@ export async function getPlatformSettings() {
     settings = await prisma.platformSetting.create({
       data: {
         commissionPercent: 15,
+        vatPercent: 14,
+        minOrderAmount: 100,
         minVendorMatchCount: 3,
         initialRadiusKm: 5,
         maxRadiusKm: 50,
         radiusExpansionStepKm: 5,
+        autoPayoutEnabled: true,
+        verifyRequired: true,
+        otpDeliveryEnabled: true,
       },
     });
   }
@@ -21,10 +26,15 @@ export async function getPlatformSettings() {
 
 export async function updatePlatformSettings(data: {
   commissionPercent?: number;
+  vatPercent?: number;
+  minOrderAmount?: number;
   minVendorMatchCount?: number;
   initialRadiusKm?: number;
   maxRadiusKm?: number;
   radiusExpansionStepKm?: number;
+  autoPayoutEnabled?: boolean;
+  verifyRequired?: boolean;
+  otpDeliveryEnabled?: boolean;
 }) {
   const settings = await getPlatformSettings();
 

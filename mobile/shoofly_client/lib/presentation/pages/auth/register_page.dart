@@ -54,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 12),
                 Text(
                   'إنشاء حساب جديد',
-                  style: AppTypography.h2.copyWith(fontSize: 28, fontWeight: FontWeight.w900),
+                  style: AppTypography.h2.copyWith(fontSize: 30, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -136,11 +136,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: RichText(
                           text: TextSpan(
                             text: 'أوافق على ',
-                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary, fontSize: 13),
+                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary, fontSize: 15),
                             children: [
                               TextSpan(
                                 text: 'الشروط والأحكام وسياسة الخصوصية',
-                                style: AppTypography.labelLarge.copyWith(color: AppColors.primary, fontSize: 13),
+                                style: AppTypography.labelLarge.copyWith(color: AppColors.primary, fontSize: 15),
                               ),
                             ],
                           ),
@@ -200,7 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
       children: [
         Text(
           label,
-          style: AppTypography.labelLarge.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+          style: AppTypography.labelLarge.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -280,7 +280,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     width: 24,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                   )
-                : const Text('إنشاء حساب', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                : const Text('إنشاء حساب', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ),
         );
       },

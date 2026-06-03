@@ -1,0 +1,159 @@
+[
+  {
+    "id": 0,
+    "files": [
+      "BUILD_FIX_EXPLANATION_AR.md",
+      "BUILD_FIX_REDIS.md",
+      "COMPLETE_GUIDE.md",
+      "DESIGN_FIXES_GUIDE.md",
+      "DESIGN_SYSTEM_FINAL_REPORT.md",
+      "DESIGN_SYSTEM_README.md",
+      "env.example.txt",
+      "frontend-integration-guide.md",
+      "MOBILE_ROADMAP.md",
+      "PROJECT_REVIEW_REPORT.md",
+      "README.md",
+      "replit.md",
+      "RESOLUTION_FIX_GUIDE.md",
+      "RESOLUTION_TESTING_GUIDE.md",
+      "RUNNING_THE_APP.md",
+      "SEEDING_BEFORE_AFTER.md",
+      "SEEDING_FIXED.md",
+      "SEEDING_FIX_DOCUMENTATION.md",
+      "SEEDING_IMPLEMENTATION_SUMMARY.md",
+      "SEEDING_QUICK_START.md",
+      "SEEDING_SUMMARY.md",
+      "seed_log.txt",
+      "UI_UX_COMPLETE_IMPLEMENTATION.md",
+      "UI_UX_IMPROVEMENTS_GUIDE.md",
+      "UI_UX_IMPROVEMENT_PLAN.md"
+    ]
+  },
+  {
+    "id": 1,
+    "files": [
+      "docs\\payment-gateway-setup.md",
+      "docs\\performance-optimization.md",
+      "front_guide\\admin-guide.md",
+      "front_guide\\client-guide.md",
+      "front_guide\\delivery-guide.md",
+      "front_guide\\frontend_strategy.md",
+      "front_guide\\stitch_design_brief.md",
+      "front_guide\\vendor-guide.md",
+      "mobile\\shoofly_client\\analysis_output.txt",
+      "mobile\\shoofly_client\\README.md",
+      "mobile\\shoofly_client\\linux\\CMakeLists.txt",
+      "mobile\\shoofly_client\\linux\\flutter\\CMakeLists.txt",
+      "mobile\\shoofly_client\\linux\\runner\\CMakeLists.txt",
+      "mobile\\shoofly_client\\web\\index.html",
+      "mobile\\shoofly_client\\windows\\CMakeLists.txt",
+      "mobile\\shoofly_client\\windows\\flutter\\CMakeLists.txt",
+      "mobile\\shoofly_client\\windows\\runner\\CMakeLists.txt",
+      "mobile\\shoofly_core\\CHANGELOG.md",
+      "mobile\\shoofly_core\\README.md",
+      "mobile\\shoofly_vendor\\README.md",
+      "mobile\\shoofly_vendor\\linux\\CMakeLists.txt",
+      "mobile\\shoofly_vendor\\linux\\flutter\\CMakeLists.txt",
+      "mobile\\shoofly_vendor\\linux\\runner\\CMakeLists.txt",
+      "mobile\\shoofly_vendor\\web\\index.html",
+      "mobile\\shoofly_vendor\\windows\\CMakeLists.txt"
+    ]
+  },
+  {
+    "id": 2,
+    "files": [
+      "mobile\\shoofly_vendor\\windows\\flutter\\CMakeLists.txt",
+      "mobile\\shoofly_vendor\\windows\\runner\\CMakeLists.txt"
+    ]
+  },
+  {
+    "id": 3,
+    "files": [
+      "shoofly_screen.png",
+      "attached_assets\\image_1776208057168.png",
+      "mobile\\shoofly_client\\screenshot_login.png",
+      "public\\delivery_banner_1776636513250.png",
+      "public\\file.svg",
+      "public\\globe.svg",
+      "public\\home_services_banner_1776636493473.png",
+      "public\\next.svg",
+      "public\\step1_request.png",
+      "public\\step2_bids.png"
+    ]
+  },
+  {
+    "id": 4,
+    "files": [
+      "public\\step3_payment.png",
+      "public\\step4_success.png",
+      "public\\tech_repair_banner_1776636474600.png",
+      "public\\vercel.svg",
+      "public\\window.svg",
+      "public\\icons\\apple-touch-icon.svg",
+      "public\\icons\\icon-192.svg",
+      "public\\icons\\icon-512.svg",
+      "public\\uploads\\1775952250259-701727137-3f45dab6c4d3d354a4d497daeebfefe8.jpg",
+      "public\\uploads\\1775952267582-966594798-a05e3acd352c8868a6271666a11c8b4f.jpg"
+    ]
+  },
+  {
+    "id": 5,
+    "files": [
+      "public\\uploads\\1775954241236-5821338-3f45dab6c4d3d354a4d497daeebfefe8.jpg",
+      "public\\uploads\\1775954241311-624725181-a05e3acd352c8868a6271666a11c8b4f.jpg",
+      "public\\uploads\\1776208854824-198418708-Gemini_Generated_Image_z7x7odz7x7odz7x7.png",
+      "public\\uploads\\1776524636349-389141508-IMG_8105.JPG.jpeg",
+      "public\\uploads\\1776524636399-291554027-Gemini_Generated_Image_z7x7odz7x7odz7x7.png",
+      "public\\uploads\\1776524636425-108575725-WhatsApp_Image_2026-04-07_at_7.23.13_PM.jpeg",
+      "public\\uploads\\1776524636432-283141744-WhatsApp_Image_2026-04-07_at_7.23.13_PM__1_.jpeg",
+      "public\\uploads\\1776721424036-722269212-WhatsApp_Image_2026-04-19_at_11.57.51_PM.jpeg",
+      "public\\uploads\\1776721424127-334961401-ChatGPT_Image_Apr_20__2026__07_52_08_PM.png",
+      "public\\uploads\\1776721813349-353427856-WhatsApp_Image_2026-04-19_at_11.57.51_PM.jpeg"
+    ]
+  },
+  {
+    "id": 6,
+    "files": [
+      "public\\uploads\\1777133865424-638425252-upload.jpg",
+      "public\\uploads\\1777136567219-381368582-upload.jpg",
+      "public\\uploads\\1777136578027-45387826-upload.png",
+      "public\\uploads\\1777140528241-192455002-upload.jpg",
+      "public\\uploads\\1777140993661-257332486-upload.jpg",
+      "public\\uploads\\1777159207843-18921338-upload.jpg",
+      "public\\uploads\\1777160720678-798886004-upload.jpg",
+      "public\\uploads\\1777160731980-740724787-upload.png",
+      "public\\uploads\\1777162615116-171037880-upload.jpg",
+      "public\\uploads\\1777162624108-952169275-upload.jpg"
+    ]
+  },
+  {
+    "id": 7,
+    "files": [
+      "public\\uploads\\1777162760818-730664971-upload.jpg",
+      "public\\uploads\\1777163083726-304798459-upload.jpg",
+      "public\\uploads\\1777163357813-721207476-upload.jpg",
+      "public\\uploads\\1777163644601-454724916-upload.png",
+      "public\\uploads\\1777198993693-970129028-upload.jpg",
+      "public\\uploads\\1777200238402-723357245-upload.jpg",
+      "public\\uploads\\1777217463736-832554503-upload.jpg",
+      "public\\uploads\\1777217830248-780449279-upload.jpg",
+      "public\\uploads\\1777217838726-393331084-upload.jpg",
+      "public\\uploads\\1777219598381-416037116-upload.jpg"
+    ]
+  },
+  {
+    "id": 8,
+    "files": [
+      "public\\uploads\\1777219732103-462056134-upload.jpg",
+      "public\\uploads\\1777220359940-89476767-upload.jpg",
+      "public\\uploads\\1777230307532-579342494-upload.jpg",
+      "public\\uploads\\1777231114971-758972416-upload.jpg",
+      "public\\uploads\\1777242158561-401929296-upload.jpg",
+      "public\\uploads\\1777396243309-786107761-upload.jpg",
+      "public\\uploads\\1777396251540-537878231-upload.jpg",
+      "public\\uploads\\kyc\\82-back-1776875455367.jpg",
+      "public\\uploads\\kyc\\82-front-1776875455367.jpg",
+      "screenshots\\home.jpg"
+    ]
+  }
+]

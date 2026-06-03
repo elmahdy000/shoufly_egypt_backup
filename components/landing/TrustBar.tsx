@@ -1,3 +1,4 @@
+import React from "react";
 import { TrustMetric } from "@/lib/types/landing";
 import { LandingCard } from "./shared/Primitives";
 
@@ -5,7 +6,7 @@ interface TrustBarProps {
   metrics: TrustMetric[];
 }
 
-export function TrustBar({ metrics }: TrustBarProps) {
+export const TrustBar = React.memo(({ metrics }: TrustBarProps) => {
   if (metrics.length === 0) return null;
 
   return (
@@ -35,4 +36,6 @@ export function TrustBar({ metrics }: TrustBarProps) {
       <p className="text-[11px] text-center text-slate-400 font-extrabold">انضم لآلاف المستخدمين اللي بيثقوا فينا كل يوم</p>
     </section>
   );
-}
+});
+
+TrustBar.displayName = "TrustBar";

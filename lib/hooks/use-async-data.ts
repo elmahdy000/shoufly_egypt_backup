@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 export function useAsyncData<T>(load: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
@@ -15,7 +15,7 @@ export function useAsyncData<T>(load: () => Promise<T>, deps: unknown[] = []) {
 
   const [refreshCount, setRefreshCount] = useState(0);
 
-  const refresh = () => setRefreshCount(prev => prev + 1);
+  const refresh = useCallback(() => setRefreshCount(prev => prev + 1), []);
 
   useEffect(() => {
     let mounted = true;

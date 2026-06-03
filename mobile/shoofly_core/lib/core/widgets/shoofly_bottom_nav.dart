@@ -113,7 +113,7 @@ class ShooflyBottomNav extends StatelessWidget {
                                 Text(
                                   items[index].label,
                                   style: AppTypography.labelSmall.copyWith(
-                                    fontSize: 11,
+                                    fontSize: 13,
                                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                                     color: isSelected ? AppColors.primary : AppColors.textSecondary,
                                   ),

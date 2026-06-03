@@ -24,7 +24,14 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   int? _selectedCategoryId;
-  String _sortBy = 'NEWEST'; // NEWEST, TITLE
+  String _sortBy = 'NEWEST';
+  
+  // Cache for filtered results to avoid redundant computations
+  List<Request> _cachedFilteredRequests = [];
+  List<Request>? _lastSourceList;
+  String? _lastQuery;
+  int? _lastCatId;
+  String? _lastSort;
 
   @override
   void initState() {
@@ -32,9 +39,47 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
     context.read<VendorBloc>().add(const LoadOpenRequests());
   }
 
+  List<Request> useMemoizedFilteredRequests(List<Request> source, String query, int? catId, String sort) {
+    if (source == _lastSourceList && query == _lastQuery && catId == _lastCatId && sort == _lastSort) {
+      return _cachedFilteredRequests;
+    }
+
+    _lastSourceList = source;
+    _lastQuery = query;
+    _lastCatId = catId;
+    _lastSort = sort;
+
+    var list = source.where((r) {
+      final queryMatches = query.isEmpty || 
+          r.title.toLowerCase().contains(query.toLowerCase()) ||
+          r.description.toLowerCase().contains(query.toLowerCase());
+      
+      final categoryMatches = catId == null || r.categoryId == catId;
+      return queryMatches && categoryMatches;
+    }).toList();
+
+    if (sort == 'NEWEST') {
+      list.sort((a, b) => b.id.compareTo(a.id));
+    } else if (sort == 'TITLE') {
+      list.sort((a, b) => a.title.compareTo(b.title));
+    }
+
+    _cachedFilteredRequests = list;
+    return list;
+  }
+
+  Timer? _debounce;
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _searchQuery = query);
+    });
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -76,24 +121,13 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
                     );
                   }
 
-                  // Apply Filtering
-                  var filteredRequests = state.openRequests.where((r) {
-                    final queryMatches = _searchQuery.isEmpty || 
-                        r.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                        r.description.toLowerCase().contains(_searchQuery.toLowerCase());
-                    
-                    final categoryMatches = _selectedCategoryId == null || 
-                        r.categoryId == _selectedCategoryId;
-
-                    return queryMatches && categoryMatches;
-                  }).toList();
-
-                  // Apply Sorting
-                  if (_sortBy == 'NEWEST') {
-                    filteredRequests.sort((a, b) => b.id.compareTo(a.id));
-                  } else if (_sortBy == 'TITLE') {
-                    filteredRequests.sort((a, b) => a.title.compareTo(b.title));
-                  }
+                  // 🚀 Optimization: Filter and Sort only when necessary
+                  final filteredRequests = useMemoizedFilteredRequests(
+                    state.openRequests,
+                    _searchQuery,
+                    _selectedCategoryId,
+                    _sortBy,
+                  );
 
                   if (filteredRequests.isNotEmpty) {
                     return ListView.separated(
@@ -101,10 +135,14 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
                       physics: const AlwaysScrollableScrollPhysics(
                         parent: BouncingScrollPhysics(),
                       ),
+                      cacheExtent: 500, // Pre-cache items for smoother scrolling
                       itemCount: filteredRequests.length,
                       separatorBuilder: (context, index) => const SizedBox(height: 20),
-                      itemBuilder: (context, index) =>
-                          _buildRequestCard(context, filteredRequests[index]),
+                      itemBuilder: (context, index) {
+                        return RepaintBoundary(
+                          child: _buildRequestCard(context, filteredRequests[index]),
+                        );
+                      },
                     );
                   }
 
@@ -212,7 +250,7 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
               ),
               child: TextField(
                 controller: _searchController,
-                onChanged: (val) => setState(() => _searchQuery = val),
+                onChanged: _onSearchChanged,
                 decoration: InputDecoration(
                   hintText: 'ابحث عن طلبات...',
                   hintStyle: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled),
@@ -373,7 +411,7 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
                     Text(
                       request.title,
                       style: AppTypography.labelLarge.copyWith(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -427,10 +465,8 @@ class _VendorRequestsPageState extends State<VendorRequestsPage> {
                 height: 44,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 onPressed: () {
-                  showModalBottomSheet(
+                  showDialog(
                     context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
                     builder: (context) => SubmitBidModal(request: request),
                   );
                 },

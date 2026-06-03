@@ -16,7 +16,7 @@ export async function PATCH(
     const body = ReviewRequestSchema.parse(await req.json());
     const action = body.action;
 
-    const request = await reviewRequest(id, action);
+    const request = await reviewRequest(id, action, user.id);
     return NextResponse.json(request);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';

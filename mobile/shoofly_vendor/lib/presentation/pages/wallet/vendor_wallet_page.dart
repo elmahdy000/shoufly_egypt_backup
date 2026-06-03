@@ -126,53 +126,59 @@ class _VendorWalletPageState extends State<VendorWalletPage> {
 
           return RefreshIndicator(
             onRefresh: _refresh,
-            child: SingleChildScrollView(
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              padding: const EdgeInsets.all(20),
-              child: AppAnimations.staggeredList(
-                staggerDelay: const Duration(milliseconds: 100),
-                children: [
-                  _buildBalanceCard(walletBalance, totalRevenue),
-                  const SizedBox(height: 24),
-                  _buildEarningsSummary(state.vendorTransactions),
-                  const SizedBox(height: 24),
-                  ModernButton(
-                    text: 'طلب سحب أرباح',
-                    icon: Icons.north_east_rounded,
-                    isLoading: state.isLoading,
-                    onPressed: walletBalance >= 50
-                        ? () => _showWithdrawalSheet(walletBalance)
-                        : null,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'آخر العمليات',
-                        style: AppTypography.h4.copyWith(fontWeight: FontWeight.w700),
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.all(20),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      AppAnimations.fadeIn(child: _buildBalanceCard(walletBalance, totalRevenue)),
+                      const SizedBox(height: 24),
+                      AppAnimations.fadeIn(child: _buildEarningsSummary(state.vendorTransactions)),
+                      const SizedBox(height: 24),
+                      ModernButton(
+                        text: 'طلب سحب أرباح',
+                        icon: Icons.north_east_rounded,
+                        isLoading: state.isLoading,
+                        onPressed: walletBalance >= 50
+                            ? () => _showWithdrawalSheet(walletBalance)
+                            : null,
                       ),
-                      if (state.vendorTransactions.isNotEmpty)
-                        IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) => _buildSearchSheet(),
-                            );
-                          },
-                          icon: const Icon(LucideIcons.search, size: 20),
-                        ),
-                    ],
+                      const SizedBox(height: 32),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'آخر العمليات',
+                            style: AppTypography.h4.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          if (state.vendorTransactions.isNotEmpty)
+                            IconButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) => _buildSearchSheet(),
+                                );
+                              },
+                              icon: const Icon(LucideIcons.search, size: 20),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ]),
                   ),
-                  const SizedBox(height: 12),
-                  _buildTransactionsList(filteredTransactions),
-                  const SizedBox(height: 100),
-                ],
-              ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: _buildSliverTransactionsList(filteredTransactions),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
             ),
           );
         },
@@ -326,7 +332,7 @@ class _VendorWalletPageState extends State<VendorWalletPage> {
                       '${walletBalance.toStringAsFixed(2)} ج.م',
                       style: AppTypography.h1.copyWith(
                         color: AppColors.primary,
-                        fontSize: 32,
+                        fontSize: 34,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -389,7 +395,7 @@ class _VendorWalletPageState extends State<VendorWalletPage> {
           style: AppTypography.labelSmall.copyWith(
             color: isUp ? AppColors.success : AppColors.error,
             fontWeight: FontWeight.bold,
-            fontSize: 10,
+            fontSize: 12,
           ),
         ),
       ],
@@ -421,7 +427,7 @@ class _VendorWalletPageState extends State<VendorWalletPage> {
                 style: AppTypography.labelSmall.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -441,80 +447,84 @@ class _VendorWalletPageState extends State<VendorWalletPage> {
     );
   }
 
-  Widget _buildTransactionsList(List<VendorTransaction> transactions) {
+  Widget _buildSliverTransactionsList(List<VendorTransaction> transactions) {
     if (transactions.isEmpty) {
-      return EmptyState(
-        icon: LucideIcons.receiptText,
-        title: 'لا توجد عمليات حالياً',
-        subtitle: 'سيتم تسجيل أي أرباح أو سحوبات هنا',
+      return SliverToBoxAdapter(
+        child: EmptyState(
+          icon: LucideIcons.receiptText,
+          title: 'لا توجد عمليات حالياً',
+          subtitle: 'سيتم تسجيل أي أرباح أو سحوبات هنا',
+        ),
       );
     }
 
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: transactions.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final tx = transactions[index];
-        final amount = tx.amount;
-        final createdAt = tx.createdAt;
-        final type = tx.type;
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final tx = transactions[index];
+          final amount = tx.amount;
+          final createdAt = tx.createdAt;
+          final type = tx.type;
 
-        final isCredit = amount >= 0;
-        final iconColor = isCredit ? AppColors.success : AppColors.error;
-        final txIcon = isCredit ? LucideIcons.arrowDownLeft : LucideIcons.arrowUpRight;
+          final isCredit = amount >= 0;
+          final iconColor = isCredit ? AppColors.success : AppColors.error;
+          final txIcon = isCredit ? LucideIcons.arrowDownLeft : LucideIcons.arrowUpRight;
 
-        return ModernCard(
-          padding: const EdgeInsets.all(16),
-          borderRadius: 20,
-          elevation: 0,
-          borderColor: Theme.of(context).dividerColor,
-          backgroundColor: Theme.of(context).cardTheme.color,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(txIcon, color: iconColor, size: 20),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _transactionTitle(type),
-                      style: AppTypography.labelLarge.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: ModernCard(
+              padding: const EdgeInsets.all(16),
+              borderRadius: 20,
+              elevation: 0,
+              borderColor: Theme.of(context).dividerColor,
+              backgroundColor: Theme.of(context).cardTheme.color,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    Text(
-                      DateFormat(
-                        'd MMMM yyyy - h:mm a',
-                        'ar',
-                      ).format(createdAt),
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textDisabled,
-                      ),
+                    child: Icon(txIcon, color: iconColor, size: 20),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _transactionTitle(type),
+                          style: AppTypography.labelLarge.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          DateFormat(
+                            'd MMMM yyyy - h:mm a',
+                            'ar',
+                          ).format(createdAt),
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.textDisabled,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Text(
+                    '${isCredit ? '+' : ''}${amount.toStringAsFixed(0)} ج.م',
+                    style: AppTypography.labelLarge.copyWith(
+                      color: iconColor,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                '${isCredit ? '+' : ''}${amount.toStringAsFixed(0)} ج.م',
-                style: AppTypography.labelLarge.copyWith(
-                  color: iconColor,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+        childCount: transactions.length,
+      ),
     );
   }
 

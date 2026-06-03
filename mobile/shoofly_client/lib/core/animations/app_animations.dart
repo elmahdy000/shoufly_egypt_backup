@@ -185,7 +185,7 @@ class AnimatedLoadingState extends StatelessWidget {
                 message!,
                 style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 14,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -235,7 +235,7 @@ class AnimatedEmptyState extends StatelessWidget {
             title,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
@@ -246,7 +246,7 @@ class AnimatedEmptyState extends StatelessWidget {
               subtitle!,
               style: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 14,
+                fontSize: 16,
               ),
               textAlign: TextAlign.center,
             ),

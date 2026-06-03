@@ -10,9 +10,9 @@ import {
   Truck, CheckCircle2,
   X, Calendar, User, Phone,
   History, Box, ArrowUpRight, Zap,
-  ChevronLeft, ChevronRight, Filter
+  ChevronLeft, ChevronRight, Filter,
+  AlertCircle
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface OrderRequest {
   id: number;
@@ -41,6 +41,8 @@ export default function AdminRequestsPage() {
   const [selected, setSelected] = useState<OrderRequest | null>(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [page, setPage] = useState(1);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // 🚀 Debounced search for better performance
   const debouncedSearch = useDebounce(search, 150);
@@ -139,7 +141,7 @@ export default function AdminRequestsPage() {
            {/* 📋 Order Ledger */}
            <div className="lg:col-span-8 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden min-h-[600px]">
               <div className="overflow-x-auto">
-                 <table className="w-full text-right">
+                 <table className="w-full text-right min-w-[800px]">
                     <thead>
                        <tr className="bg-slate-50/50 border-b border-slate-100">
                           <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-500">الطلب</th>
@@ -164,12 +166,15 @@ export default function AdminRequestsPage() {
                                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${selected?.id === req.id ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-orange-100 group-hover:text-orange-600'}`}>
                                      <Box size={20} />
                                   </div>
-                                  <div>
-                                     <p className="text-sm font-bold text-slate-900 leading-tight">#{req.id}</p>
-                                     <p className="text-[10px] font-medium text-slate-400 mt-1">{formatDate(req.createdAt)}</p>
-                                  </div>
-                               </div>
-                            </td>
+                                   <div>
+                                      <p className="text-sm font-bold text-slate-900 leading-tight line-clamp-1">{req.title || `طلب رقم #${req.id}`}</p>
+                                      <div className="flex items-center gap-2 mt-1">
+                                         <span className="text-[9px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">#{req.id}</span>
+                                         <span className="text-[10px] font-medium text-slate-400" dir="ltr">{formatDate(req.createdAt)}</span>
+                                      </div>
+                                   </div>
+                                </div>
+                             </td>
                             <td className="px-6 py-5 text-center">
                                <StatusBadge status={req.status} />
                             </td>
@@ -179,7 +184,7 @@ export default function AdminRequestsPage() {
                                   <span className="text-sm font-semibold text-slate-700">{req.client?.fullName || "عميل النظام"}</span>
                                </div>
                             </td>
-                            <td className="px-6 py-5 text-left font-jakarta text-lg font-bold text-slate-900 tracking-tight">
+                            <td className="px-6 py-5 text-left font-jakarta text-lg font-bold text-slate-900 tracking-tight" dir="ltr">
                                {formatCurrency(req.total)}
                             </td>
                          </tr>
@@ -218,12 +223,8 @@ export default function AdminRequestsPage() {
            </div>
 
            {/* 🛡️ Order Inspector */}
-           <AnimatePresence mode="wait">
               {selected ? (
-                 <motion.aside
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
+                 <aside
                     className="lg:col-span-4 bg-white rounded-2xl p-4 lg:p-8 border border-slate-200 shadow-sm lg:sticky lg:top-32 overflow-hidden"
                  >
                     <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
@@ -261,39 +262,56 @@ export default function AdminRequestsPage() {
                     </div>
 
                     <div className="mt-8 pt-8 border-t border-slate-100 space-y-3">
-                       {selected.status === 'PENDING_ADMIN_REVISION' ? (
-                          <div className="grid grid-cols-2 gap-3">
-                             <button 
-                               onClick={async () => {
-                                 await apiFetch(`/api/admin/requests/${selected.id}/review`, "ADMIN", { method: 'PATCH', body: { action: 'approve' } });
-                                 refresh();
-                                 setSelected(null);
-                               }}
-                               className="h-12 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
-                             >
-                                <CheckCircle2 size={16} /> موافقة
-                             </button>
-                             <button 
-                               onClick={async () => {
-                                 await apiFetch(`/api/admin/requests/${selected.id}/review`, "ADMIN", { method: 'PATCH', body: { action: 'reject' } });
-                                 refresh();
-                                 setSelected(null);
-                               }}
-                               className="h-12 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition-all flex items-center justify-center gap-2"
-                             >
-                                <X size={16} /> رفض الطلب
-                             </button>
-                          </div>
-                       ) : (
-<>
+                        {selected.status === 'PENDING_ADMIN_REVISION' ? (
+                           <div className="grid grid-cols-2 gap-3">
+                              <button 
+                                onClick={async () => {
+                                  setErrorMessage(null);
+                                  setSuccessMessage(null);
+                                  try {
+                                    await apiFetch(`/api/admin/requests/${selected.id}/review`, "ADMIN", { method: 'PATCH', body: { action: 'approve' } });
+                                    setSuccessMessage("تمت الموافقة على الطلب بنجاح! ✅");
+                                    refresh();
+                                    setSelected(null);
+                                  } catch (err) {
+                                    setErrorMessage("حدث خطأ أثناء الموافقة على الطلب.");
+                                  }
+                                }}
+                                className="h-12 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
+                              >
+                                 <CheckCircle2 size={16} /> موافقة
+                              </button>
+                              <button 
+                                onClick={async () => {
+                                  setErrorMessage(null);
+                                  setSuccessMessage(null);
+                                  try {
+                                    await apiFetch(`/api/admin/requests/${selected.id}/review`, "ADMIN", { method: 'PATCH', body: { action: 'reject' } });
+                                    setSuccessMessage("تم رفض الطلب بنجاح. ❌");
+                                    refresh();
+                                    setSelected(null);
+                                  } catch (err) {
+                                    setErrorMessage("حدث خطأ أثناء رفض الطلب.");
+                                  }
+                                }}
+                                className="h-12 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition-all flex items-center justify-center gap-2"
+                              >
+                                 <X size={16} /> رفض الطلب
+                              </button>
+                           </div>
+                        ) : (
+                           <>
                               <button 
                                 onClick={async () => {
                                   if (!selected.id) return;
+                                  setErrorMessage(null);
+                                  setSuccessMessage(null);
                                   try {
                                     await apiFetch(`/api/admin/requests/${selected.id}/dispatch`, "ADMIN", { method: 'PATCH' });
+                                    setSuccessMessage("تم تحديث مسار التوصيل بنجاح! 🚚");
                                     refresh();
                                   } catch (err) {
-                                    alert(err instanceof Error ? err.message : 'فشل تحديث المسار');
+                                    setErrorMessage(err instanceof Error ? err.message : 'فشل تحديث المسار');
                                   }
                                 }}
                                 className="w-full h-14 bg-orange-600 text-white rounded-xl font-semibold text-sm shadow-sm hover:bg-orange-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
@@ -304,9 +322,9 @@ export default function AdminRequestsPage() {
                                  <History size={16} /> عرض سجل التغييرات
                               </button>
                            </>
-                       )}
-                    </div>
-                 </motion.aside>
+                        )}
+                     </div>
+                 </aside>
               ) : (
                 <div className="lg:col-span-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-20 flex flex-col items-center justify-center text-center gap-4 text-slate-400">
                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
@@ -315,9 +333,32 @@ export default function AdminRequestsPage() {
                    <p className="text-sm font-medium">اختر طلباً من القائمة لعرض تفاصيله بالكامل</p>
                 </div>
               )}
-           </AnimatePresence>
-        </div>
+         </div>
       </div>
+
+      {/* 🔔 Toast Notifications */}
+      {(successMessage || errorMessage) && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4">
+          {successMessage && (
+            <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-3.5 rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-fade-in font-bold text-xs pointer-events-auto">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="text-emerald-500" size={16} />
+                <span>{successMessage}</span>
+              </div>
+              <button onClick={() => setSuccessMessage(null)} className="text-emerald-400 hover:text-emerald-600"><X size={14} /></button>
+            </div>
+          )}
+          {errorMessage && (
+            <div className="bg-rose-50 text-rose-800 border border-rose-200 px-5 py-3.5 rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-fade-in font-bold text-xs pointer-events-auto">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="text-rose-500" size={16} />
+                <span>{errorMessage}</span>
+              </div>
+              <button onClick={() => setErrorMessage(null)} className="text-rose-400 hover:text-rose-600"><X size={14} /></button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

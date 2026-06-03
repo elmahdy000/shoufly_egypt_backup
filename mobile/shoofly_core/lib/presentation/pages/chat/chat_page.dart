@@ -80,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     Text(
                       'محادثة الطلب #${widget.requestId}',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled, fontSize: 10),
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.textDisabled, fontSize: 12),
                     ),
                   ],
                 ),
@@ -201,7 +201,7 @@ class _ChatPageState extends State<ChatPage> {
               '${message.createdAt.hour}:${message.createdAt.minute.toString().padLeft(2, '0')}',
               style: AppTypography.bodySmall.copyWith(
                 color: isMe ? Colors.white70 : AppColors.textDisabled,
-                fontSize: 10,
+                fontSize: 12,
               ),
             ),
           ],
@@ -237,7 +237,7 @@ class _ChatPageState extends State<ChatPage> {
                 decoration: const InputDecoration(
                   hintText: 'اكتب رسالتك...',
                   border: InputBorder.none,
-                  hintStyle: TextStyle(fontSize: 14),
+                  hintStyle: TextStyle(fontSize: 16),
                 ),
                 maxLines: null,
               ),

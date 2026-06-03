@@ -1,26 +1,11 @@
 "use client";
 
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { useState, useCallback, useEffect } from 'react';
-import { FiUser, FiTruck, FiBox, FiPackage } from 'react-icons/fi';
-import dynamic from 'next/dynamic';
-import "leaflet/dist/leaflet.css";
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow, Polyline } from '@react-google-maps/api';
+import { GOOGLE_MAPS_CONFIG, DEFAULT_CENTER, CLEAN_MAP_STYLE, MAP_MARKERS } from '@/lib/google-maps-loader';
+import { MapPin } from 'lucide-react';
 
-const containerStyle = {
-  width: '100%',
-  height: '100%'
-};
-
-const defaultCenter = {
-  lat: 30.0444, // Cairo
-  lng: 31.2357
-};
-
-// Dynamic imports for Leaflet
-const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), { ssr: false });
-const LeafletMarker = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), { ssr: false });
+const containerStyle = { width: '100%', height: '100%' };
 
 interface MapObject {
   id: string;
@@ -32,148 +17,116 @@ interface MapObject {
   status?: string;
 }
 
-export function OperationsMap({ data }: { data: MapObject[] }) {
-  const [useFreeMaps, setUseFreeMaps] = useState(process.env.NEXT_PUBLIC_USE_FREE_MAPS === 'true');
-  const [L, setL] = useState<any>(null);
-
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: !useFreeMaps ? (process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "") : ""
-  });
-
+export function OperationsMap({ data, selectedOrder }: { data: MapObject[]; selectedOrder?: any }) {
+  const { isLoaded, loadError } = useJsApiLoader(GOOGLE_MAPS_CONFIG);
   const [selected, setSelected] = useState<MapObject | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
 
+  // Refit bounds whenever data or selectedOrder changes
   useEffect(() => {
-    if (loadError || useFreeMaps) {
-      import("leaflet").then((leaflet) => {
-        setL(leaflet);
-        // Fix default icon issue
-        delete (leaflet.Icon.Default.prototype as any)._getIconUrl;
-        leaflet.Icon.Default.mergeOptions({
-          iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-          iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-          shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-        });
+    if (!mapRef.current) return;
+    const pointsToFit: { lat: number; lng: number }[] = [];
+
+    if (selectedOrder) {
+      if (selectedOrder.vendorLat && selectedOrder.vendorLng) {
+        pointsToFit.push({ lat: selectedOrder.vendorLat, lng: selectedOrder.vendorLng });
+      }
+      if (selectedOrder.riderLat && selectedOrder.riderLng) {
+        pointsToFit.push({ lat: selectedOrder.riderLat, lng: selectedOrder.riderLng });
+      }
+      if (selectedOrder.clientLat && selectedOrder.clientLng) {
+        pointsToFit.push({ lat: selectedOrder.clientLat, lng: selectedOrder.clientLng });
+      }
+    }
+
+    if (pointsToFit.length === 0 && data.length > 0) {
+      data.filter(obj => isFinite(obj.lat) && isFinite(obj.lng)).forEach(obj => {
+        pointsToFit.push({ lat: obj.lat, lng: obj.lng });
       });
     }
-  }, [loadError, useFreeMaps]);
 
-  const onLoad = useCallback(function callback(map: google.maps.Map) {
-    const bounds = new window.google.maps.LatLngBounds();
-    if (data.length > 0) {
-      data.forEach(obj => bounds.extend({ lat: obj.lat, lng: obj.lng }));
-      map.fitBounds(bounds);
+    if (pointsToFit.length > 0) {
+      const bounds = new window.google.maps.LatLngBounds();
+      pointsToFit.forEach(pt => bounds.extend(pt));
+      mapRef.current.fitBounds(bounds);
     }
-    setMap(map);
+  }, [data, selectedOrder]);
+
+  const onLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+    if (data.length > 0) {
+      const validPoints = data.filter(obj => isFinite(obj.lat) && isFinite(obj.lng));
+      if (validPoints.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        validPoints.forEach(obj => bounds.extend({ lat: obj.lat, lng: obj.lng }));
+        map.fitBounds(bounds);
+      }
+    }
   }, [data]);
 
-  const onUnmount = useCallback(function callback(map: google.maps.Map) {
-    setMap(null);
-  }, []);
+  const onUnmount = useCallback(() => { mapRef.current = null; }, []);
+
+  const icons = useMemo(() => {
+    if (!isLoaded || !window.google) return null;
+    return {
+      CLIENT: MAP_MARKERS.CLIENT(isLoaded),
+      VENDOR: MAP_MARKERS.VENDOR(isLoaded),
+      RIDER: MAP_MARKERS.RIDER(isLoaded),
+    };
+  }, [isLoaded]);
 
   const getIcon = (type: string) => {
-    if (type === 'CLIENT') return {
-        url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-        scaledSize: new window.google.maps.Size(40, 40)
-    };
-    if (type === 'VENDOR') return {
-        url: 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png',
-        scaledSize: new window.google.maps.Size(40, 40)
-    };
-    if (type === 'RIDER') return {
-        url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        scaledSize: new window.google.maps.Size(40, 40)
-    };
-    return undefined;
+    if (!icons) return undefined;
+    return icons[type as keyof typeof icons] || undefined;
   };
 
-  const getLeafletIcon = (type: string) => {
-    if (!L) return undefined;
-    const colors = {
-      'CLIENT': '#3b82f6',
-      'VENDOR': '#f97316',
-      'RIDER': '#10b981'
-    };
-    const color = colors[type as keyof typeof colors] || '#64748b';
-    
-    return new L.DivIcon({
-      className: 'custom-div-icon',
-      html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
-      popupAnchor: [0, -12]
-    });
-  };
+  const polylinePath = useMemo(() => {
+    if (!selectedOrder) return null;
+    const path = [];
+    if (selectedOrder.vendorLat && selectedOrder.vendorLng) {
+      path.push({ lat: Number(selectedOrder.vendorLat), lng: Number(selectedOrder.vendorLng) });
+    }
+    if (selectedOrder.riderLat && selectedOrder.riderLng) {
+      path.push({ lat: Number(selectedOrder.riderLat), lng: Number(selectedOrder.riderLng) });
+    }
+    if (selectedOrder.clientLat && selectedOrder.clientLng) {
+      path.push({ lat: Number(selectedOrder.clientLat), lng: Number(selectedOrder.clientLng) });
+    }
+    return path.length >= 2 ? path : null;
+  }, [selectedOrder]);
 
-  // Render Leaflet Fallback
-  if ((loadError || useFreeMaps) && L) {
+  if (loadError) {
     return (
-      <div className="w-full h-full rounded-2xl overflow-hidden relative border border-slate-200">
-        <MapContainer 
-          center={[defaultCenter.lat, defaultCenter.lng]} 
-          zoom={12} 
-          style={{ height: "100%", width: "100%" }}
-        >
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          />
-          {data.map((obj) => (
-            <LeafletMarker 
-              key={obj.id} 
-              position={[obj.lat, obj.lng]}
-              icon={getLeafletIcon(obj.type)}
-            >
-              <Popup>
-                <div className="p-1 dir-rtl text-right min-w-[150px]">
-                  <h4 className="font-bold text-slate-900 text-sm mb-0">{obj.title}</h4>
-                  <p className="text-[10px] text-slate-500 mb-1">{obj.subtitle}</p>
-                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold ${
-                      obj.type === 'CLIENT' ? 'bg-blue-100 text-blue-600' :
-                      obj.type === 'VENDOR' ? 'bg-orange-100 text-orange-600' :
-                      'bg-emerald-100 text-emerald-600'
-                  }`}>
-                      {obj.type === 'CLIENT' ? 'طلب عميل' : obj.type === 'VENDOR' ? 'مورد' : 'مندوب'}
-                  </span>
-                </div>
-              </Popup>
-            </LeafletMarker>
-          ))}
-        </MapContainer>
-        <div className="absolute top-4 left-4 z-[1000] bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200 shadow-lg flex items-center gap-2">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="text-[10px] font-bold text-slate-700">وضع الخرائط المجاني (OpenStreetMap)</span>
+      <div className="w-full h-full flex items-center justify-center bg-rose-50 rounded-2xl">
+        <div className="flex flex-col items-center gap-3 text-rose-400">
+          <MapPin size={32} />
+          <p className="text-xs font-bold">فشل تحميل الخريطة — تأكد من مفتاح Google Maps</p>
         </div>
       </div>
     );
   }
 
-  if (!isLoaded && !useFreeMaps) return <div className="w-full h-full bg-slate-100 animate-pulse flex items-center justify-center text-slate-400 font-bold italic">جاري تحميل نظام الخرائط...</div>;
+  if (!isLoaded) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-slate-50 rounded-2xl">
+        <div className="flex flex-col items-center gap-3 text-slate-400">
+          <MapPin size={32} className="animate-pulse" />
+          <p className="text-xs font-bold">جاري تحميل الخريطة...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <GoogleMap
       mapContainerStyle={containerStyle}
-      center={defaultCenter}
+      center={DEFAULT_CENTER}
       zoom={12}
       onLoad={onLoad}
       onUnmount={onUnmount}
-      options={{
-        styles: [
-            {
-              "featureType": "all",
-              "elementType": "labels.text.fill",
-              "stylers": [{"saturation": 36}, {"color": "#333333"}, {"lightness": 40}]
-            },
-            {
-              "featureType": "landscape",
-              "elementType": "all",
-              "stylers": [{"color": "#f2f2f2"}]
-            }
-        ]
-      }}
+      options={{ styles: CLEAN_MAP_STYLE }}
     >
-      {data.map((obj) => (
+      {data.filter(obj => isFinite(obj.lat) && isFinite(obj.lng)).map((obj) => (
         <Marker
           key={obj.id}
           position={{ lat: obj.lat, lng: obj.lng }}
@@ -182,26 +135,38 @@ export function OperationsMap({ data }: { data: MapObject[] }) {
         />
       ))}
 
+      {polylinePath && (
+        <Polyline
+          path={polylinePath}
+          options={{
+            strokeColor: "#1e3a8a", // Navy Blue path line
+            strokeOpacity: 0.8,
+            strokeWeight: 4,
+            geodesic: true,
+          }}
+        />
+      )}
+
       {selected && (
         <InfoWindow
           position={{ lat: selected.lat, lng: selected.lng }}
           onCloseClick={() => setSelected(null)}
         >
           <div className="p-2 dir-rtl text-right min-w-[150px]">
-             <h4 className="font-bold text-slate-900 text-sm mb-1">{selected.title}</h4>
-             <p className="text-[10px] text-slate-500 mb-2">{selected.subtitle}</p>
-             <div className="flex items-center gap-2">
-                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                    selected.type === 'CLIENT' ? 'bg-blue-100 text-blue-600' :
-                    selected.type === 'VENDOR' ? 'bg-orange-100 text-orange-600' :
-                    'bg-emerald-100 text-emerald-600'
-                }`}>
-                    {selected.type === 'CLIENT' ? 'طلب عميل' : selected.type === 'VENDOR' ? 'مورد' : 'مندوب'}
-                </span>
-                {selected.status && (
-                    <span className="text-[9px] font-bold text-slate-400">{selected.status}</span>
-                )}
-             </div>
+            <h4 className="font-bold text-slate-900 text-sm mb-1">{selected.title}</h4>
+            <p className="text-[10px] text-slate-500 mb-2">{selected.subtitle}</p>
+            <div className="flex items-center gap-2">
+              <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                selected.type === 'CLIENT' ? 'bg-blue-100 text-blue-600' :
+                selected.type === 'VENDOR' ? 'bg-orange-100 text-orange-600' :
+                'bg-emerald-100 text-emerald-600'
+              }`}>
+                {selected.type === 'CLIENT' ? 'طلب عميل' : selected.type === 'VENDOR' ? 'مورد' : 'مندوب'}
+              </span>
+              {selected.status && (
+                <span className="text-[9px] font-bold text-slate-400">{selected.status}</span>
+              )}
+            </div>
           </div>
         </InfoWindow>
       )}

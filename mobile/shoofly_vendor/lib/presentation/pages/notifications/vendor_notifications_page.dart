@@ -217,7 +217,7 @@ class _VendorNotificationsPageState extends State<VendorNotificationsPage> {
                     DateFormat('d MMMM yyyy - h:mm a', 'ar').format(createdAt),
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.textDisabled,
-                      fontSize: 10,
+                      fontSize: 12,
                     ),
                   ),
                 ],

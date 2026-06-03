@@ -188,7 +188,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             child: Text(
               data.title,
               style: AppTypography.h1.copyWith(
-                fontSize: 32,
+                fontSize: 34,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
               ),
@@ -204,7 +204,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.6,
-                fontSize: 17,
+                fontSize: 19,
               ),
               textAlign: TextAlign.center,
             ),

@@ -8,12 +8,50 @@ async function testFeedback() {
 
   try {
     // 1. Find a successfully closed request from simulation
-    const request = await prisma.request.findFirst({
+    let request = await prisma.request.findFirst({
         where: { status: 'CLOSED_SUCCESS' },
         include: { client: true }
     });
 
-    if (!request) throw new Error('No closed request found. Run simulation.ts first.');
+    if (!request) {
+      console.log('Creating a dummy closed request for testing feedback...');
+      const client = await prisma.user.findFirst({ where: { role: 'CLIENT' } });
+      const vendor = await prisma.user.findFirst({ where: { role: 'VENDOR' } });
+      const category = await prisma.category.findFirst({ where: { parentId: { not: null } } }) || await prisma.category.findFirst();
+      if (!client || !vendor || !category) throw new Error('Cannot create dummy request: entities missing');
+      
+      const newRequest = await prisma.request.create({
+        data: {
+          clientId: client.id,
+          title: 'Feedback Test Dummy Request',
+          description: 'Dummy description',
+          categoryId: category.id,
+          status: 'CLOSED_SUCCESS',
+          address: 'Test address',
+          latitude: 30.0,
+          longitude: 31.0,
+          deliveryPhone: '01000000000',
+        }
+      });
+      
+      await prisma.bid.create({
+        data: {
+          requestId: newRequest.id,
+          vendorId: vendor.id,
+          description: 'Test Bid',
+          netPrice: 100,
+          clientPrice: 115,
+          status: 'ACCEPTED_BY_CLIENT'
+        }
+      });
+      
+      request = await prisma.request.findUnique({
+        where: { id: newRequest.id },
+        include: { client: true }
+      });
+    }
+
+    if (!request) throw new Error('No closed request found and failed to create dummy.');
 
     // 2. Client leaves a Review
     console.log(`--- Step 1: Client (#${request.clientId}) leaving a 5-star Review ---`);

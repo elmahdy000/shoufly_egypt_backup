@@ -11,7 +11,7 @@
         android:enableOnBackInvokedCallback="true">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCnVbBKPY0fZBGQXW0zbMJiaMNLVkXyY_0" />
+            android:value="AIzaSyCxIQ6xjDfQch3L0BwFSIUHmIsIAVmGqEc" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

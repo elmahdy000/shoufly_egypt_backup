@@ -168,7 +168,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       _formatDate(transaction.createdAt),
                       style: AppTypography.labelSmall.copyWith(
                         color: AppColors.textDisabled,
-                        fontSize: 11,
+                        fontSize: 13,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -214,7 +214,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         text,
         style: AppTypography.labelSmall.copyWith(
           color: color,
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
       ),

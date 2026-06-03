@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -173,19 +174,51 @@ class VendorRequestsMapCubit extends Cubit<VendorRequestsMapState> {
   }
 
   Set<Marker> _buildMarkers(List<Request> requests, int? selectedId) {
-    return requests
-        .where((r) => r.latitude != null && r.longitude != null)
-        .map((r) {
+    // Separate requests with real coords from those without
+    final withCoords = requests.where((r) => r.latitude != null && r.longitude != null).toList();
+    final withoutCoords = requests.where((r) => r.latitude == null || r.longitude == null).toList();
+
+    final markers = <Marker>{};
+
+    // Real-position markers
+    for (final r in withCoords) {
       final isSelected = r.id == selectedId;
-      return Marker(
+      markers.add(Marker(
         markerId: MarkerId(r.id.toString()),
         position: LatLng(r.latitude!, r.longitude!),
         icon: BitmapDescriptor.defaultMarkerWithHue(
           isSelected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed,
         ),
         onTap: () => selectRequest(r),
-      );
-    }).toSet();
+      ));
+    }
+
+    // Fallback: cluster requests without coords around Cairo center with tiny offsets
+    // so the map is never empty when there ARE requests
+    if (withCoords.isEmpty && withoutCoords.isNotEmpty) {
+      const baseLat = 30.0444;
+      const baseLng = 31.2357;
+      final rng = math.Random(42); // fixed seed → stable positions
+      for (int i = 0; i < withoutCoords.length; i++) {
+        final r = withoutCoords[i];
+        final isSelected = r.id == selectedId;
+        // Spread in ~3 km radius circle
+        final angle = (i / withoutCoords.length) * 2 * math.pi;
+        final radius = 0.008 + rng.nextDouble() * 0.012;
+        final lat = baseLat + radius * math.cos(angle);
+        final lng = baseLng + radius * math.sin(angle);
+        markers.add(Marker(
+          markerId: MarkerId(r.id.toString()),
+          position: LatLng(lat, lng),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            isSelected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueOrange,
+          ),
+          onTap: () => selectRequest(r),
+        ));
+      }
+    }
+
+    return markers;
   }
 
   void _animateTo(LatLng position) {

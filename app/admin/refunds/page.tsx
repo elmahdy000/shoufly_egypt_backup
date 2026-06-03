@@ -8,8 +8,6 @@ import {
   AlertTriangle, CheckCircle, FileText, Hash,
   Loader2, Package, RefreshCw, Search, XCircle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-
 type RequestStatus =
   | "PENDING_ADMIN_REVISION"
   | "OPEN_FOR_BIDDING"
@@ -111,18 +109,18 @@ export default function AdminRefundsPage() {
                        </div>
                     </div>
 
-                    <AnimatePresence>
+                    
                        {message && (
-                          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-xs font-bold text-emerald-600 flex items-center gap-2">
+                          <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-xs font-bold text-emerald-600 flex items-center gap-2">
                              <CheckCircle size={16} /> {message}
-                          </motion.div>
+                          </div>
                        )}
                        {error && (
-                          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-xs font-bold text-rose-600 flex items-center gap-2">
+                          <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-xs font-bold text-rose-600 flex items-center gap-2">
                              <XCircle size={16} /> {error}
-                          </motion.div>
+                          </div>
                        )}
-                    </AnimatePresence>
+                    
 
                     <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <div className="space-y-3">
@@ -190,7 +188,7 @@ export default function AdminRefundsPage() {
                  </div>
                  
                  <div className="overflow-x-auto">
-                    <table className="w-full text-right border-collapse">
+                    <table className="w-full text-right border-collapse min-w-[800px]">
                        <thead>
                           <tr className="bg-slate-50 text-slate-500">
                              <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">الشحنة المستهدفة</th>

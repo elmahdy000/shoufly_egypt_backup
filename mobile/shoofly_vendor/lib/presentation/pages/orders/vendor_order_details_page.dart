@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shoofly_core/core/animations/app_animations.dart';
 import 'package:shoofly_core/core/theme/app_colors.dart';
@@ -26,7 +27,12 @@ class VendorOrderDetailsPage extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: 'طلب شوفلي #${request.id}\n${request.title}\n\n${request.description}'));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم نسخ تفاصيل الطلب لمشاركتها', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: AppColors.success),
+              );
+            },
             icon: const Icon(Icons.share_rounded, size: 20),
           ),
           IconButton(
@@ -116,7 +122,7 @@ class VendorOrderDetailsPage extends StatelessWidget {
               ),
               child: Text(
                 '1/${request.images.length}',
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -349,10 +355,8 @@ class VendorOrderDetailsPage extends StatelessWidget {
             child: ModernButton(
               text: 'تقديم عرض سعر',
               onPressed: () {
-                showModalBottomSheet(
+                showDialog(
                   context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
                   builder: (_) => SubmitBidModal(request: request),
                 );
               },
@@ -469,15 +473,66 @@ class VendorOrderDetailsPage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.favorite_border_rounded),
               title: const Text('إضافة إلى المفضلة'),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('تمت الإضافة إلى المفضلة بنجاح', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: AppColors.primary),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.report_gmailerrorred_rounded, color: AppColors.error),
               title: const Text('إبلاغ عن هذا الطلب', style: TextStyle(color: AppColors.error)),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+                _showReportDialog(context);
+              },
             ),
           ],
         ),
+      ),
+    );
+  }
+  void _showReportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('إبلاغ عن الطلب', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('ما هي المشكلة في هذا الطلب؟', style: TextStyle(fontFamily: 'Cairo')),
+            const SizedBox(height: 16),
+            TextField(
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'اكتب تفاصيل البلاغ هنا...',
+                hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo')),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم إرسال البلاغ للإدارة لمراجعته', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: AppColors.success),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('إرسال البلاغ', style: TextStyle(fontFamily: 'Cairo')),
+          ),
+        ],
       ),
     );
   }

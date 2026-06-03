@@ -4,7 +4,7 @@ import { Notify } from '../notifications/hub';
 
 type ReviewAction = 'approve' | 'reject';
 
-export async function reviewRequest(requestId: number, action: ReviewAction) {
+export async function reviewRequest(requestId: number, action: ReviewAction, adminId?: number) {
   logger.info('request.review.started', { requestId, action });
   const request = await prisma.request.findUnique({
     where: { id: requestId },
@@ -78,7 +78,22 @@ export async function reviewRequest(requestId: number, action: ReviewAction) {
     requestId,
     action,
     newStatus: updated.status,
+    adminId,
   });
+
+  // 📝 Log to Admin Audit Trail (Non-blocking)
+  if (adminId) {
+    import('@/lib/services/admin/audit-log').then(({ logAdminAction }) => {
+      logAdminAction({
+        adminId,
+        action: action === 'approve' ? 'REQUEST_APPROVED' : 'REQUEST_REJECTED',
+        targetType: 'REQUEST',
+        targetId: requestId,
+        newValue: updated,
+        metadata: { category: updated.category.name, title: updated.title }
+      });
+    }).catch(() => {});
+  }
 
   return updated;
 }

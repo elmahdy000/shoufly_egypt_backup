@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:shoofly_core/core/di/injection.dart';
@@ -18,6 +20,14 @@ import 'presentation/pages/auth/vendor_login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Use legacy AndroidView renderer to avoid ImageReader buffer exhaustion
+  // on Samsung devices with the newer TLHC (TextureLayer Hybrid Composition) renderer.
+  final mapsImplementation = GoogleMapsFlutterPlatform.instance;
+  if (mapsImplementation is GoogleMapsFlutterAndroid) {
+    mapsImplementation.useAndroidViewSurface = true; // Use legacy Hybrid Composition
+  }
+
   intl.Intl.defaultLocale = 'ar_EG';
   await initializeDateFormatting('ar', null);
   await initInjection();

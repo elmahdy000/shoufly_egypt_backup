@@ -21,6 +21,14 @@ async function writeLogFile(line: string) {
 }
 
 function log(level: LogLevel, event: string, context?: Record<string, unknown>) {
+  const isProduction = process.env.NODE_ENV === "production";
+  
+  // 🚀 Optimization: Skip non-error file logging in production to save I/O
+  if (isProduction && level === "info") {
+    console.info(`[INFO] ${event}`, context ? JSON.stringify(context) : "");
+    return;
+  }
+
   const payload = {
     ts: new Date().toISOString(),
     level,
@@ -28,18 +36,21 @@ function log(level: LogLevel, event: string, context?: Record<string, unknown>) 
     ...(context ?? {}),
   };
   const line = JSON.stringify(payload);
+
   if (level === "error") {
     console.error(line);
     void writeLogFile(line);
     return;
   }
+  
   if (level === "warn") {
     console.warn(line);
-    void writeLogFile(line);
+    if (!isProduction) void writeLogFile(line);
     return;
   }
+
   console.info(line);
-  void writeLogFile(line);
+  if (!isProduction) void writeLogFile(line);
 }
 
 export const logger = {

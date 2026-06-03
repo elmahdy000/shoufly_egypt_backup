@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { ElementType } from "react";
-import { motion } from "framer-motion";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
 import { formatCurrency } from "@/lib/formatters";
@@ -54,16 +53,21 @@ export default function AnalyticsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
+  const selectedRange = useMemo(
+    () => RANGE_OPTIONS.find((opt) => opt.key === dateRange) ?? RANGE_OPTIONS[0],
+    [dateRange]
+  );
+
   const { data: analytics, loading: loadingAnalytics, refresh: refreshAnalytics } = useAsyncData<AnalyticsData>(
     () => apiFetch("/api/admin/analytics/overview", "ADMIN"),
     []
   );
   const { data: transactions, loading: loadingTx, refresh: refreshTx } = useAsyncData<Transaction[]>(
-    () => apiFetch("/api/admin/finance/transactions?limit=500", "ADMIN"),
-    []
+    () => apiFetch(`/api/admin/finance/transactions?limit=200&days=${selectedRange.days}`, "ADMIN"),
+    [selectedRange.days]
   );
   const { data: vendors, loading: loadingVendors, refresh: refreshVendors } = useAsyncData<Vendor[]>(
-    () => apiFetch("/api/admin/vendors?limit=500", "ADMIN"),
+    () => apiFetch("/api/admin/vendors?limit=10", "ADMIN"),
     []
   );
 
@@ -73,11 +77,6 @@ export default function AnalyticsPage() {
     setLastUpdated(new Date());
     setIsRefreshing(false);
   }, [refreshAnalytics, refreshTx, refreshVendors]);
-
-  const selectedRange = useMemo(
-    () => RANGE_OPTIONS.find((opt) => opt.key === dateRange) ?? RANGE_OPTIONS[0],
-    [dateRange]
-  );
 
   const filteredTransactions = useMemo(() => {
     const list = transactions ?? [];
@@ -223,12 +222,10 @@ export default function AnalyticsPage() {
               {trends.map((item, i) => {
                 const pct = Math.max((item.requests / maxTrendRequests) * 100, 8);
                 return (
-                  <div key={item.day} className="flex-1 flex flex-col items-center gap-3 group">
-                    <div className="relative w-full h-full flex items-end justify-center">
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${pct}%` }}
-                        transition={{ delay: i * 0.05, type: 'spring' }}
+                  <div key={item.day} className="flex-1 h-full flex flex-col items-center gap-3 group">
+                    <div className="relative w-full flex-1 flex items-end justify-center">
+                      <div
+                        style={{ height: `${pct}%` }}
                         className="w-full max-w-[40px] rounded-t-lg bg-gradient-to-t from-indigo-600 to-indigo-400 group-hover:from-indigo-500 group-hover:to-indigo-300 transition-all shadow-sm"
                       />
                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-[10px] font-semibold px-2 py-1 rounded shadow-md whitespace-nowrap z-20">
@@ -332,10 +329,8 @@ export default function AnalyticsPage() {
                       <span className="text-xs font-black text-slate-900 font-jakarta">{category.requestCount}</span>
                     </div>
                     <div className="h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shadow-inner">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${pct}%` }}
-                        transition={{ duration: 1, type: 'spring' }}
+                      <div
+                        style={{ width: `${pct}%` }}
                         className="h-full rounded-full bg-gradient-to-r from-orange-500 to-orange-400"
                       />
                     </div>

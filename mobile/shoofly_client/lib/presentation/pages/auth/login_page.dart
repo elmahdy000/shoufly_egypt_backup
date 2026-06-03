@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       delay: const Duration(milliseconds: 200),
                       child: Text(
                         'مرحباً بك مجدداً',
-                        style: AppTypography.h2.copyWith(fontSize: 28, fontWeight: FontWeight.w900),
+                        style: AppTypography.h2.copyWith(fontSize: 30, fontWeight: FontWeight.w900),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         'سجل دخولك للوصول لأفضل الموردين في مصر',
                         style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                       ),
                     ),
@@ -125,13 +125,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('سيتم تفعيل ميزة استعادة كلمة المرور قريباً', style: TextStyle(fontFamily: 'Cairo'))),
+                      );
+                    },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                     child: Text(
                       'نسيت كلمة المرور؟',
                       style: AppTypography.labelLarge.copyWith(
                         color: AppColors.primary,
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -199,7 +203,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         ),
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w800, fontSize: 15),
+        labelStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w800, fontSize: 17),
         tabs: const [
           Tab(text: 'رقم الهاتف'),
           Tab(text: 'البريد الإلكتروني'),
@@ -269,7 +273,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           padding: const EdgeInsets.only(right: 4, bottom: 8),
           child: Text(
             label,
-            style: AppTypography.labelLarge.copyWith(fontSize: 14, fontWeight: FontWeight.w800),
+            style: AppTypography.labelLarge.copyWith(fontSize: 16, fontWeight: FontWeight.w800),
           ),
         ),
         TextField(
@@ -360,7 +364,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   )
                 : const Text(
                     'دخول للنظام',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                   ),
           ),
         );
@@ -378,7 +382,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             'أو المتابعة من خلال',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textDisabled,
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -390,7 +394,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   Widget _buildGoogleButton() {
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تسجيل الدخول بواسطة جوجل سيكون متاحاً في التحديث القادم', style: TextStyle(fontFamily: 'Cairo'))),
+        );
+      },
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 64),
         side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
@@ -411,7 +419,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             style: AppTypography.labelLarge.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w800,
-              fontSize: 16,
+              fontSize: 18,
             ),
           ),
         ],
@@ -443,7 +451,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               style: AppTypography.labelLarge.copyWith(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w900,
-                fontSize: 15,
+                fontSize: 17,
               ),
             ),
           ),

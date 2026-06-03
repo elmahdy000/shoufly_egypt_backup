@@ -17,12 +17,15 @@ export async function GET(req: NextRequest) {
 
     return ok({
       commission: settings ? Number(settings.commissionPercent) : 15,
-      vat: 14, // Default VAT
+      vat: settings ? Number(settings.vatPercent) : 14,
       radius: settings?.maxRadiusKm || 50,
-      minOrder: 100, // Default min order
+      minOrder: settings ? Number(settings.minOrderAmount) : 100,
       minVendorMatch: settings?.minVendorMatchCount || 3,
       initialRadius: settings?.initialRadiusKm || 5,
-      radiusStep: settings?.radiusExpansionStepKm || 5
+      radiusStep: settings?.radiusExpansionStepKm || 5,
+      autoPayout: settings?.autoPayoutEnabled ?? true,
+      verifyRequired: settings?.verifyRequired ?? true,
+      otpDelivery: settings?.otpDeliveryEnabled ?? true,
     });
 
   } catch (error) {
@@ -39,43 +42,63 @@ export async function POST(req: NextRequest) {
     requireRole(user, 'ADMIN');
 
     const body = await req.json();
-    const { commission, vat, radius, minOrder, minVendorMatch, initialRadius, radiusStep } = body;
+    const { 
+      commission, 
+      vat, 
+      radius, 
+      minOrder, 
+      minVendorMatch, 
+      initialRadius, 
+      radiusStep,
+      autoPayout,
+      verifyRequired,
+      otpDelivery 
+    } = body;
 
     // 🛡️ VALIDATION: Ensure settings values are within acceptable ranges
-    if (typeof commission !== 'number' || commission < 0 || commission > 50) {
+    if (typeof commission === 'number' && (commission < 0 || commission > 50)) {
       return ok({ error: 'عمولة المنصة يجب أن تكون بين 0% و 50%' }, 400);
     }
     if (typeof vat === 'number' && (vat < 0 || vat > 30)) {
       return ok({ error: 'ضريبة القيمة المضافة يجب أن تكون بين 0% و 30%' }, 400);
     }
-    if (typeof radius !== 'number' || radius < 1 || radius > 500) {
+    if (typeof radius === 'number' && (radius < 1 || radius > 500)) {
       return ok({ error: 'نطاق البحث يجب أن يكون بين 1 و 500 كم' }, 400);
     }
     if (typeof minOrder === 'number' && (minOrder < 0 || minOrder > 10000)) {
       return ok({ error: 'الحد الأدنى للطلب يجب أن يكون بين 0 و 10,000 ج.م' }, 400);
     }
-    if (typeof minVendorMatch !== 'number' || minVendorMatch < 1 || minVendorMatch > 20) {
-      return ok({ error: 'الحد الأدنى لمطابقة الموردين يجب أن يكون بين 1 و 20' }, 400);
+    // Additional validations — missing before
+    if (typeof radiusStep === 'number' && radiusStep <= 0) {
+      return ok({ error: 'خطوة توسع النطاق يجب أن تكون أكبر من صفر' }, 400);
     }
-    if (typeof initialRadius !== 'number' || initialRadius < 1 || initialRadius > 100) {
-      return ok({ error: 'نطاق البحث الابتدائي يجب أن يكون بين 1 و 100 كم' }, 400);
+    if (typeof initialRadius === 'number' && initialRadius <= 0) {
+      return ok({ error: 'النطاق الابتدائي يجب أن يكون أكبر من صفر' }, 400);
     }
-    if (typeof radiusStep !== 'number' || radiusStep < 1 || radiusStep > 50) {
-      return ok({ error: 'خطوة توسيع النطاق يجب أن تكون بين 1 و 50 كم' }, 400);
+    if (typeof initialRadius === 'number' && typeof radius === 'number' && initialRadius > radius) {
+      return ok({ error: 'النطاق الابتدائي لا يمكن أن يتجاوز النطاق الأقصى' }, 400);
+    }
+    if (typeof minVendorMatch === 'number' && minVendorMatch < 1) {
+      return ok({ error: 'الحد الأدنى لعدد الموردين يجب أن يكون 1 على الأقل' }, 400);
     }
 
     // Get the current settings first
     const currentSettings = await getPlatformSettings();
 
-    // Upsert settings
+    // Update settings
     const settings = await prisma.platformSetting.update({
       where: { id: currentSettings.id },
       data: {
-        commissionPercent: commission,
-        maxRadiusKm: radius,
-        minVendorMatchCount: minVendorMatch,
-        initialRadiusKm: initialRadius,
-        radiusExpansionStepKm: radiusStep
+        commissionPercent: commission ?? undefined,
+        vatPercent: vat ?? undefined,
+        minOrderAmount: minOrder ?? undefined,
+        maxRadiusKm: radius ?? undefined,
+        minVendorMatchCount: minVendorMatch ?? undefined,
+        initialRadiusKm: initialRadius ?? undefined,
+        radiusExpansionStepKm: radiusStep ?? undefined,
+        autoPayoutEnabled: autoPayout ?? undefined,
+        verifyRequired: verifyRequired ?? undefined,
+        otpDeliveryEnabled: otpDelivery ?? undefined,
       }
     });
 
@@ -83,10 +106,15 @@ export async function POST(req: NextRequest) {
       success: true,
       settings: {
         commission: Number(settings.commissionPercent),
+        vat: Number(settings.vatPercent),
+        minOrder: Number(settings.minOrderAmount),
         radius: settings.maxRadiusKm,
         minVendorMatch: settings.minVendorMatchCount,
         initialRadius: settings.initialRadiusKm,
-        radiusStep: settings.radiusExpansionStepKm
+        radiusStep: settings.radiusExpansionStepKm,
+        autoPayout: settings.autoPayoutEnabled,
+        verifyRequired: settings.verifyRequired,
+        otpDelivery: settings.otpDeliveryEnabled,
       }
     };
     

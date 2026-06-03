@@ -142,7 +142,7 @@ export default function VendorRequestsPage() {
             <select
               value={selectedGov}
               onChange={(e) => handleGovChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-primary transition-all appearance-none"
+              className="w-full pr-10 pl-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-primary transition-all appearance-none"
             >
               <option value="">كل المحافظات</option>
               {governorates.map((gov: any) => (
@@ -156,7 +156,7 @@ export default function VendorRequestsPage() {
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-primary transition-all appearance-none"
+              className="w-full pr-10 pl-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-primary transition-all appearance-none"
               disabled={!selectedGov}
             >
               <option value="">كل المدن</option>

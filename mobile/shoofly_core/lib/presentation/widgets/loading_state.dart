@@ -65,7 +65,7 @@ class LoadingState extends StatelessWidget {
               "لحظات والبيانات تكون عندك...",
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.textSecondary,
-                fontSize: 11,
+                fontSize: 13,
               ),
               textAlign: TextAlign.center,
             ),

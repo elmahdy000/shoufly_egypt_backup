@@ -9,7 +9,6 @@ import {
   CheckCircle, XCircle, Search, Filter,
   ArrowLeft, MessageSquare, FileText, Zap
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 interface FlaggedContent {
@@ -136,8 +135,7 @@ export default function AdminVisionPage() {
               ) : (
                 <div className="space-y-4">
                   {filtered.map((item) => (
-                    <motion.div
-                      layout
+                    <div
                       key={item.id}
                       onClick={() => setSelected(item)}
                       className={`p-6 rounded-2xl border transition-all cursor-pointer group bg-white hover:shadow-xl hover:-translate-y-0.5 ${selected?.id === item.id ? 'border-primary ring-2 ring-primary/10' : 'border-slate-100'}`}
@@ -164,19 +162,15 @@ export default function AdminVisionPage() {
                           <ChevronLeft size={16} className="text-slate-300 group-hover:text-primary transition-all" />
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               )}
            </div>
 
            {/* 🛡️ Decision Side Panel */}
-           <AnimatePresence>
               {selected ? (
-                <motion.aside
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
+                <aside
                   className="lg:col-span-4 bg-white rounded-3xl p-8 border border-slate-200 shadow-2xl sticky top-28 space-y-8 overflow-hidden"
                 >
                   <div className="flex items-center justify-between border-b border-slate-100 pb-6">
@@ -220,7 +214,7 @@ export default function AdminVisionPage() {
                       </button>
                     </div>
                   </div>
-                </motion.aside>
+                </aside>
               ) : (
                 <div className="lg:col-span-4 h-[500px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center text-slate-400 gap-4">
                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm">
@@ -229,7 +223,6 @@ export default function AdminVisionPage() {
                    <p className="text-sm font-medium">اختر بلاغاً لبدء المراجعة والقرار</p>
                 </div>
               )}
-           </AnimatePresence>
         </div>
       </div>
     </div>

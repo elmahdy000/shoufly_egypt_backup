@@ -22041,6 +22041,8 @@ export namespace Prisma {
   export type PlatformSettingAvgAggregateOutputType = {
     id: number | null
     commissionPercent: Decimal | null
+    vatPercent: Decimal | null
+    minOrderAmount: Decimal | null
     minVendorMatchCount: number | null
     initialRadiusKm: number | null
     maxRadiusKm: number | null
@@ -22050,6 +22052,8 @@ export namespace Prisma {
   export type PlatformSettingSumAggregateOutputType = {
     id: number | null
     commissionPercent: Decimal | null
+    vatPercent: Decimal | null
+    minOrderAmount: Decimal | null
     minVendorMatchCount: number | null
     initialRadiusKm: number | null
     maxRadiusKm: number | null
@@ -22059,30 +22063,45 @@ export namespace Prisma {
   export type PlatformSettingMinAggregateOutputType = {
     id: number | null
     commissionPercent: Decimal | null
+    vatPercent: Decimal | null
+    minOrderAmount: Decimal | null
     minVendorMatchCount: number | null
     initialRadiusKm: number | null
     maxRadiusKm: number | null
     radiusExpansionStepKm: number | null
+    autoPayoutEnabled: boolean | null
+    verifyRequired: boolean | null
+    otpDeliveryEnabled: boolean | null
     updatedAt: Date | null
   }
 
   export type PlatformSettingMaxAggregateOutputType = {
     id: number | null
     commissionPercent: Decimal | null
+    vatPercent: Decimal | null
+    minOrderAmount: Decimal | null
     minVendorMatchCount: number | null
     initialRadiusKm: number | null
     maxRadiusKm: number | null
     radiusExpansionStepKm: number | null
+    autoPayoutEnabled: boolean | null
+    verifyRequired: boolean | null
+    otpDeliveryEnabled: boolean | null
     updatedAt: Date | null
   }
 
   export type PlatformSettingCountAggregateOutputType = {
     id: number
     commissionPercent: number
+    vatPercent: number
+    minOrderAmount: number
     minVendorMatchCount: number
     initialRadiusKm: number
     maxRadiusKm: number
     radiusExpansionStepKm: number
+    autoPayoutEnabled: number
+    verifyRequired: number
+    otpDeliveryEnabled: number
     updatedAt: number
     _all: number
   }
@@ -22091,6 +22110,8 @@ export namespace Prisma {
   export type PlatformSettingAvgAggregateInputType = {
     id?: true
     commissionPercent?: true
+    vatPercent?: true
+    minOrderAmount?: true
     minVendorMatchCount?: true
     initialRadiusKm?: true
     maxRadiusKm?: true
@@ -22100,6 +22121,8 @@ export namespace Prisma {
   export type PlatformSettingSumAggregateInputType = {
     id?: true
     commissionPercent?: true
+    vatPercent?: true
+    minOrderAmount?: true
     minVendorMatchCount?: true
     initialRadiusKm?: true
     maxRadiusKm?: true
@@ -22109,30 +22132,45 @@ export namespace Prisma {
   export type PlatformSettingMinAggregateInputType = {
     id?: true
     commissionPercent?: true
+    vatPercent?: true
+    minOrderAmount?: true
     minVendorMatchCount?: true
     initialRadiusKm?: true
     maxRadiusKm?: true
     radiusExpansionStepKm?: true
+    autoPayoutEnabled?: true
+    verifyRequired?: true
+    otpDeliveryEnabled?: true
     updatedAt?: true
   }
 
   export type PlatformSettingMaxAggregateInputType = {
     id?: true
     commissionPercent?: true
+    vatPercent?: true
+    minOrderAmount?: true
     minVendorMatchCount?: true
     initialRadiusKm?: true
     maxRadiusKm?: true
     radiusExpansionStepKm?: true
+    autoPayoutEnabled?: true
+    verifyRequired?: true
+    otpDeliveryEnabled?: true
     updatedAt?: true
   }
 
   export type PlatformSettingCountAggregateInputType = {
     id?: true
     commissionPercent?: true
+    vatPercent?: true
+    minOrderAmount?: true
     minVendorMatchCount?: true
     initialRadiusKm?: true
     maxRadiusKm?: true
     radiusExpansionStepKm?: true
+    autoPayoutEnabled?: true
+    verifyRequired?: true
+    otpDeliveryEnabled?: true
     updatedAt?: true
     _all?: true
   }
@@ -22226,10 +22264,15 @@ export namespace Prisma {
   export type PlatformSettingGroupByOutputType = {
     id: number
     commissionPercent: Decimal
+    vatPercent: Decimal
+    minOrderAmount: Decimal
     minVendorMatchCount: number
     initialRadiusKm: number
     maxRadiusKm: number
     radiusExpansionStepKm: number
+    autoPayoutEnabled: boolean
+    verifyRequired: boolean
+    otpDeliveryEnabled: boolean
     updatedAt: Date
     _count: PlatformSettingCountAggregateOutputType | null
     _avg: PlatformSettingAvgAggregateOutputType | null
@@ -22255,44 +22298,64 @@ export namespace Prisma {
   export type PlatformSettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     commissionPercent?: boolean
+    vatPercent?: boolean
+    minOrderAmount?: boolean
     minVendorMatchCount?: boolean
     initialRadiusKm?: boolean
     maxRadiusKm?: boolean
     radiusExpansionStepKm?: boolean
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["platformSetting"]>
 
   export type PlatformSettingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     commissionPercent?: boolean
+    vatPercent?: boolean
+    minOrderAmount?: boolean
     minVendorMatchCount?: boolean
     initialRadiusKm?: boolean
     maxRadiusKm?: boolean
     radiusExpansionStepKm?: boolean
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["platformSetting"]>
 
   export type PlatformSettingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     commissionPercent?: boolean
+    vatPercent?: boolean
+    minOrderAmount?: boolean
     minVendorMatchCount?: boolean
     initialRadiusKm?: boolean
     maxRadiusKm?: boolean
     radiusExpansionStepKm?: boolean
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["platformSetting"]>
 
   export type PlatformSettingSelectScalar = {
     id?: boolean
     commissionPercent?: boolean
+    vatPercent?: boolean
+    minOrderAmount?: boolean
     minVendorMatchCount?: boolean
     initialRadiusKm?: boolean
     maxRadiusKm?: boolean
     radiusExpansionStepKm?: boolean
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: boolean
   }
 
-  export type PlatformSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "commissionPercent" | "minVendorMatchCount" | "initialRadiusKm" | "maxRadiusKm" | "radiusExpansionStepKm" | "updatedAt", ExtArgs["result"]["platformSetting"]>
+  export type PlatformSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "commissionPercent" | "vatPercent" | "minOrderAmount" | "minVendorMatchCount" | "initialRadiusKm" | "maxRadiusKm" | "radiusExpansionStepKm" | "autoPayoutEnabled" | "verifyRequired" | "otpDeliveryEnabled" | "updatedAt", ExtArgs["result"]["platformSetting"]>
 
   export type $PlatformSettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PlatformSetting"
@@ -22300,10 +22363,15 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       commissionPercent: Prisma.Decimal
+      vatPercent: Prisma.Decimal
+      minOrderAmount: Prisma.Decimal
       minVendorMatchCount: number
       initialRadiusKm: number
       maxRadiusKm: number
       radiusExpansionStepKm: number
+      autoPayoutEnabled: boolean
+      verifyRequired: boolean
+      otpDeliveryEnabled: boolean
       updatedAt: Date
     }, ExtArgs["result"]["platformSetting"]>
     composites: {}
@@ -22730,10 +22798,15 @@ export namespace Prisma {
   interface PlatformSettingFieldRefs {
     readonly id: FieldRef<"PlatformSetting", 'Int'>
     readonly commissionPercent: FieldRef<"PlatformSetting", 'Decimal'>
+    readonly vatPercent: FieldRef<"PlatformSetting", 'Decimal'>
+    readonly minOrderAmount: FieldRef<"PlatformSetting", 'Decimal'>
     readonly minVendorMatchCount: FieldRef<"PlatformSetting", 'Int'>
     readonly initialRadiusKm: FieldRef<"PlatformSetting", 'Int'>
     readonly maxRadiusKm: FieldRef<"PlatformSetting", 'Int'>
     readonly radiusExpansionStepKm: FieldRef<"PlatformSetting", 'Int'>
+    readonly autoPayoutEnabled: FieldRef<"PlatformSetting", 'Boolean'>
+    readonly verifyRequired: FieldRef<"PlatformSetting", 'Boolean'>
+    readonly otpDeliveryEnabled: FieldRef<"PlatformSetting", 'Boolean'>
     readonly updatedAt: FieldRef<"PlatformSetting", 'DateTime'>
   }
     
@@ -29245,10 +29318,15 @@ export namespace Prisma {
   export const PlatformSettingScalarFieldEnum: {
     id: 'id',
     commissionPercent: 'commissionPercent',
+    vatPercent: 'vatPercent',
+    minOrderAmount: 'minOrderAmount',
     minVendorMatchCount: 'minVendorMatchCount',
     initialRadiusKm: 'initialRadiusKm',
     maxRadiusKm: 'maxRadiusKm',
     radiusExpansionStepKm: 'radiusExpansionStepKm',
+    autoPayoutEnabled: 'autoPayoutEnabled',
+    verifyRequired: 'verifyRequired',
+    otpDeliveryEnabled: 'otpDeliveryEnabled',
     updatedAt: 'updatedAt'
   };
 
@@ -30941,20 +31019,30 @@ export namespace Prisma {
     NOT?: PlatformSettingWhereInput | PlatformSettingWhereInput[]
     id?: IntFilter<"PlatformSetting"> | number
     commissionPercent?: DecimalFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntFilter<"PlatformSetting"> | number
     initialRadiusKm?: IntFilter<"PlatformSetting"> | number
     maxRadiusKm?: IntFilter<"PlatformSetting"> | number
     radiusExpansionStepKm?: IntFilter<"PlatformSetting"> | number
+    autoPayoutEnabled?: BoolFilter<"PlatformSetting"> | boolean
+    verifyRequired?: BoolFilter<"PlatformSetting"> | boolean
+    otpDeliveryEnabled?: BoolFilter<"PlatformSetting"> | boolean
     updatedAt?: DateTimeFilter<"PlatformSetting"> | Date | string
   }
 
   export type PlatformSettingOrderByWithRelationInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder
     radiusExpansionStepKm?: SortOrder
+    autoPayoutEnabled?: SortOrder
+    verifyRequired?: SortOrder
+    otpDeliveryEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -30964,20 +31052,30 @@ export namespace Prisma {
     OR?: PlatformSettingWhereInput[]
     NOT?: PlatformSettingWhereInput | PlatformSettingWhereInput[]
     commissionPercent?: DecimalFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntFilter<"PlatformSetting"> | number
     initialRadiusKm?: IntFilter<"PlatformSetting"> | number
     maxRadiusKm?: IntFilter<"PlatformSetting"> | number
     radiusExpansionStepKm?: IntFilter<"PlatformSetting"> | number
+    autoPayoutEnabled?: BoolFilter<"PlatformSetting"> | boolean
+    verifyRequired?: BoolFilter<"PlatformSetting"> | boolean
+    otpDeliveryEnabled?: BoolFilter<"PlatformSetting"> | boolean
     updatedAt?: DateTimeFilter<"PlatformSetting"> | Date | string
   }, "id">
 
   export type PlatformSettingOrderByWithAggregationInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder
     radiusExpansionStepKm?: SortOrder
+    autoPayoutEnabled?: SortOrder
+    verifyRequired?: SortOrder
+    otpDeliveryEnabled?: SortOrder
     updatedAt?: SortOrder
     _count?: PlatformSettingCountOrderByAggregateInput
     _avg?: PlatformSettingAvgOrderByAggregateInput
@@ -30992,10 +31090,15 @@ export namespace Prisma {
     NOT?: PlatformSettingScalarWhereWithAggregatesInput | PlatformSettingScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"PlatformSetting"> | number
     commissionPercent?: DecimalWithAggregatesFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalWithAggregatesFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalWithAggregatesFilter<"PlatformSetting"> | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntWithAggregatesFilter<"PlatformSetting"> | number
     initialRadiusKm?: IntWithAggregatesFilter<"PlatformSetting"> | number
     maxRadiusKm?: IntWithAggregatesFilter<"PlatformSetting"> | number
     radiusExpansionStepKm?: IntWithAggregatesFilter<"PlatformSetting"> | number
+    autoPayoutEnabled?: BoolWithAggregatesFilter<"PlatformSetting"> | boolean
+    verifyRequired?: BoolWithAggregatesFilter<"PlatformSetting"> | boolean
+    otpDeliveryEnabled?: BoolWithAggregatesFilter<"PlatformSetting"> | boolean
     updatedAt?: DateTimeWithAggregatesFilter<"PlatformSetting"> | Date | string
   }
 
@@ -32747,68 +32850,103 @@ export namespace Prisma {
 
   export type PlatformSettingCreateInput = {
     commissionPercent?: Decimal | DecimalJsLike | number | string
+    vatPercent?: Decimal | DecimalJsLike | number | string
+    minOrderAmount?: Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: number
     initialRadiusKm?: number
     maxRadiusKm?: number
     radiusExpansionStepKm?: number
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: Date | string
   }
 
   export type PlatformSettingUncheckedCreateInput = {
     id?: number
     commissionPercent?: Decimal | DecimalJsLike | number | string
+    vatPercent?: Decimal | DecimalJsLike | number | string
+    minOrderAmount?: Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: number
     initialRadiusKm?: number
     maxRadiusKm?: number
     radiusExpansionStepKm?: number
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: Date | string
   }
 
   export type PlatformSettingUpdateInput = {
     commissionPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntFieldUpdateOperationsInput | number
     initialRadiusKm?: IntFieldUpdateOperationsInput | number
     maxRadiusKm?: IntFieldUpdateOperationsInput | number
     radiusExpansionStepKm?: IntFieldUpdateOperationsInput | number
+    autoPayoutEnabled?: BoolFieldUpdateOperationsInput | boolean
+    verifyRequired?: BoolFieldUpdateOperationsInput | boolean
+    otpDeliveryEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PlatformSettingUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     commissionPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntFieldUpdateOperationsInput | number
     initialRadiusKm?: IntFieldUpdateOperationsInput | number
     maxRadiusKm?: IntFieldUpdateOperationsInput | number
     radiusExpansionStepKm?: IntFieldUpdateOperationsInput | number
+    autoPayoutEnabled?: BoolFieldUpdateOperationsInput | boolean
+    verifyRequired?: BoolFieldUpdateOperationsInput | boolean
+    otpDeliveryEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PlatformSettingCreateManyInput = {
     id?: number
     commissionPercent?: Decimal | DecimalJsLike | number | string
+    vatPercent?: Decimal | DecimalJsLike | number | string
+    minOrderAmount?: Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: number
     initialRadiusKm?: number
     maxRadiusKm?: number
     radiusExpansionStepKm?: number
+    autoPayoutEnabled?: boolean
+    verifyRequired?: boolean
+    otpDeliveryEnabled?: boolean
     updatedAt?: Date | string
   }
 
   export type PlatformSettingUpdateManyMutationInput = {
     commissionPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntFieldUpdateOperationsInput | number
     initialRadiusKm?: IntFieldUpdateOperationsInput | number
     maxRadiusKm?: IntFieldUpdateOperationsInput | number
     radiusExpansionStepKm?: IntFieldUpdateOperationsInput | number
+    autoPayoutEnabled?: BoolFieldUpdateOperationsInput | boolean
+    verifyRequired?: BoolFieldUpdateOperationsInput | boolean
+    otpDeliveryEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PlatformSettingUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     commissionPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    vatPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    minOrderAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     minVendorMatchCount?: IntFieldUpdateOperationsInput | number
     initialRadiusKm?: IntFieldUpdateOperationsInput | number
     maxRadiusKm?: IntFieldUpdateOperationsInput | number
     radiusExpansionStepKm?: IntFieldUpdateOperationsInput | number
+    autoPayoutEnabled?: BoolFieldUpdateOperationsInput | boolean
+    verifyRequired?: BoolFieldUpdateOperationsInput | boolean
+    otpDeliveryEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -34649,16 +34787,23 @@ export namespace Prisma {
   export type PlatformSettingCountOrderByAggregateInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder
     radiusExpansionStepKm?: SortOrder
+    autoPayoutEnabled?: SortOrder
+    verifyRequired?: SortOrder
+    otpDeliveryEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type PlatformSettingAvgOrderByAggregateInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder
@@ -34668,26 +34813,38 @@ export namespace Prisma {
   export type PlatformSettingMaxOrderByAggregateInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder
     radiusExpansionStepKm?: SortOrder
+    autoPayoutEnabled?: SortOrder
+    verifyRequired?: SortOrder
+    otpDeliveryEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type PlatformSettingMinOrderByAggregateInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder
     radiusExpansionStepKm?: SortOrder
+    autoPayoutEnabled?: SortOrder
+    verifyRequired?: SortOrder
+    otpDeliveryEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type PlatformSettingSumOrderByAggregateInput = {
     id?: SortOrder
     commissionPercent?: SortOrder
+    vatPercent?: SortOrder
+    minOrderAmount?: SortOrder
     minVendorMatchCount?: SortOrder
     initialRadiusKm?: SortOrder
     maxRadiusKm?: SortOrder

@@ -24,6 +24,7 @@
     "test:delivery": "tsx --tsconfig tsconfig.test.json tests/delivery-logic-test.ts",
     "test:admin": "tsx --tsconfig tsconfig.test.json tests/admin-logic-test.ts",
     "test:transactions": "tsx --tsconfig tsconfig.test.json tests/transactions-scenarios-test.ts",
+    "test:ui": "python scripts/with_server.py --server \"npm run dev\" --port 5000 -- python -u tests/ui_verification.py",
     "analyze": "cross-env ANALYZE=true next build",
     "perf:check": "npx tsx --tsconfig tsconfig.test.json tests/performance-test.ts"
   },

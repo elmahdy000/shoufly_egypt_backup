@@ -32,10 +32,10 @@ class AppConfig {
         if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
           // 10.0.2.2 → Android emulator's alias for the host machine's localhost.
           // For a physical device, pass --dart-define=DEV_HOST=<your-lan-ip>
-          final host = _devHostOverride.isNotEmpty ? _devHostOverride : '192.168.1.13';
+          final host = _devHostOverride.isNotEmpty ? _devHostOverride : '192.168.1.18';
           return 'http://$host:5000';
         }
-        return 'http://192.168.1.13:5000';
+        return 'http://192.168.1.18:5000';
       case Environment.staging:
         return 'https://staging-api.shoofly-egy.com';
       case Environment.production:

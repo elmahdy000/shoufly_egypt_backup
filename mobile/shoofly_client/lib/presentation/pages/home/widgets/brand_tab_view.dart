@@ -210,7 +210,7 @@ class _BrandTabViewState extends State<BrandTabView>
             children: [
               const Icon(LucideIcons.triangleAlert, color: AppColors.error, size: 42),
               const SizedBox(height: 12),
-              Text('تعذر تحميل البيانات', style: AppTypography.h3.copyWith(fontSize: 18)),
+              Text('تعذر تحميل البيانات', style: AppTypography.h3.copyWith(fontSize: 20)),
               const SizedBox(height: 6),
               Text(
                 message,
@@ -249,7 +249,7 @@ class _BrandTabViewState extends State<BrandTabView>
               child: Icon(icon, color: AppColors.primary, size: 34),
             ),
             const SizedBox(height: 16),
-            Text(title, style: AppTypography.h3.copyWith(fontSize: 18), textAlign: TextAlign.center),
+            Text(title, style: AppTypography.h3.copyWith(fontSize: 20), textAlign: TextAlign.center),
             const SizedBox(height: 6),
             Text(
               subtitle,

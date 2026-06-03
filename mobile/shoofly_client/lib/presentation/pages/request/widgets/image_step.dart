@@ -32,7 +32,7 @@ class ImageStep extends StatelessWidget {
           Text(
             'إيه اللي بتدور عليه؟',
             style: AppTypography.h2.copyWith(
-              fontSize: 26,
+              fontSize: 28,
               color: theme.textTheme.titleLarge?.color,
             ),
           ),

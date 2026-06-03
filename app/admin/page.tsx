@@ -6,15 +6,14 @@ import {
   AlertCircle, ArrowLeft, BarChart3, Briefcase, 
   CircleDollarSign, Clock3, Eye, FileText, 
   Package, Settings, Sparkles, Truck, Users,
-  TrendingUp, ShieldCheck, Zap, Layers
+  TrendingUp, ShieldCheck, Zap, Layers,
+  ChevronLeft, ArrowUpRight, TrendingDown
 } from "lucide-react";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
 import { formatCurrency, formatDate } from "@/lib/formatters";
-import { ImprovedCard } from "@/components/ui/improved-card";
-import { ImprovedButton } from "@/components/ui/improved-button";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { motion } from "framer-motion";
+
+import { ShooflyLoader } from "@/components/shoofly/loader";
 
 interface RecentRequest {
   id: number;
@@ -30,24 +29,25 @@ interface DashboardStats {
   totalVendors: number;
   todayRequests: number;
   totalGMV: number;
+  totalRevenue: number;
   pendingAiReview: number;
   pendingWithdrawals: number;
+  pendingComplaints: number;
   activeDeliveries: number;
   totalAdmins: number;
   onlineAdmins: number;
   recentRequests: RecentRequest[];
+  dailyTrends: { date: string; count: number }[];
 }
 
 const quickActions = [
-  { label: "الطلبات", href: "/admin/requests", icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
-  { label: "تتبع الأسطول", href: "/admin/tracking", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50" },
-  { label: "التحليلات", href: "/admin/analytics", icon: BarChart3, color: "text-indigo-500", bg: "bg-indigo-50" },
-  { label: "المستخدمين", href: "/admin/users", icon: Users, color: "text-orange-500", bg: "bg-orange-50" },
-  { label: "الموردين", href: "/admin/vendors", icon: Briefcase, color: "text-primary", bg: "bg-primary/10" },
+  { label: "إدارة الطلبات", href: "/admin/requests", icon: Package, color: "text-blue-600", bg: "bg-blue-50" },
+  { label: "المستخدمين", href: "/admin/users", icon: Users, color: "text-orange-600", bg: "bg-orange-50" },
+  { label: "الموردين", href: "/admin/vendors", icon: Briefcase, color: "text-primary", bg: "bg-primary/5" },
+  { label: "الشؤون المالية", href: "/admin/finance", icon: CircleDollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
+  { label: "سجل الأحداث", href: "/admin/audit-logs", icon: Layers, color: "text-slate-600", bg: "bg-slate-100" },
   { label: "الإعدادات", href: "/admin/settings", icon: Settings, color: "text-slate-500", bg: "bg-slate-100" },
 ];
-
-import { ShooflyLoader } from "@/components/shoofly/loader";
 
 export default function AdminDashboard() {
   const { data: stats, loading, error } = useAsyncData<DashboardStats>(
@@ -55,82 +55,31 @@ export default function AdminDashboard() {
     []
   );
 
-  const cards = useMemo(() => [
-    {
-      label: "إجمالي التداول المالي",
-      value: stats ? formatCurrency(Math.floor(stats.totalGMV)) : "٠",
-      icon: CircleDollarSign,
-      hint: "القيمة الإجمالية للعمليات المنفذة بالمنصة",
-      trend: "+١٢.٥٪",
-      trendUp: true,
-      color: "blue",
-      borderColor: "border-blue-100",
-      accentColor: "bg-blue-500 text-white",
-      bgGradient: "from-blue-50 to-white"
-    },
-    {
-      label: "عمليات الميدان اليوم",
-      value: stats?.todayRequests ?? 0,
-      icon: Zap,
-      hint: "إجمالي الطلبات المستلمة خلال ٢٤ ساعة",
-      trend: "+٥ وحدات",
-      trendUp: true,
-      color: "emerald",
-      borderColor: "border-emerald-100",
-      accentColor: "bg-emerald-500 text-white",
-      bgGradient: "from-emerald-50 to-white"
-    },
-    {
-        label: "تنبيهات المراقبة الذكية",
-        value: stats?.pendingAiReview ?? 0,
-        icon: Sparkles,
-        hint: "طلبات بانتظار المراجعة والتدقيق الإداري",
-        trend: stats?.pendingAiReview ? "مراجعة مطلوبة" : "النظام مستقر",
-        trendUp: false,
-        color: "orange",
-        borderColor: "border-orange-100",
-        accentColor: "bg-orange-500 text-white",
-        bgGradient: "from-orange-50 to-white"
-      },
-    {
-      label: "الطلبات النشطة الآن",
-      value: stats?.openRequests ?? 0,
-      icon: Package,
-      hint: "طلبات مفتوحة للمزايدة بالوقت الفعلي",
-      trend: "متابعة مباشرة",
-      trendUp: true,
-      color: "primary",
-      borderColor: "border-primary/20",
-      accentColor: "bg-primary text-white",
-      bgGradient: "from-primary/10 to-white"
-    },
-  ], [stats]);
+  const nowLabel = new Intl.DateTimeFormat("ar-EG", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(new Date());
 
   if (loading && !stats) {
-    return <ShooflyLoader message="بنجمعلك إحصائيات النظام..." />;
+    return <ShooflyLoader message="جاري تحميل مؤشرات الأداء..." />;
   }
-
-  const nowLabel = new Intl.DateTimeFormat("ar-EG", {
-    hour: "2-digit",
-    minute: "2-digit",
-    day: "numeric",
-    month: "long"
-  }).format(new Date());
 
   if (error) {
     return (
-      <div className="p-6 lg:p-10 font-cairo" dir="rtl">
-        <div className="p-12 text-center bg-white border border-red-100 shadow-xl shadow-red-500/5 rounded-3xl max-w-2xl mx-auto mt-20">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50 text-red-500">
-            <AlertCircle size={40} strokeWidth={2} />
+      <div className="p-6 lg:p-10 font-cairo text-right" dir="rtl">
+        <div className="p-12 bg-white border border-rose-100 rounded-2xl max-w-xl mx-auto mt-20 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-500">
+            <AlertCircle size={32} />
           </div>
-          <h2 className="text-2xl font-black text-slate-900">الاتصال بمركز البيانات قطع</h2>
-          <p className="mt-3 text-base font-medium text-slate-500">حصل مشكلة في تحديث البيانات. ياريت تتأكد إن السيرفر شغال كويس.</p>
+          <h2 className="text-xl font-bold text-slate-900">حدث خطأ في الاتصال</h2>
+          <p className="mt-2 text-slate-500 text-sm">لم نتمكن من جلب إحصائيات النظام حالياً. يرجى التحقق من اتصال الخادم.</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-8 px-8 h-12 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 active:scale-95"
+            className="mt-8 px-6 py-2.5 bg-rose-500 text-white text-sm font-bold rounded-lg hover:bg-rose-600 transition-all active:scale-95"
           >
-            حاول تاني دلوقتي
+            إعادة المحاولة
           </button>
         </div>
       </div>
@@ -138,226 +87,284 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-[1600px] mx-auto space-y-10 font-cairo antialiased min-h-screen bg-slate-50" dir="rtl">
-      
-      {/* 🌟 ELEGANT HEADER */}
-      <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-8">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-            <span className="text-xs font-bold tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">تحديث لايف</span>
+    <div className="min-h-screen bg-[#f8fafc] font-cairo text-right antialiased" dir="rtl">
+      <div className="max-w-[1400px] mx-auto p-6 lg:p-10 space-y-10">
+        
+        {/* 🏛 Operational Header */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-200">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">لوحة التحكم التشغيلية — الإصدار ٤.٠</p>
+            </div>
+            <h1 className="text-2xl lg:text-3xl font-black text-slate-900">نظرة عامة على <span className="text-primary">المنصة</span></h1>
+            <p className="text-sm text-slate-500 font-medium">متابعة دقيقة لمؤشرات الأداء، حركات التداول، والنشاط اللوجستي الفوري.</p>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">لوحة التحكم</h1>
-          <p className="text-base text-slate-500 font-medium">دير كل الشغل والفلوس لشبكة شوفلي مصر من مكان واحد.</p>
-        </div>
-        
-        <div className="flex items-center gap-4">
-            <div className="bg-white border border-slate-100 p-4 px-6 rounded-2xl flex items-center gap-5 shadow-sm">
-                <div className="flex -space-x-3 rtl:space-x-reverse">
-                    {[1,2,3].map(i => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 shadow-sm">
-                            م
-                        </div>
-                    ))}
-                </div>
-                <div className="border-r border-slate-100 pr-5">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">المشرفين المتصلين حالياً</p>
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg font-black text-slate-800">
-                            {String(stats?.onlineAdmins ?? 1).padStart(2, '0')}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white border border-slate-100 p-4 px-6 rounded-2xl flex items-center gap-3 shadow-sm text-slate-700">
-                <Clock3 size={20} className="text-primary" />
-                <span className="text-sm font-bold">{nowLabel}</span>
-            </div>
-        </div>
-      </header>
-
-      {/* 📊 PREMIUM KPI GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {cards.map((card, idx) => {
-            const Icon = card.icon;
-            return (
-                <motion.div
-                    key={card.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="group"
-                >
-                    <div className={`bg-gradient-to-br ${card.bgGradient} border ${card.borderColor} rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}>
-                        <div className="flex justify-between items-start mb-6">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${card.accentColor}`}>
-                                <Icon size={24} />
-                            </div>
-                            <div className={`flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-white border border-slate-100 text-slate-600 shadow-sm`}>
-                                {card.trendUp && <TrendingUp size={12} className="text-emerald-500" />}
-                                {card.trend}
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className="text-xs font-bold text-slate-500">{card.label}</h3>
-                            <div className="flex items-baseline gap-3">
-                                <span className="text-3xl font-black text-slate-900 tracking-tight">
-                                    {loading ? "..." : card.value}
-                                </span>
-                            </div>
-                            <p className="text-[11px] font-medium text-slate-400 pt-2 opacity-80">{card.hint}</p>
-                        </div>
-                    </div>
-                </motion.div>
-            );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-        
-        {/* 📋 DATA HUB (CLEAN TABLE) */}
-        <div className="lg:col-span-8 space-y-6">
           
-          <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center"><Layers size={20} /></div>
-                <div>
-                    <h2 className="text-xl font-black text-slate-900">آخر العمليات</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">سجل لايف لآخر الطلبات اللي حصلت</p>
-                </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex flex-col items-end px-4 border-r border-slate-200">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">التوقيت الحالي</p>
+              <p className="text-sm font-bold text-slate-700">{nowLabel}</p>
+            </div>
+            <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-xl flex items-center gap-4 shadow-sm">
+              <div className="text-left">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">الأدمن النشطين</p>
+                <p className="text-base font-bold text-slate-900">{stats?.onlineAdmins ?? 1}</p>
               </div>
-              <Link href="/admin/requests" className="text-xs font-bold text-primary bg-primary/5 hover:bg-primary/10 px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-                شوف الأرشيف <ArrowLeft size={14} />
-              </Link>
+              <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
+                <Users size={20} />
+              </div>
+            </div>
           </div>
+        </header>
 
-          <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
-            {loading ? (
-              <div className="space-y-4 p-8">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-16 rounded-xl bg-slate-50 animate-pulse border border-slate-100" />
-                ))}
+        {/* 📊 KPI Dashboard - Calm & Clear */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <KpiCard 
+            label="إجمالي التداول (GMV)" 
+            value={formatCurrency(stats?.totalGMV ?? 0)} 
+            icon={CircleDollarSign} 
+            trend="+١٢.٥٪" 
+            trendUp={true} 
+            color="blue"
+          />
+          <KpiCard 
+            label="صافي أرباح المنصة" 
+            value={formatCurrency(stats?.totalRevenue ?? 0)} 
+            icon={TrendingUp} 
+            trend="مستقر" 
+            trendUp={true} 
+            color="emerald"
+          />
+          <KpiCard 
+            label="طلبات المراجعة" 
+            value={stats?.pendingAiReview ?? 0} 
+            icon={ShieldCheck} 
+            trend={stats?.pendingAiReview ? "مطلوب إجراء" : "مستقر"} 
+            trendUp={false} 
+            color="amber"
+          />
+          <KpiCard 
+            label="الطلبات النشطة" 
+            value={stats?.openRequests ?? 0} 
+            icon={Zap} 
+            trend="مباشر" 
+            trendUp={true} 
+            color="primary"
+          />
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* 📋 Central Ledger / Recent Activity */}
+          <div className="lg:col-span-8 space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-sm">
+                  <Layers size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900">أحدث العمليات</h2>
               </div>
-            ) : stats?.recentRequests?.length ? (
+              <Link href="/admin/requests" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                عرض كل الطلبات <ChevronLeft size={14} />
+              </Link>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-right border-collapse">
-                    <thead>
-                    <tr className="bg-slate-50 border-b border-slate-100 text-slate-500">
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider">الطلب</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center">العميل</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center">الحالة</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-left">التاريخ</th>
+                <table className="w-full text-right border-collapse min-w-[800px]">
+                  <thead>
+                    <tr className="bg-slate-50/50 border-b border-slate-100 text-slate-400">
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-widest">توصيف العملية</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-widest">العميل</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-center">الحالة</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-left">التاريخ</th>
                     </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                    {stats.recentRequests.map((req) => (
-                        <tr key={req.id} className="group hover:bg-slate-50/50 transition-colors cursor-pointer">
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {stats?.recentRequests?.map((req) => (
+                      <tr key={req.id} className="hover:bg-slate-50/80 transition-colors group">
                         <td className="px-6 py-4">
-                            <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-slate-50 border border-slate-100 text-slate-400 rounded-xl flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                <FileText size={18} />
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-slate-50 border border-slate-100 text-slate-400 rounded-lg flex items-center justify-center group-hover:bg-white transition-colors">
+                              <FileText size={18} />
                             </div>
                             <div>
-                                <p className="text-sm font-black text-slate-900 group-hover:text-primary transition-colors line-clamp-1">{req.title}</p>
-                                <p className="text-[10px] font-bold text-slate-400 mt-1">#{req.id}</p>
+                              <p className="text-sm font-bold text-slate-800 line-clamp-1">{req.title}</p>
+                              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">ID: #{req.id}</p>
                             </div>
-                            </div>
+                          </div>
                         </td>
-                        <td className="px-6 py-4 text-center text-sm font-bold text-slate-600">
-                            {req.client?.fullName || "عميل غير مسمى"}
+                        <td className="px-6 py-4 text-sm font-medium text-slate-600">
+                          {req.client?.fullName || "مستخدم عام"}
                         </td>
                         <td className="px-6 py-4 text-center">
-                            <StatusBadge status={req.status} className="scale-90 shadow-sm" />
+                          <StatusPill status={req.status} />
                         </td>
-                        <td className="px-6 py-4 text-left text-[11px] font-bold text-slate-500">
-                            {formatDate(req.createdAt)}
+                        <td className="px-6 py-4 text-left text-xs font-medium text-slate-400 tabular-nums">
+                          {formatDate(req.createdAt)}
                         </td>
-                        </tr>
+                      </tr>
                     ))}
-                    </tbody>
+                  </tbody>
                 </table>
               </div>
-            ) : (
+              {!stats?.recentRequests?.length && (
                 <div className="py-20 text-center space-y-4">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 text-slate-300">
-                        <FileText size={32} />
-                    </div>
-                    <div>
-                        <p className="text-lg font-bold text-slate-700">مفيش أي سجلات</p>
-                        <p className="text-xs text-slate-400 mt-1">هتظهر كل الأنشطة هنا أول ما الشغل يبدأ.</p>
-                    </div>
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-200">
+                    <FileText size={32} />
+                  </div>
+                  <p className="text-slate-400 text-sm font-medium">لا توجد عمليات حديثة مسجلة حالياً</p>
                 </div>
-            )}
-          </div>
-        </div>
-
-        {/* 🛠 ELEGANT SIDEBAR */}
-        <div className="lg:col-span-4 space-y-6">
-          
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center"><Zap size={16} /></div>
-                <h2 className="text-lg font-black text-slate-900">في السريع</h2>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
+          </div>
+
+          {/* 🛠 Command Center Sidebar */}
+          <div className="lg:col-span-4 space-y-8">
+            
+            {/* Quick Actions Grid */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">التحكم السريع</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {quickActions.map((action) => (
                   <Link
                     key={action.href}
                     href={action.href}
-                    className="group bg-slate-50 border border-slate-100 p-4 rounded-2xl transition-all hover:border-primary/30 hover:bg-white hover:shadow-md"
+                    className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-primary/20 hover:shadow-sm transition-all group"
                   >
-                    <div className={`w-10 h-10 rounded-xl mb-3 flex items-center justify-center ${action.bg} ${action.color}`}>
-                      <Icon size={20} />
+                    <div className={`w-10 h-10 rounded-lg mb-3 flex items-center justify-center ${action.bg} ${action.color} group-hover:scale-110 transition-transform`}>
+                      <action.icon size={20} />
                     </div>
-                    <span className="text-xs font-bold text-slate-700 group-hover:text-primary transition-colors">{action.label}</span>
+                    <span className="text-[11px] font-bold text-slate-600 group-hover:text-primary transition-colors">{action.label}</span>
                   </Link>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
-            
-            <div className="relative z-10 flex flex-col gap-8">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-6">
-                    <h2 className="text-lg font-black text-white">إحصائيات الشبكة</h2>
-                    <ShieldCheck size={24} className="text-primary" />
-                </div>
-                
-                <div className="grid gap-4">
-                    <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-400 mb-1">العملاء الشغالين</p>
-                            <p className="text-2xl font-black">{stats?.totalUsers ?? 0}</p>
-                        </div>
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center"><Users size={20} /></div>
-                    </div>
-
-                    <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-400 mb-1">الصنايعية المعتمدين</p>
-                            <p className="text-2xl font-black">{stats?.totalVendors ?? 0}</p>
-                        </div>
-                        <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center"><Briefcase size={20} /></div>
-                    </div>
-
-                    <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-400 mb-1">المناديب</p>
-                            <p className="text-2xl font-black">{stats?.activeDeliveries ?? 0}</p>
-                        </div>
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><Truck size={20} /></div>
-                    </div>
-                </div>
+            {/* Critical Alerts */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">إجراءات معلقة</h3>
+              <div className="space-y-3">
+                <AlertItem 
+                  label="طلبات السحب المعلقة" 
+                  count={stats?.pendingWithdrawals ?? 0} 
+                  href="/admin/withdrawals" 
+                  color="emerald"
+                />
+                <AlertItem 
+                  label="بلاغات النزاع النشطة" 
+                  count={stats?.pendingComplaints ?? 0} 
+                  href="/admin/complaints" 
+                  color="amber"
+                />
+                <AlertItem 
+                  label="مراجعة الحسابات (KYC)" 
+                  count={stats?.pendingAiReview ?? 0} 
+                  href="/admin/kyc" 
+                  color="blue"
+                />
+              </div>
             </div>
+
+            {/* Network Health */}
+            <div className="bg-slate-900 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+              <div className="relative z-10 space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold">حالة الشبكة</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Network Integrity</p>
+                </div>
+                <div className="space-y-4">
+                  <StatLine label="إجمالي العملاء" value={stats?.totalUsers ?? 0} />
+                  <StatLine label="إجمالي الموردين" value={stats?.totalVendors ?? 0} />
+                  <StatLine label="شحنات قيد التوصيل" value={stats?.activeDeliveries ?? 0} />
+                </div>
+                <div className="pt-4 border-t border-white/10 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">النظام يعمل بكفاءة كاملة</span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
       </div>
+    </div>
+  );
+}
+
+function KpiCard({ label, value, icon: Icon, trend, trendUp, color }: any) {
+  const colorMap: any = {
+    blue: "text-blue-600 bg-blue-50 border-blue-100",
+    emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
+    amber: "text-amber-600 bg-amber-50 border-amber-100",
+    primary: "text-primary bg-primary/5 border-primary/10",
+  };
+
+  return (
+    <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow group">
+      <div className="flex justify-between items-start mb-6">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${colorMap[color] || colorMap.primary}`}>
+          <Icon size={24} />
+        </div>
+        <div className={`flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 ${trendUp ? 'text-emerald-600' : 'text-amber-600'}`}>
+          {trendUp ? <ArrowUpRight size={12} /> : <TrendingDown size={12} />}
+          {trend}
+        </div>
+      </div>
+      <div className="space-y-1">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-2xl font-black text-slate-900 tracking-tight font-outfit">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function StatusPill({ status }: { status: string }) {
+  const config: any = {
+    PENDING_ADMIN_REVISION: { label: "قيد المراجعة", color: "bg-amber-50 text-amber-700 border-amber-100" },
+    OPEN_FOR_BIDDING: { label: "مفتوح للمزايدة", color: "bg-blue-50 text-blue-700 border-blue-100" },
+    BIDS_RECEIVED: { label: "عروض مستلمة", color: "bg-indigo-50 text-indigo-700 border-indigo-100" },
+    OFFERS_FORWARDED: { label: "تم التوجيه", color: "bg-sky-50 text-sky-700 border-sky-100" },
+    ORDER_PAID_PENDING_DELIVERY: { label: "قيد التوصيل", color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+    CLOSED_SUCCESS: { label: "مكتمل بنجاح", color: "bg-slate-50 text-slate-600 border-slate-200" },
+    CLOSED_CANCELLED: { label: "ملغي", color: "bg-rose-50 text-rose-700 border-rose-100" },
+    REJECTED: { label: "مرفوض إدارياً", color: "bg-rose-50 text-rose-700 border-rose-100" },
+  };
+
+  const c = config[status] || { label: status, color: "bg-slate-50 text-slate-500 border-slate-100" };
+
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-bold border ${c.color}`}>
+      {c.label}
+    </span>
+  );
+}
+
+function AlertItem({ label, count, href, color }: any) {
+  const colors: any = {
+    emerald: "group-hover:bg-emerald-500 group-hover:text-white",
+    amber: "group-hover:bg-amber-500 group-hover:text-white",
+    blue: "group-hover:bg-blue-500 group-hover:text-white",
+  };
+
+  return (
+    <Link href={href} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all group">
+      <span className="text-xs font-bold text-slate-700">{label}</span>
+      <span className={`min-w-[24px] h-6 px-1.5 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-500 transition-all ${colors[color]}`}>
+        {count}
+      </span>
+    </Link>
+  );
+}
+
+function StatLine({ label, value }: any) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</span>
+      <span className="text-lg font-bold text-white font-outfit">{value}</span>
     </div>
   );
 }

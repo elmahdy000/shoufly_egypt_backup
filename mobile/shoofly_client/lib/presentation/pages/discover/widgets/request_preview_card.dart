@@ -94,7 +94,7 @@ class RequestPreviewCard extends StatelessWidget {
         style: AppTypography.labelSmall.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.bold,
-          fontSize: 10,
+          fontSize: 12,
         ),
       ),
     );
@@ -110,7 +110,7 @@ class RequestPreviewCard extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               request.address?.split(',').first ?? 'مصر',
-              style: AppTypography.bodySmall.copyWith(fontSize: 11),
+              style: AppTypography.bodySmall.copyWith(fontSize: 13),
             ),
           ],
         ),
@@ -126,7 +126,7 @@ class RequestPreviewCard extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 0,
           ),
-          child: const Text('التفاصيل', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          child: const Text('التفاصيل', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         ),
       ],
     );

@@ -78,10 +78,17 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
 
     on<UpdateLocation>((event, emit) {
       if (state is TrackingActive) {
-        final currentHistory = (state as TrackingActive).history;
+        final activeState = state as TrackingActive;
+        
+        // 🚀 Optimization: Skip emission if location coordinates haven't changed
+        final isSameLocation = activeState.currentTracking.latitude == event.tracking.latitude &&
+                               activeState.currentTracking.longitude == event.tracking.longitude;
+                               
+        if (isSameLocation) return;
+
         emit(TrackingActive(
           currentTracking: event.tracking,
-          history: [event.tracking, ...currentHistory],
+          history: [event.tracking, ...activeState.history],
         ));
       } else {
         emit(TrackingActive(currentTracking: event.tracking, history: [event.tracking]));

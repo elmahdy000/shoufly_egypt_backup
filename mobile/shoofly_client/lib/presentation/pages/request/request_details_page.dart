@@ -268,7 +268,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('العروض المستلمة', style: AppTypography.h3.copyWith(fontSize: 18)),
+          Text('العروض المستلمة', style: AppTypography.h3.copyWith(fontSize: 20)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),

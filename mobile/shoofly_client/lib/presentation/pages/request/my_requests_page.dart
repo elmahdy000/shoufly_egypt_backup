@@ -120,7 +120,7 @@ class MyRequestsPage extends StatelessWidget {
                       style: AppTypography.labelSmall.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w900,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -194,7 +194,7 @@ class MyRequestsPage extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   _formatDate(request.createdAt),
-                  style: AppTypography.labelSmall.copyWith(color: AppColors.textDisabled, fontSize: 10),
+                  style: AppTypography.labelSmall.copyWith(color: AppColors.textDisabled, fontSize: 12),
                 ),
                 const Spacer(),
                 Container(
@@ -222,7 +222,7 @@ class MyRequestsPage extends StatelessWidget {
                         style: AppTypography.labelSmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w900,
-                          fontSize: 11,
+                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -260,7 +260,7 @@ class MyRequestsPage extends StatelessWidget {
             style: AppTypography.labelSmall.copyWith(
               color: status.color,
               fontWeight: FontWeight.w900,
-              fontSize: 11,
+              fontSize: 13,
             ),
           ),
         ],

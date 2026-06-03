@@ -10,10 +10,15 @@ export async function GET(req: NextRequest) {
     requireRole(user, 'ADMIN');
 
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit  = parseInt(searchParams.get('limit')  || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
+    const days   = parseInt(searchParams.get('days')   || '0');
 
-    const transactions = await listAdminTransactions(limit, offset);
+    const sinceDate = days > 0
+      ? new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+      : undefined;
+
+    const transactions = await listAdminTransactions(limit, offset, sinceDate);
     return ok(transactions);
 
   } catch (error) {

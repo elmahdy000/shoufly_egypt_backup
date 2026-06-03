@@ -1,0 +1,139 @@
+{
+  "nodes": [
+    {
+      "id": "shoofly_architecture",
+      "label": "Shoofly Egypt Architecture",
+      "file_type": "document",
+      "source_file": "COMPLETE_GUIDE.md"
+    },
+    {
+      "id": "lifecycle_request",
+      "label": "Service Request Lifecycle",
+      "file_type": "document",
+      "source_file": "COMPLETE_GUIDE.md"
+    },
+    {
+      "id": "mobile_client_app",
+      "label": "Shoofly Client Mobile App",
+      "file_type": "code",
+      "source_file": "mobile/shoofly_client/lib/main.dart"
+    },
+    {
+      "id": "mobile_vendor_app",
+      "label": "Shoofly Vendor Mobile App",
+      "file_type": "code",
+      "source_file": "mobile/shoofly_vendor/lib/main.dart"
+    },
+    {
+      "id": "redis_integration",
+      "label": "Redis Caching & Pub/Sub",
+      "file_type": "document",
+      "source_file": "BUILD_FIX_REDIS.md"
+    },
+    {
+      "id": "design_system",
+      "label": "Shoofly Design System",
+      "file_type": "document",
+      "source_file": "DESIGN_SYSTEM_README.md"
+    },
+    {
+      "id": "seeding_system",
+      "label": "Advanced Seeding System",
+      "file_type": "document",
+      "source_file": "SEEDING_FIX_DOCUMENTATION.md"
+    },
+    {
+      "id": "admin_dashboard",
+      "label": "Admin Control Panel",
+      "file_type": "code",
+      "source_file": "app/admin/page.tsx"
+    },
+    {
+      "id": "kyc_verification",
+      "label": "KYC Verification Flow",
+      "file_type": "document",
+      "source_file": "front_guide/admin-guide.md"
+    },
+    {
+      "id": "payment_gateway",
+      "label": "Payment Gateway Integration",
+      "file_type": "document",
+      "source_file": "docs/payment-gateway-setup.md"
+    }
+  ],
+  "edges": [
+    {
+      "source": "shoofly_architecture",
+      "target": "lifecycle_request",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "mobile_client_app",
+      "target": "shoofly_architecture",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9
+    },
+    {
+      "source": "mobile_vendor_app",
+      "target": "shoofly_architecture",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9
+    },
+    {
+      "source": "redis_integration",
+      "target": "shoofly_architecture",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "design_system",
+      "target": "mobile_client_app",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "seeding_system",
+      "target": "shoofly_architecture",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "admin_dashboard",
+      "target": "kyc_verification",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "payment_gateway",
+      "target": "lifecycle_request",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "core_service_loop",
+      "label": "Core Service Delivery Loop",
+      "nodes": [
+        "lifecycle_request",
+        "mobile_client_app",
+        "mobile_vendor_app",
+        "admin_dashboard"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95
+    }
+  ],
+  "input_tokens": 15000,
+  "output_tokens": 2000
+}

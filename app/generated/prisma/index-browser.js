@@ -311,10 +311,15 @@ exports.Prisma.WithdrawalRequestScalarFieldEnum = {
 exports.Prisma.PlatformSettingScalarFieldEnum = {
   id: 'id',
   commissionPercent: 'commissionPercent',
+  vatPercent: 'vatPercent',
+  minOrderAmount: 'minOrderAmount',
   minVendorMatchCount: 'minVendorMatchCount',
   initialRadiusKm: 'initialRadiusKm',
   maxRadiusKm: 'maxRadiusKm',
   radiusExpansionStepKm: 'radiusExpansionStepKm',
+  autoPayoutEnabled: 'autoPayoutEnabled',
+  verifyRequired: 'verifyRequired',
+  otpDeliveryEnabled: 'otpDeliveryEnabled',
   updatedAt: 'updatedAt'
 };
 

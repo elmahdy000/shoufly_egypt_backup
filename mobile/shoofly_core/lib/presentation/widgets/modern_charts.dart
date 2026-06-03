@@ -71,7 +71,7 @@ class ModernBarChart extends StatelessWidget {
                 Text(
                   label,
                   style: AppTypography.bodySmall.copyWith(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: AppColors.textDisabled,
                     fontWeight: FontWeight.bold,
                   ),

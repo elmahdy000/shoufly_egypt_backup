@@ -623,9 +623,9 @@ async function seedDatabase() {
     // 8. SEED REQUESTS & BIDS
     console.log("📝 Seeding Requests and Bids...");
     const carPartsCat = await prisma.category.findUnique({ where: { slug: "car-parts" } });
+    const cairoCity = await prisma.city.findFirst({ where: { governorateId: cairoGovId } });
 
     if (clients[0] && carPartsCat) {
-      const cairoCity = await prisma.city.findFirst({ where: { governorateId: cairoGovId } });
       const req1 = await prisma.request.create({
         data: {
           clientId: clients[0].id,

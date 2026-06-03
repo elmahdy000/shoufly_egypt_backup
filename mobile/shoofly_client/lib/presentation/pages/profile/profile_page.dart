@@ -225,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   backgroundColor: Colors.white.withValues(alpha: 0.2),
                   child: Text(
                     user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : '?',
-                    style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 32),
+                    style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 34),
                   ),
                 ),
               ),

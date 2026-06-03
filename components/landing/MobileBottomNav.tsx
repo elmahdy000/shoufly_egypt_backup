@@ -19,8 +19,14 @@ interface BottomNavProps {
 export function MobileBottomNav({ userRole }: BottomNavProps) {
   const pathname = usePathname();
 
-  // Don't show on login/register pages
-  if (pathname.startsWith('/login') || pathname.startsWith('/register')) return null;
+  // Don't show on login/register pages, or backend role dashboards (admin, vendor, delivery)
+  if (
+    pathname.startsWith('/login') || 
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/vendor') ||
+    pathname.startsWith('/delivery')
+  ) return null;
 
   const getDashboardLink = () => {
     if (!userRole) return "/login";

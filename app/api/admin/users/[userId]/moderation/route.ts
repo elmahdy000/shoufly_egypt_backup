@@ -29,44 +29,20 @@ export async function PATCH(
     const { action } = ModerationSchema.parse(body);
 
     let result;
-    let auditAction: 'USER_VERIFIED' | 'USER_UNVERIFIED' | 'USER_BLOCKED' | 'USER_UNBLOCKED';
-    let oldValue: Record<string, unknown> = {};
-    
     switch (action) {
       case 'VERIFY': 
-        result = await verifyUser(uid, true); 
-        auditAction = 'USER_VERIFIED';
-        oldValue = { isVerified: false };
+        result = await verifyUser(uid, true, admin.id); 
         break;
       case 'UNVERIFY': 
-        result = await verifyUser(uid, false); 
-        auditAction = 'USER_UNVERIFIED';
-        oldValue = { isVerified: true };
+        result = await verifyUser(uid, false, admin.id); 
         break;
       case 'BLOCK': 
-        result = await blockUser(uid, true); 
-        auditAction = 'USER_BLOCKED';
-        oldValue = { isBlocked: false };
+        result = await blockUser(uid, true, admin.id); 
         break;
       case 'UNBLOCK': 
-        result = await blockUser(uid, false); 
-        auditAction = 'USER_UNBLOCKED';
-        oldValue = { isBlocked: true };
+        result = await blockUser(uid, false, admin.id); 
         break;
     }
-    
-    // 📝 Log admin action to audit trail (non-blocking)
-    logAdminAction({
-      adminId: admin.id,
-      action: auditAction,
-      targetType: 'USER',
-      targetId: uid,
-      oldValue,
-      newValue: result,
-      metadata: { performedBy: admin.fullName || admin.email }
-    }).catch(() => {
-      // Audit logging failure should not break the main flow
-    });
 
     // 🚀 Invalidate middleware Redis cache so block/unblock takes effect immediately
     if (action === 'BLOCK' || action === 'UNBLOCK') {

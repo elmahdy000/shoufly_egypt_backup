@@ -104,6 +104,18 @@ export async function reviewWithdrawal(params: {
       vendorId: withdrawal.vendorId,
     });
 
+    // 📝 Log to Admin Audit Trail (Non-blocking)
+    import('@/lib/services/admin/audit-log').then(({ logAdminAction }) => {
+      logAdminAction({
+        adminId,
+        action: action === 'approve' ? 'WITHDRAWAL_APPROVED' : 'WITHDRAWAL_REJECTED',
+        targetType: 'WITHDRAWAL',
+        targetId: withdrawalId,
+        newValue: updated,
+        metadata: { vendorId: withdrawal.vendorId, amount: withdrawal.amount }
+      });
+    }).catch(() => {});
+
     return updated;
   });
 }

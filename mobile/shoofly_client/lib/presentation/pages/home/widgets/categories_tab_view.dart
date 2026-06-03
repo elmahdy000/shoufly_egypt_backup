@@ -88,7 +88,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
                 Expanded(
                   child: Text(
                     refreshError,
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.error, fontSize: 12),
+                    style: AppTypography.bodySmall.copyWith(color: AppColors.error, fontSize: 14),
                   ),
                 ),
                 TextButton(
@@ -199,7 +199,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
                     style: AppTypography.labelSmall.copyWith(
                       color: isSelected ? AppColors.primary : AppColors.textSecondary,
                       fontWeight: isSelected ? FontWeight.w900 : FontWeight.w500,
-                      fontSize: 11,
+                      fontSize: 13,
                       height: 1.1,
                     ),
                   ),
@@ -243,7 +243,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(selectedCategory.name, style: AppTypography.h3.copyWith(fontSize: 17)),
+                        Text(selectedCategory.name, style: AppTypography.h3.copyWith(fontSize: 19)),
                         const SizedBox(height: 2),
                         Text(
                           selectedCategory.hintText,
@@ -334,7 +334,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
               subcategory.name,
               style: AppTypography.labelLarge.copyWith(
                 fontWeight: FontWeight.w800,
-                fontSize: 14,
+                fontSize: 16,
                 height: 1.2,
               ),
               maxLines: 2,
@@ -345,7 +345,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
               subcategory.hintText,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.textSecondary,
-                fontSize: 10,
+                fontSize: 12,
                 height: 1.1,
               ),
               maxLines: 1,
@@ -405,7 +405,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
             children: [
               const Icon(LucideIcons.triangleAlert, color: AppColors.error, size: 42),
               const SizedBox(height: 12),
-              Text('تعذر تحميل البيانات', style: AppTypography.h3.copyWith(fontSize: 18)),
+              Text('تعذر تحميل البيانات', style: AppTypography.h3.copyWith(fontSize: 20)),
               const SizedBox(height: 6),
               Text(
                 message,
@@ -442,7 +442,7 @@ class _CategoriesTabViewState extends State<CategoriesTabView>
               child: Icon(icon, color: AppColors.primary, size: 34),
             ),
             const SizedBox(height: 16),
-            Text(title, style: AppTypography.h3.copyWith(fontSize: 18), textAlign: TextAlign.center),
+            Text(title, style: AppTypography.h3.copyWith(fontSize: 20), textAlign: TextAlign.center),
             const SizedBox(height: 6),
             Text(
               subtitle,

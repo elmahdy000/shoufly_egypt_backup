@@ -27,7 +27,7 @@ class LocationStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('مكان التوصيل', style: AppTypography.h2.copyWith(
-            fontSize: 26,
+            fontSize: 28,
             color: theme.textTheme.titleLarge?.color,
           )),
           const SizedBox(height: 8),
@@ -105,7 +105,7 @@ class LocationStep extends StatelessWidget {
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                      fontSize: 15,
                     ),
                   ),
                 ),
@@ -202,7 +202,7 @@ class LocationStep extends StatelessWidget {
                   border: InputBorder.none,
                   prefixIcon: Padding(
                     padding: EdgeInsetsDirectional.only(end: 8),
-                    child: Text('🇪🇬', style: TextStyle(fontSize: 18)),
+                    child: Text('🇪🇬', style: TextStyle(fontSize: 20)),
                   ),
                   prefixIconConstraints: BoxConstraints(
                     minWidth: 0,

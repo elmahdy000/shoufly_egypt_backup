@@ -191,17 +191,39 @@ class _HomePageState extends State<HomePage> {
                 _DrawerItem(
                   icon: LucideIcons.settings,
                   label: 'الإعدادات',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('سيتم تفعيل الإعدادات قريباً', style: TextStyle(fontFamily: 'Cairo'))),
+                    );
+                  },
                 ),
                 _DrawerItem(
                   icon: LucideIcons.messageSquare,
                   label: 'مركز المساعدة',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('جاري تحويلك لمركز المساعدة...', style: TextStyle(fontFamily: 'Cairo'))),
+                    );
+                  },
                 ),
                 _DrawerItem(
                   icon: LucideIcons.info,
                   label: 'عن شوفلي',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    showAboutDialog(
+                      context: context,
+                      applicationName: 'شوفلي - تطبيق العملاء',
+                      applicationVersion: '1.0.0',
+                      applicationIcon: const Icon(LucideIcons.shoppingCart, size: 40, color: AppColors.primary),
+                      children: [
+                        const SizedBox(height: 16),
+                        const Text('تطبيق شوفلي يسهل عليك طلب أي منتج أو خدمة بضغطة زر وتلقي أفضل العروض من الموردين.', style: TextStyle(fontFamily: 'Cairo', height: 1.5)),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -259,7 +281,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 18),
               Text(
                 user?.fullName ?? 'مستخدم شوفلي',
-                style: AppTypography.h3.copyWith(fontSize: 20, fontWeight: FontWeight.w800),
+                style: AppTypography.h3.copyWith(fontSize: 22, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 4),
               Text(
@@ -343,7 +365,7 @@ class _HomePageState extends State<HomePage> {
               Text(
                 'صباح الخير، $name',
                 style: AppTypography.h3.copyWith(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
@@ -427,7 +449,7 @@ class _HomePageState extends State<HomePage> {
             'محتاج إيه النهاردة؟',
             style: AppTypography.h1.copyWith(
               color: AppColors.textPrimary,
-              fontSize: 32,
+              fontSize: 34,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
             ),
@@ -438,7 +460,7 @@ class _HomePageState extends State<HomePage> {
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondary,
               height: 1.6,
-              fontSize: 14,
+              fontSize: 16,
             ),
           ),
           const SizedBox(height: 24),
@@ -508,7 +530,7 @@ class _HomePageState extends State<HomePage> {
           child: Text(
             title,
             style: AppTypography.h3.copyWith(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -886,7 +908,7 @@ class _FloatingNavItem extends StatelessWidget {
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 180),
                 style: AppTypography.labelSmall.copyWith(
-                  fontSize: 10,
+                  fontSize: 12,
                   color: isActive ? AppColors.primary : AppColors.textSecondary,
                   fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
                   height: 1,
@@ -975,7 +997,7 @@ class _HeaderIconButton extends StatelessWidget {
                     badgeCount > 99 ? '99+' : badgeCount.toString(),
                     style: AppTypography.labelSmall.copyWith(
                       color: Colors.white,
-                      fontSize: 8,
+                      fontSize: 10,
                       fontWeight: FontWeight.w800,
                       height: 1,
                     ),
@@ -1146,7 +1168,7 @@ class _CompactShortcutCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.labelSmall.copyWith(
                       color: AppColors.textSecondary,
-                      fontSize: 10,
+                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -1278,7 +1300,7 @@ class _RequestPreviewTile extends StatelessWidget {
                       style: AppTypography.labelSmall.copyWith(
                         color: statusColor,
                         fontWeight: FontWeight.w800,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),

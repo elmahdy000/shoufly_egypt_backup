@@ -238,7 +238,7 @@ class _WalletPageState extends State<WalletPage> {
                       else
                         Text(
                           '${balance.toStringAsFixed(2)} ج.م',
-                          style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 36),
+                          style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 38),
                         ),
                     ],
                   ),
@@ -381,7 +381,7 @@ class _WalletPageState extends State<WalletPage> {
               ),
               Text(
                 _formatRelativeDate(tx.createdAt),
-                style: AppTypography.labelSmall.copyWith(color: AppColors.textDisabled, fontSize: 11),
+                style: AppTypography.labelSmall.copyWith(color: AppColors.textDisabled, fontSize: 13),
               ),
             ],
           ),

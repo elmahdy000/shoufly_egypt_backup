@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shoofly_core/core/theme/app_colors.dart';
 import 'package:shoofly_core/core/theme/app_typography.dart';
 import 'package:shoofly_core/core/widgets/modern_widgets.dart';
+import 'package:shoofly_core/core/widgets/app_image.dart';
 import 'package:shoofly_core/domain/entities/request.dart';
 import 'package:shoofly_core/presentation/blocs/auth/auth_bloc.dart';
 import 'package:shoofly_core/presentation/blocs/vendor/vendor_bloc.dart';
@@ -14,7 +15,6 @@ import '../../profile/vendor_profile_page.dart';
 import '../widgets/location_filter_sheet.dart';
 import '../../requests/vendor_requests_map_page.dart';
 import 'package:shoofly_core/core/widgets/shimmer_placeholder.dart';
-import 'dart:ui';
 
 class DashboardTab extends StatefulWidget {
   final ValueChanged<int> onNavigate;
@@ -222,7 +222,7 @@ class _DashboardTabState extends State<DashboardTab> {
                 style: AppTypography.labelSmall.copyWith(
                   color: AppColors.success,
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -262,7 +262,7 @@ class _DashboardTabState extends State<DashboardTab> {
                 style: AppTypography.labelSmall.copyWith(
                   color: AppColors.textDisabled,
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -472,14 +472,14 @@ class _DashboardTabState extends State<DashboardTab> {
             value,
             style: AppTypography.labelLarge.copyWith(
               fontWeight: FontWeight.w900,
-              fontSize: 16,
+              fontSize: 18,
             ),
           ),
           Text(
             label,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.textDisabled,
-              fontSize: 10,
+              fontSize: 12,
             ),
           ),
         ],
@@ -538,7 +538,11 @@ class _DashboardTabState extends State<DashboardTab> {
                   title: 'الدعم الفني',
                   icon: LucideIcons.headset,
                   color: Colors.purple,
-                  onTap: () {},
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('جاري تحويلك لمركز الدعم الفني...', style: TextStyle(fontFamily: 'Cairo'))),
+                    );
+                  },
                 ),
               ],
             ),
@@ -614,14 +618,14 @@ class _DashboardTabState extends State<DashboardTab> {
                   value,
                   style: AppTypography.labelLarge.copyWith(
                     fontWeight: FontWeight.w800,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                 ),
                 Text(
                   label,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textDisabled,
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -732,22 +736,23 @@ class _DashboardTabState extends State<DashboardTab> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(16),
-                  image: request.images.isNotEmpty 
-                    ? DecorationImage(
-                        image: NetworkImage(request.images.first),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
+                  width: 64,
+                  height: 64,
+                  child: request.images.isNotEmpty
+                    ? AppImage(
+                        imageUrl: request.images.first,
+                        width: 64,
+                        height: 64,
                         fit: BoxFit.cover,
                       )
-                    : null,
+                    : Container(
+                        color: AppColors.surfaceVariant.withOpacity(0.4),
+                        child: const Icon(LucideIcons.package, color: AppColors.textDisabled, size: 24),
+                      ),
                 ),
-                child: request.images.isEmpty 
-                  ? const Icon(LucideIcons.package, color: AppColors.textDisabled, size: 24)
-                  : null,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -767,7 +772,7 @@ class _DashboardTabState extends State<DashboardTab> {
                             request.categoryNameAr ?? 'عام',
                             style: AppTypography.labelSmall.copyWith(
                               color: AppColors.primary,
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -776,7 +781,7 @@ class _DashboardTabState extends State<DashboardTab> {
                           _formatTimeAgo(request.createdAt),
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.textDisabled,
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -786,7 +791,7 @@ class _DashboardTabState extends State<DashboardTab> {
                       request.title,
                       style: AppTypography.labelLarge.copyWith(
                         fontWeight: FontWeight.w900,
-                        fontSize: 16,
+                        fontSize: 18,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -818,7 +823,7 @@ class _DashboardTabState extends State<DashboardTab> {
                   request.address ?? 'القاهرة',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 11,
+                    fontSize: 13,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -832,10 +837,8 @@ class _DashboardTabState extends State<DashboardTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 borderRadius: 12,
                 onPressed: () {
-                  showModalBottomSheet(
+                  showDialog(
                     context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
                     builder: (_) => SubmitBidModal(request: request),
                   );
                 },

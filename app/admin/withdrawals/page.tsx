@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
-import { motion, AnimatePresence } from "framer-motion";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
   PENDING:  { label: "قيد الفحص", color: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200" },
@@ -149,7 +148,7 @@ export default function AdminWithdrawalsPage() {
 
             <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden min-h-[500px]">
                <div className="overflow-x-auto">
-                  <table className="w-full text-right border-collapse">
+                  <table className="w-full text-right border-collapse min-w-[800px]">
                      <thead>
                         <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
                            <th className="px-4 lg:px-8 py-5 text-[11px] font-bold uppercase tracking-wider">المستفيد / التاريخ</th>
@@ -205,12 +204,8 @@ export default function AdminWithdrawalsPage() {
          </div>
 
          {/* 🛡️ Withdrawal Auditor */}
-         <AnimatePresence>
             {selected ? (
-               <motion.aside
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
+               <aside
                   className="lg:col-span-4 bg-white rounded-3xl p-4 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/40 lg:sticky lg:top-28 space-y-8 overflow-hidden"
                >
                   <div className="flex items-center justify-between border-b border-slate-50 pb-6 text-slate-900">
@@ -278,14 +273,13 @@ export default function AdminWithdrawalsPage() {
                         <History size={14} /> سجل التدقيق المالي
                      </button>
                   </div>
-               </motion.aside>
+               </aside>
             ) : (
               <div className="lg:col-span-4 h-[400px] bg-slate-50 border border-slate-100 rounded-3xl flex flex-col items-center justify-center text-slate-400 gap-4">
                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm"><Landmark size={32} className="text-slate-300" /></div>
                  <p className="text-sm font-bold text-slate-500">اختر طلباً لعرض تفاصيل الصرف</p>
               </div>
             )}
-         </AnimatePresence>
       </div>
     </div>
   );

@@ -408,7 +408,7 @@ class _TrackingBottomCard extends StatelessWidget {
                           _statusText,
                           style: AppTypography.labelLarge.copyWith(
                             fontWeight: FontWeight.w800,
-                            fontSize: 16,
+                            fontSize: 18,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -495,7 +495,7 @@ class _TrackingBottomCard extends StatelessWidget {
                           'عنوان التسليم',
                           style: AppTypography.labelSmall.copyWith(
                             color: AppColors.textSecondary,
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                         const SizedBox(height: 2),
