@@ -126,11 +126,16 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   phone: 'phone',
+  phoneVerified: 'phoneVerified',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   role: 'role',
   isActive: 'isActive',
   isVerified: 'isVerified',
   verificationStatus: 'verificationStatus',
   isBlocked: 'isBlocked',
+  trustScore: 'trustScore',
+  suspendedUntil: 'suspendedUntil',
+  suspensionReason: 'suspensionReason',
   walletBalance: 'walletBalance',
   fcmToken: 'fcmToken',
   cityId: 'cityId',
@@ -248,6 +253,38 @@ exports.Prisma.DeliveryTrackingScalarFieldEnum = {
   speed: 'speed',
   note: 'note',
   locationText: 'locationText',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RequestReportScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  reportedById: 'reportedById',
+  reason: 'reason',
+  details: 'details',
+  resolved: 'resolved',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.TrustEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  delta: 'delta',
+  reason: 'reason',
+  actorId: 'actorId',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PhoneOtpScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  phone: 'phone',
+  codeHash: 'codeHash',
+  purpose: 'purpose',
+  attempts: 'attempts',
+  consumed: 'consumed',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt'
 };
 
@@ -450,6 +487,11 @@ exports.DeliveryStatus = exports.$Enums.DeliveryStatus = {
   RETURNED: 'RETURNED'
 };
 
+exports.OtpPurpose = exports.$Enums.OtpPurpose = {
+  PHONE_VERIFY: 'PHONE_VERIFY',
+  LOGIN: 'LOGIN'
+};
+
 exports.TransactionType = exports.$Enums.TransactionType = {
   ESCROW_DEPOSIT: 'ESCROW_DEPOSIT',
   VENDOR_PAYOUT: 'VENDOR_PAYOUT',
@@ -480,7 +522,13 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   DISPUTE_RAISED: 'DISPUTE_RAISED',
   DISPUTE_RESOLVED: 'DISPUTE_RESOLVED',
   KYC_APPROVED: 'KYC_APPROVED',
-  KYC_REJECTED: 'KYC_REJECTED'
+  KYC_REJECTED: 'KYC_REJECTED',
+  PHONE_OTP: 'PHONE_OTP',
+  REQUEST_REPORTED: 'REQUEST_REPORTED',
+  REQUEST_AUTO_CLOSED: 'REQUEST_AUTO_CLOSED',
+  USER_SUSPENDED: 'USER_SUSPENDED',
+  USER_REINSTATED: 'USER_REINSTATED',
+  AI_FLAGGED_REQUEST: 'AI_FLAGGED_REQUEST'
 };
 
 exports.WithdrawalStatus = exports.$Enums.WithdrawalStatus = {
@@ -507,6 +555,9 @@ exports.Prisma.ModelName = {
   Bid: 'Bid',
   BidImage: 'BidImage',
   DeliveryTracking: 'DeliveryTracking',
+  RequestReport: 'RequestReport',
+  TrustEvent: 'TrustEvent',
+  PhoneOtp: 'PhoneOtp',
   Transaction: 'Transaction',
   PaymentAttempt: 'PaymentAttempt',
   Notification: 'Notification',

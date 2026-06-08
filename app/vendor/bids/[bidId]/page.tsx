@@ -136,7 +136,8 @@ export default function VendorOrderDetailsPage() {
             <Button 
               onClick={() => updateStatus('VENDOR_PREPARING')}
               disabled={updating}
-              className="w-full bg-slate-100 hover:bg-slate-200 text-[#0F1111] border-none"
+              variant="soft"
+              className="w-full"
               isLoading={updating && currentStatus !== 'VENDOR_PREPARING'}
             >
               أنا بجهز الأوردر دلوقتي
@@ -144,7 +145,8 @@ export default function VendorOrderDetailsPage() {
             <Button 
               onClick={() => updateStatus('READY_FOR_PICKUP')}
               disabled={updating}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+              variant="success"
+              className="w-full"
               isLoading={updating && currentStatus === 'VENDOR_PREPARING'}
             >
               الأوردر خلاص جاهز

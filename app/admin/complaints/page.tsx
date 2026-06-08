@@ -1,378 +1,600 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
 import { formatDate } from "@/lib/formatters";
 import {
-  ShieldAlert, Shield, Search, X, MessageSquare, AlertCircle, CheckCircle, ArrowUpRight
+  AlertCircle,
+  ArrowUpRight,
+  CheckCircle,
+  ChevronLeft,
+  MessageSquare,
+  Shield,
+  ShieldAlert,
+  X,
 } from "lucide-react";
-
-import { ShooflyLoader } from "@/components/shoofly/loader";
+import { AdminButton, AdminIconButton, AdminFilterChip } from "@/components/admin/ui";
+import {
+  PageHeader,
+  StatCard,
+  DataTable,
+  type DataTableColumn,
+  TableCard,
+  EmptyState,
+  PageLoading,
+  Pagination,
+  SearchInput,
+  StatusBadge,
+  InlineToast,
+  COMPLAINT_STATUS_META,
+  type StatusTone,
+  ConfirmDialog,
+} from "@/components/admin/primitives";
 
 interface Complaint {
   id: number;
+  requestId: number;
+  requestTitle: string;
+  requestStatus: string;
+  hasEscrow: boolean;
+  escrowAmount: number | null;
+  netPrice: number | null;
   ticketNumber: string;
   reporterName: string;
   reporterRole: string;
   accusedName?: string;
   accusedRole?: string;
   type: string;
-  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED";
   description: string;
   createdAt: string;
 }
+
+const STATUS_TABS = [
+  { value: "ALL", label: "الكل" },
+  { value: "OPEN", label: "مفتوح" },
+  { value: "RESOLVED", label: "مغلق" },
+];
 
 export default function AdminComplaintsPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Complaint | null>(null);
   const [statusFilter, setStatusFilter] = useState<"ALL" | "OPEN" | "RESOLVED">("ALL");
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: "ok" | "err"; message: string } | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ id: number; action: string } | null>(null);
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
-  const { data: complaints, loading, refresh } = useAsyncData<Complaint[]>(
-    () => apiFetch("/api/admin/complaints", "ADMIN"),
-    []
+  const [penaltyPercentage, setPenaltyPercentage] = useState(50);
+  const [confirmDisputeOpen, setConfirmDisputeOpen] = useState(false);
+  const [disputeLoading, setDisputeLoading] = useState(false);
+
+  useEffect(() => {
+    if (selected) {
+      setPenaltyPercentage(50);
+    }
+  }, [selected]);
+
+
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), toast.type === "ok" ? 4000 : 6000);
+    return () => clearTimeout(id);
+  }, [toast]);
+
+  const { data: result, loading, refresh } = useAsyncData<
+    Complaint[] | { data: Complaint[]; total: number }
+  >(
+    () => {
+      const params = new URLSearchParams({
+        limit: String(ITEMS_PER_PAGE),
+        offset: String((page - 1) * ITEMS_PER_PAGE),
+      });
+      return apiFetch(`/api/admin/complaints?${params}`, "ADMIN");
+    },
+    [page],
   );
+
+  const complaints: Complaint[] = Array.isArray(result) ? result : (result as { data?: Complaint[] })?.data ?? [];
+  const totalItems: number = Array.isArray(result) ? complaints.length : (result as { total?: number })?.total ?? complaints.length;
 
   const filteredComplaints = useMemo(() => {
     let list = complaints || [];
-    
     if (statusFilter === "OPEN") {
       list = list.filter((c) => c.status === "OPEN" || c.status === "IN_PROGRESS");
     } else if (statusFilter === "RESOLVED") {
-      list = list.filter((c) => c.status === "RESOLVED" || c.status === "CLOSED");
+      list = list.filter((c) => c.status === "RESOLVED" || c.status === "REJECTED");
     }
-
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
         (c) =>
           c.ticketNumber.toLowerCase().includes(q) ||
           c.reporterName.toLowerCase().includes(q) ||
-          c.type.toLowerCase().includes(q)
+          c.type.toLowerCase().includes(q),
       );
     }
     return list;
   }, [complaints, search, statusFilter]);
 
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
   const stats = useMemo(() => {
-    const list = complaints || [];
+    const list = complaints ?? [];
     return {
-      total: list.length,
-      open: list.filter((c) => c.status === "OPEN").length,
-      resolved: list.filter((c) => c.status === "RESOLVED" || c.status === "CLOSED").length,
+      total: totalItems,
+      open: list.filter((c) => c.status === "OPEN" || c.status === "IN_PROGRESS").length,
+      resolved: list.filter((c) => c.status === "RESOLVED" || c.status === "REJECTED").length,
     };
-  }, [complaints]);
+  }, [complaints, totalItems]);
 
   const handleUpdateStatus = async (id: number, newStatus: string) => {
-    setErrorMessage(null);
-    setSuccessMessage(null);
     try {
       await apiFetch(`/api/admin/complaints/${id}`, "ADMIN", {
         method: "PATCH",
         body: { status: newStatus },
       });
-      setSuccessMessage(
-        newStatus === "RESOLVED" ? "تم حل النزاع وإغلاق التذكرة بنجاح! ✅" :
-        newStatus === "IN_PROGRESS" ? "تم تحويل حالة النزاع إلى قيد المراجعة. ⚠️" :
-        "تم إعادة فتح النزاع بنجاح. 🔄"
-      );
+      setToast({
+        type: "ok",
+        message:
+          newStatus === "RESOLVED"
+            ? "تم حل النزاع وإغلاق التذكرة بنجاح! ✅"
+            : newStatus === "IN_PROGRESS"
+              ? "تم تحويل حالة النزاع إلى قيد المراجعة. ⚠️"
+              : "تم إعادة فتح النزاع بنجاح. 🔄",
+      });
       refresh();
       if (selected?.id === id) {
-        setSelected((prev) => prev ? { ...prev, status: newStatus as any } : null);
+        setSelected((prev) => (prev ? { ...prev, status: newStatus as Complaint["status"] } : null));
       }
-    } catch (e) {
-      console.error(e);
-      setErrorMessage("حدث خطأ أثناء تحديث حالة النزاع.");
+      setConfirmAction(null);
+    } catch {
+      setToast({ type: "err", message: "حدث خطأ أثناء تحديث حالة النزاع." });
     }
   };
 
-  if (loading && !complaints) {
-    return <ShooflyLoader message="جاري جلب سجل النزاعات..." />;
+  const handleResolveDispute = async (requestId: number, complaintId: number) => {
+    setDisputeLoading(true);
+    try {
+      await apiFetch(`/api/admin/requests/${requestId}/resolve-dispute`, "ADMIN", {
+        method: "POST",
+        body: { penaltyPercentage },
+      });
+
+      await apiFetch(`/api/admin/complaints/${complaintId}`, "ADMIN", {
+        method: "PATCH",
+        body: { status: "RESOLVED" },
+      });
+
+      setToast({
+        type: "ok",
+        message: "تم تسوية النزاع مالياً وإغلاق التذكرة بنجاح! 💰⚖️",
+      });
+
+      setConfirmDisputeOpen(false);
+      refresh();
+      if (selected?.id === complaintId) {
+        setSelected(null);
+      }
+    } catch (err: any) {
+      setToast({ type: "err", message: err.message || "حدث خطأ أثناء تسوية النزاع." });
+    } finally {
+      setDisputeLoading(false);
+    }
+  };
+
+
+  const columns: DataTableColumn<Complaint>[] = useMemo(
+    () => [
+      {
+        key: "ticket",
+        header: "التذكرة",
+        render: (c) => (
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
+              <MessageSquare size={16} />
+            </div>
+            <span className="font-black text-slate-900 text-sm">{c.ticketNumber}</span>
+          </div>
+        ),
+      },
+      {
+        key: "reporter",
+        header: "المُبلغ",
+        render: (c) => (
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-slate-900 truncate">{c.reporterName}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">{c.reporterRole}</p>
+          </div>
+        ),
+      },
+      {
+        key: "accused",
+        header: "المُدعى عليه",
+        render: (c) => (
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-slate-900 truncate">{c.accusedName || "—"}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">{c.accusedRole || "—"}</p>
+          </div>
+        ),
+      },
+      {
+        key: "type",
+        header: "النوع",
+        render: (c) => (
+          <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-lg">{c.type}</span>
+        ),
+      },
+      {
+        key: "status",
+        header: "الحالة",
+        render: (c) => {
+          const meta = COMPLAINT_STATUS_META[c.status] ?? { label: c.status, tone: "slate" as StatusTone };
+          return <StatusBadge tone={meta.tone} label={meta.label} dot size="xs" />;
+        },
+      },
+      {
+        key: "date",
+        header: "التاريخ",
+        render: (c) => (
+          <span className="text-xs text-slate-500 font-bold tabular-nums whitespace-nowrap">
+            {formatDate(c.createdAt)}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
+
+  if (loading && !complaints.length) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="مركز النزاعات"
+          eyebrowTone="rose"
+          title={
+            <>
+              إدارة <span className="text-rose-500">النزاعات</span>
+            </>
+          }
+          subtitle="متابعة وحل الشكاوى والنزاعات بين العملاء والموردين لضمان جودة المنصة."
+        />
+        <PageLoading label="جاري جلب سجل النزاعات..." />
+      </>
+    );
   }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-cairo text-right antialiased" dir="rtl">
-      <div className="max-w-[1500px] mx-auto p-6 lg:p-10 space-y-10">
-        
-        {/* 📋 Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-200">
-          <div className="space-y-2">
-            <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">إدارة <span className="text-rose-500">النزاعات</span></h1>
-            <p className="text-sm text-slate-500 font-medium">متابعة وحل الشكاوى والنزاعات بين العملاء والموردين لضمان جودة المنصة.</p>
+      <PageHeader
+        eyebrow="مركز النزاعات"
+        eyebrowTone="rose"
+        title={
+          <>
+            إدارة <span className="text-rose-500">النزاعات</span>
+          </>
+        }
+        subtitle="متابعة وحل الشكاوى والنزاعات بين العملاء والموردين لضمان جودة المنصة."
+        actions={
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <SearchInput
+              value={search}
+              onChange={(v) => {
+                setSearch(v);
+                setPage(1);
+              }}
+              placeholder="بحث برقم التذكرة أو الاسم..."
+              className="sm:w-72"
+              ariaLabel="بحث في النزاعات"
+            />
+            <div className="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
+              {STATUS_TABS.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => {
+                    setStatusFilter(tab.value as typeof statusFilter);
+                    setPage(1);
+                  }}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    statusFilter === tab.value
+                      ? "bg-white text-rose-600 border border-slate-200 shadow-sm"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-             <div className="relative group w-full sm:w-72">
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors" size={18} />
-                <input
-                   type="text"
-                   value={search}
-                   onChange={(e) => setSearch(e.target.value)}
-                   placeholder="بحث برقم التذكرة أو الاسم..."
-                   className="w-full pr-12 pl-4 h-11 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all shadow-sm"
-                />
-             </div>
-             <div className="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
-                {[
-                  { id: "ALL", label: "الكل" },
-                  { id: "OPEN", label: "مفتوح" },
-                  { id: "RESOLVED", label: "مغلق" },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setStatusFilter(tab.id as any)}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      statusFilter === tab.id
-                        ? "bg-white text-rose-600 border border-slate-200 shadow-sm"
-                        : "text-slate-400 hover:text-slate-600"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-             </div>
-          </div>
-        </header>
+        }
+      />
 
-        {/* 📊 KPI Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-           <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center justify-between shadow-sm">
-              <div>
-                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">إجمالي النزاعات</p>
-                 <p className="text-2xl font-black text-slate-900 font-outfit leading-none">{stats.total}</p>
-              </div>
-              <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400">
-                 <Shield size={24} />
-              </div>
-           </div>
-           <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center justify-between shadow-sm">
-              <div>
-                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">نزاعات مفتوحة</p>
-                 <p className="text-2xl font-black text-rose-600 font-outfit leading-none">{stats.open}</p>
-              </div>
-              <div className="w-12 h-12 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center text-rose-500">
-                 <AlertCircle size={24} />
-              </div>
-           </div>
-           <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center justify-between shadow-sm">
-              <div>
-                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">نزاعات محلولة</p>
-                 <p className="text-2xl font-black text-emerald-600 font-outfit leading-none">{stats.resolved}</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center text-emerald-500">
-                 <CheckCircle size={24} />
-              </div>
-           </div>
-        </div>
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-6 space-y-5">
+        {/* KPI Strip */}
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard label="إجمالي النزاعات" value={stats.total} icon={Shield} tone="blue" />
+          <StatCard label="نزاعات مفتوحة" value={stats.open} icon={AlertCircle} tone="rose" />
+          <StatCard label="نزاعات محلولة" value={stats.resolved} icon={CheckCircle} tone="emerald" />
+        </section>
 
-        <div className="flex flex-col xl:flex-row gap-8 items-start">
-           
-           {/* 📋 Complaints List */}
-           <div className="flex-1 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden min-h-[500px]">
-              <div className="overflow-x-auto">
-                 <table className="w-full text-right border-collapse min-w-[800px]">
-                    <thead>
-                       <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
-                          <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">التذكرة</th>
-                          <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">المُبلغ</th>
-                          <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">المُدعى عليه</th>
-                          <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">النوع</th>
-                          <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">الحالة</th>
-                          <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-wider">التاريخ</th>
-                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                       {filteredComplaints.length === 0 ? (
-                          <tr>
-                             <td colSpan={6} className="py-20 text-center">
-                                <ShieldAlert size={48} className="mx-auto text-slate-200 mb-4" />
-                                <p className="text-slate-500 font-bold">لا توجد نزاعات مسجلة حالياً</p>
-                             </td>
-                          </tr>
-                       ) : (
-                          filteredComplaints.map((complaint) => (
-                             <tr 
-                                key={complaint.id}
-                                onClick={() => setSelected(complaint)}
-                                className={`group cursor-pointer transition-colors ${selected?.id === complaint.id ? "bg-rose-50/50" : "hover:bg-slate-50"}`}
-                             >
-                                <td className="px-8 py-5">
-                                   <div className="flex items-center gap-3">
-                                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${selected?.id === complaint.id ? "bg-rose-100 text-rose-600" : "bg-slate-100 text-slate-500 group-hover:bg-rose-50 group-hover:text-rose-500"}`}>
-                                         <MessageSquare size={18} />
-                                      </div>
-                                      <span className="font-outfit font-black text-slate-900 group-hover:text-rose-600 transition-colors">
-                                         {complaint.ticketNumber}
-                                      </span>
-                                   </div>
-                                </td>
-                                <td className="px-8 py-5">
-                                   <p className="text-sm font-bold text-slate-900">{complaint.reporterName}</p>
-                                   <p className="text-[10px] text-slate-400 font-bold uppercase">{complaint.reporterRole}</p>
-                                </td>
-                                <td className="px-8 py-5">
-                                   <p className="text-sm font-bold text-slate-900">{complaint.accusedName || "—"}</p>
-                                   <p className="text-[10px] text-slate-400 font-bold uppercase">{complaint.accusedRole || "—"}</p>
-                                </td>
-                                <td className="px-8 py-5">
-                                   <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg">
-                                      {complaint.type}
-                                   </span>
-                                </td>
-                                <td className="px-8 py-5">
-                                   <StatusBadge status={complaint.status} />
-                                </td>
-                                <td className="px-8 py-5 text-xs text-slate-500 font-bold tabular-nums">
-                                   {formatDate(complaint.createdAt)}
-                                </td>
-                             </tr>
-                          ))
-                       )}
-                    </tbody>
-                 </table>
-              </div>
-           </div>
-
-           {/* 🛡️ Inspector Panel */}
-           
-             {selected && (
-               <aside
-                 className="xl:w-[450px] w-full bg-white rounded-2xl p-8 border border-slate-200 shadow-sm sticky top-28 flex flex-col overflow-hidden"
-               >
-                 <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-6">
-                    <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center border border-rose-100">
-                          <ShieldAlert size={24} />
-                       </div>
-                       <div>
-                          <h2 className="text-lg font-black text-slate-900">تفاصيل النزاع</h2>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{selected.ticketNumber}</p>
-                       </div>
-                    </div>
-                    <button onClick={() => setSelected(null)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-rose-500 transition-colors">
-                       <X size={20} />
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          {/* Complaints List */}
+          <div className="xl:col-span-7 space-y-3">
+            <TableCard flush>
+              <DataTable
+                columns={columns}
+                rows={filteredComplaints}
+                rowKey={(c) => c.id}
+                minWidth={750}
+                loading={loading}
+                onRowClick={(c) => setSelected(c)}
+                mobileCard={(c) => {
+                  const meta = COMPLAINT_STATUS_META[c.status] ?? { label: c.status, tone: "slate" as StatusTone };
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setSelected(c)}
+                      className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
+                        selected?.id === c.id
+                          ? "border-rose-300 bg-rose-50/30"
+                          : "border-slate-200 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-slate-900 truncate">{c.ticketNumber}</p>
+                          <p className="text-[11px] text-slate-500 truncate">{c.reporterName}</p>
+                        </div>
+                        <StatusBadge tone={meta.tone} label={meta.label} dot size="xs" />
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                        <span>{c.type}</span>
+                        <span>{formatDate(c.createdAt)}</span>
+                      </div>
                     </button>
-                 </div>
+                  );
+                }}
+                empty={
+                  <EmptyState
+                    icon={ShieldAlert}
+                    title="لا توجد نزاعات مسجلة حالياً"
+                  />
+                }
+              />
 
-                 <div className="flex-1 space-y-6">
-                    <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl space-y-4">
-                       <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">نوع النزاع</span>
-                          <StatusBadge status={selected.status} />
-                       </div>
-                       <p className="text-sm font-bold text-slate-900 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                          {selected.type}
-                       </p>
+              {totalPages > 1 && (
+                <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
+                  <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    onPageChange={setPage}
+                  />
+                </div>
+              )}
+            </TableCard>
+          </div>
+
+          {/* Inspector Panel */}
+          <div className="xl:col-span-5 space-y-4 xl:sticky xl:top-28">
+            {selected ? (
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center border border-rose-100 shrink-0">
+                      <ShieldAlert size={20} />
                     </div>
-
-                    <div className="space-y-3">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">تفاصيل الشكوى</p>
-                       <div className="p-5 bg-white border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 leading-relaxed shadow-sm">
-                          {selected.description}
-                       </div>
+                    <div className="min-w-0">
+                      <h2 className="text-sm font-black text-slate-900 truncate">تفاصيل النزاع</h2>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        {selected.ticketNumber}
+                      </p>
                     </div>
+                  </div>
+                  <button
+                    onClick={() => setSelected(null)}
+                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"
+                    aria-label="إغلاق"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="p-4 border border-slate-100 rounded-2xl bg-white shadow-sm">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">المُبلغ</p>
-                          <p className="text-sm font-black text-slate-900 mb-1">{selected.reporterName}</p>
-                          <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md uppercase">{selected.reporterRole}</span>
-                       </div>
-                       <div className="p-4 border border-slate-100 rounded-2xl bg-white shadow-sm">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">المُدعى عليه</p>
-                          <p className="text-sm font-black text-slate-900 mb-1">{selected.accusedName || "—"}</p>
-                          {selected.accusedRole && (
-                             <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md uppercase">{selected.accusedRole}</span>
+                <div className="p-5 space-y-5">
+                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">نوع النزاع</span>
+                      <StatusBadge
+                        tone={(COMPLAINT_STATUS_META[selected.status] ?? { tone: "slate" as StatusTone }).tone}
+                        label={(COMPLAINT_STATUS_META[selected.status] ?? { label: selected.status }).label}
+                        dot
+                        size="xs"
+                      />
+                    </div>
+                    <p className="text-sm font-bold text-slate-900 bg-white p-3 rounded-xl border border-slate-200">
+                      {selected.type}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">تفاصيل الشكوى</p>
+                    <div className="p-4 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 leading-relaxed">
+                      {selected.description}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 border border-slate-100 rounded-xl bg-white">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">المُبلغ</p>
+                      <p className="text-sm font-black text-slate-900 mb-1">{selected.reporterName}</p>
+                      <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md uppercase">
+                        {selected.reporterRole}
+                      </span>
+                    </div>
+                    <div className="p-3 border border-slate-100 rounded-xl bg-white">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">المُدعى عليه</p>
+                      <p className="text-sm font-black text-slate-900 mb-1">{selected.accusedName || "—"}</p>
+                      {selected.accusedRole && (
+                        <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md uppercase">
+                          {selected.accusedRole}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-5 pb-5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+                  {selected.hasEscrow && ["ORDER_PAID_PENDING_DELIVERY", "CLOSED_CANCELLED", "PENDING_ADMIN_REVISION"].includes(selected.requestStatus) && (
+                    <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 col-span-2 text-right mb-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-amber-800">
+                        <AlertCircle size={14} />
+                        <span>نزاع مالي نشط (مبلغ الضمان: {selected.escrowAmount} ج.م)</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
+                        هذا الطلب يحتوي على دفعة ضمان معلقة. يرجى تحديد نسبة التعويض للمورد (تتراوح بين 0% و 100%) لتقسيم مبلغ الضمان بين العميل والمورد.
+                      </p>
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-slate-700 block">نسبة تعويض المورد: {penaltyPercentage}%</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={penaltyPercentage}
+                          onChange={(e) => setPenaltyPercentage(Number(e.target.value))}
+                          className="w-full accent-amber-500"
+                        />
+                        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
+                          <span>0% (إرجاع كامل للعميل)</span>
+                          <span>100% (صرف كامل للمورد)</span>
+                        </div>
+                      </div>
+
+                      {selected.netPrice && (
+                        <div className="bg-white p-2.5 rounded-lg border border-slate-100 space-y-1 text-[11px] font-bold text-slate-600">
+                          <div className="flex justify-between">
+                            <span>سعر الخدمة الصافي:</span>
+                            <span className="text-slate-900">{selected.netPrice} ج.م</span>
+                          </div>
+                          <div className="flex justify-between text-emerald-600">
+                            <span>سيتم إرجاع للعميل:</span>
+                            <span>{(selected.netPrice * (100 - penaltyPercentage) / 100).toFixed(2)} ج.م</span>
+                          </div>
+                          <div className="flex justify-between text-amber-600">
+                            <span>سيتم صرفه للمورد:</span>
+                            <span>{(selected.netPrice * penaltyPercentage / 100).toFixed(2)} ج.م</span>
+                          </div>
+                          {selected.escrowAmount && (
+                            <div className="flex justify-between text-indigo-600 border-t border-slate-50 pt-1 mt-1">
+                              <span>عمولة المنصة (مستقطعة):</span>
+                              <span>{(selected.escrowAmount - selected.netPrice).toFixed(2)} ج.م</span>
+                            </div>
                           )}
-                       </div>
-                    </div>
-                 </div>
+                        </div>
+                      )}
 
-                 <div className="pt-6 mt-6 border-t border-slate-100 grid grid-cols-2 gap-3">
-                    {selected.status === "OPEN" || selected.status === "IN_PROGRESS" ? (
-                       <>
-                          <button 
-                             onClick={() => handleUpdateStatus(selected.id, "RESOLVED")}
-                             className="h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
-                          >
-                             <CheckCircle size={16} /> حل النزاع
-                          </button>
-                          <button 
-                             onClick={() => handleUpdateStatus(selected.id, "IN_PROGRESS")}
-                             className="h-12 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
-                          >
-                             <ArrowUpRight size={16} /> قيد المراجعة
-                          </button>
-                       </>
-                    ) : (
-                       <button 
-                          onClick={() => handleUpdateStatus(selected.id, "OPEN")}
-                          className="col-span-2 h-12 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
-                       >
-                          <AlertCircle size={16} /> إعادة فتح النزاع
-                       </button>
-                    )}
-                 </div>
-               </aside>
-             )}
-           
+                      <AdminButton
+                        variant="primary"
+                        size="md"
+                        fullWidth
+                        leadingIcon={Shield}
+                        onClick={() => setConfirmDisputeOpen(true)}
+                        className="mt-2"
+                      >
+                        تسوية الضمان مالياً وحل النزاع
+                      </AdminButton>
+                    </div>
+                  )}
+
+                  {selected.status === "OPEN" || selected.status === "IN_PROGRESS" ? (
+                    <>
+                      <AdminButton
+                        variant="success"
+                        size="md"
+                        fullWidth
+                        leadingIcon={CheckCircle}
+                        onClick={() => setConfirmAction({ id: selected.id, action: "RESOLVED" })}
+                      >
+                        حل النزاع
+                      </AdminButton>
+                      <AdminButton
+                        variant="soft"
+                        size="md"
+                        fullWidth
+                        leadingIcon={ArrowUpRight}
+                        onClick={() => handleUpdateStatus(selected.id, "IN_PROGRESS")}
+                      >
+                        قيد المراجعة
+                      </AdminButton>
+                    </>
+                  ) : (
+                    <AdminButton
+                      variant="soft"
+                      size="md"
+                      fullWidth
+                      leadingIcon={AlertCircle}
+                      onClick={() => handleUpdateStatus(selected.id, "OPEN")}
+                      className="col-span-2"
+                    >
+                      إعادة فتح النزاع
+                    </AdminButton>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center space-y-3">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                  <ShieldAlert size={28} className="text-slate-300" />
+                </div>
+                <p className="text-sm font-medium text-slate-500">اختر نزاعاً لعرض تفاصيله</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 🔔 Toast Notifications */}
-      {(successMessage || errorMessage) && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4">
-          {successMessage && (
-            <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-3.5 rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-fade-in font-bold text-xs pointer-events-auto">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="text-emerald-500" size={16} />
-                <span>{successMessage}</span>
-              </div>
-              <button onClick={() => setSuccessMessage(null)} className="text-emerald-400 hover:text-emerald-600"><X size={14} /></button>
-            </div>
-          )}
-          {errorMessage && (
-            <div className="bg-rose-50 text-rose-800 border border-rose-200 px-5 py-3.5 rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-fade-in font-bold text-xs pointer-events-auto">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="text-rose-500" size={16} />
-                <span>{errorMessage}</span>
-              </div>
-              <button onClick={() => setErrorMessage(null)} className="text-rose-400 hover:text-rose-600"><X size={14} /></button>
-            </div>
-          )}
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[110] w-full max-w-sm px-4">
+          <InlineToast type={toast.type} message={toast.message} onClose={() => setToast(null)} />
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => {
+          if (confirmAction) handleUpdateStatus(confirmAction.id, confirmAction.action);
+        }}
+        title="تأكيد الإجراء"
+        description="هل أنت متأكد من رغبتك في تنفيذ هذا الإجراء؟"
+        confirmText="تأكيد"
+        cancelText="تراجع"
+        variant="primary"
+      />
+
+      <ConfirmDialog
+        open={confirmDisputeOpen}
+        onClose={() => setConfirmDisputeOpen(false)}
+        onConfirm={() => {
+          if (selected) handleResolveDispute(selected.requestId, selected.id);
+        }}
+        title="تسوية النزاع المالي وتصفية الضمان"
+        description={
+          <div className="space-y-2 text-right" dir="rtl">
+            <p>هل أنت متأكد من تصفية مبلغ الضمان للطلب <strong>#{selected?.requestId}</strong>؟</p>
+            <p className="text-xs text-slate-500 font-bold">
+              سيتم تقسيم المبلغ بنسبة <strong>{penaltyPercentage}%</strong> لصالح المورد و <strong>{100 - penaltyPercentage}%</strong> لصالح العميل. هذا الإجراء نهائي وسيتم تحويل المبالغ للمحافظ مباشرة.
+            </p>
+          </div>
+        }
+        confirmText="تأكيد التسوية المالية"
+        cancelText="تراجع"
+        variant="primary"
+        loading={disputeLoading}
+      />
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  let badgeClass = "";
-  let label = status;
-
-  switch (status) {
-    case "OPEN":
-      badgeClass = "bg-rose-100 text-rose-700 border border-rose-200";
-      label = "مفتوح";
-      break;
-    case "IN_PROGRESS":
-      badgeClass = "bg-amber-100 text-amber-700 border border-amber-200";
-      label = "قيد المراجعة";
-      break;
-    case "RESOLVED":
-    case "CLOSED":
-      badgeClass = "bg-emerald-100 text-emerald-700 border border-emerald-200";
-      label = "محلول";
-      break;
-    default:
-      badgeClass = "bg-slate-100 text-slate-600 border border-slate-200";
-  }
-
-  return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold ${badgeClass}`}>
-      {label}
-    </span>
-  );
-}

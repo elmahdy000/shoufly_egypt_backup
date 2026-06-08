@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Clock, ShieldCheck, UserCheck, AlertCircle } from "lucide-react";
+import { Clock, ShieldCheck, UserCheck, AlertCircle, LogOut, RefreshCw } from "lucide-react";
+import { apiFetch } from "@/lib/api/client";
 
 interface PendingApprovalProps {
   role: "VENDOR" | "DELIVERY";
@@ -9,6 +12,27 @@ interface PendingApprovalProps {
 
 export function PendingApproval({ role }: PendingApprovalProps) {
   const isVendor = role === "VENDOR";
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await apiFetch("/api/auth/logout", role, { method: "POST" });
+      router.push("/login");
+    } catch (e) {
+      console.error("Logout failed:", e);
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    window.location.reload();
+  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-6">
@@ -54,10 +78,21 @@ export function PendingApproval({ role }: PendingApprovalProps) {
           </div>
 
           <button 
-            onClick={() => window.location.reload()}
-            className="mt-8 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-colors font-tajawal shadow-lg shadow-slate-200"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="mt-8 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-colors font-tajawal shadow-lg shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            تحديث الحالة
+            <RefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
+            {isRefreshing ? "جاري التحديث..." : "تحديث الحالة"}
+          </button>
+
+          <button 
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="mt-3 w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition-colors font-tajawal flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <LogOut size={18} />
+            {isLoggingOut ? "جاري تسجيل الخروج..." : "تسجيل الخروج"}
           </button>
         </div>
       </motion.div>

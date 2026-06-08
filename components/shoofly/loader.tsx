@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiShield, FiLoader, FiZap, FiCpu } from "react-icons/fi";
+import { motion } from "framer-motion";
+import { FiShield, FiZap, FiCpu } from "react-icons/fi";
 
 export function ShooflyLoader({ 
   message = "بنجيبلك أحسن العروض في ثواني", 

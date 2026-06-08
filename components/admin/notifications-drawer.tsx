@@ -13,6 +13,7 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/lib/api/notifications";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import type { ApiNotification } from "@/lib/types/api";
 import { useToast } from "@/components/providers/toast-provider";
 import { playNotificationSound } from "@/lib/utils/sounds";
@@ -75,28 +76,18 @@ export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Pr
   }, [isOpen, fetchNotifications]);
 
   useEffect(() => {
-    // REAL-TIME SSE FOR ADMIN
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("🔔 Admin notification received via SSE:", payload.type);
-        
-        // Refresh notifications list if drawer is open, or just increment count
-        fetchNotifications();
-        playNotificationSound();
-        
-        // Show a toast for critical admin events
-        if (['WITHDRAWAL', 'PAYMENT', 'NEW_USER'].includes(payload.type)) {
-            toast('تنبيه إداري 🛡️', payload.data.message || 'حدث جديد على المنصة', 'info');
-        }
-      } catch (err) {
-        console.error("SSE Admin Error:", err);
+    // Shared SSE — refresh for any notification, toast on critical events
+    const TOAST_ON = new Set(["WITHDRAWAL", "PAYMENT_RECEIVED", "PAYMENT_FAILED", "NEW_USER"]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification" || !payload.data) return;
+      const inner = payload.data as { type?: string; message?: string };
+      void fetchNotifications();
+      playNotificationSound();
+      if (inner.type && TOAST_ON.has(inner.type)) {
+        toast("تنبيه إداري 🛡️", inner.message || "حدث جديد على المنصة", "info");
       }
-    };
-
-    return () => eventSource.close();
+    });
+    return unsubscribe;
   }, [fetchNotifications, toast]);
 
   useEffect(() => {

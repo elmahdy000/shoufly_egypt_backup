@@ -64,6 +64,21 @@ export type BidImage = $Result.DefaultSelection<Prisma.$BidImagePayload>
  */
 export type DeliveryTracking = $Result.DefaultSelection<Prisma.$DeliveryTrackingPayload>
 /**
+ * Model RequestReport
+ * Vendor reports on a request (fake/spam/duplicate/...).
+ */
+export type RequestReport = $Result.DefaultSelection<Prisma.$RequestReportPayload>
+/**
+ * Model TrustEvent
+ * Append-only trust score audit log for a user.
+ */
+export type TrustEvent = $Result.DefaultSelection<Prisma.$TrustEventPayload>
+/**
+ * Model PhoneOtp
+ * One-time-password codes sent to a user's phone for verification.
+ */
+export type PhoneOtp = $Result.DefaultSelection<Prisma.$PhoneOtpPayload>
+/**
  * Model Transaction
  * 
  */
@@ -224,10 +239,24 @@ export const NotificationType: {
   DISPUTE_RAISED: 'DISPUTE_RAISED',
   DISPUTE_RESOLVED: 'DISPUTE_RESOLVED',
   KYC_APPROVED: 'KYC_APPROVED',
-  KYC_REJECTED: 'KYC_REJECTED'
+  KYC_REJECTED: 'KYC_REJECTED',
+  PHONE_OTP: 'PHONE_OTP',
+  REQUEST_REPORTED: 'REQUEST_REPORTED',
+  REQUEST_AUTO_CLOSED: 'REQUEST_AUTO_CLOSED',
+  USER_SUSPENDED: 'USER_SUSPENDED',
+  USER_REINSTATED: 'USER_REINSTATED',
+  AI_FLAGGED_REQUEST: 'AI_FLAGGED_REQUEST'
 };
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const OtpPurpose: {
+  PHONE_VERIFY: 'PHONE_VERIFY',
+  LOGIN: 'LOGIN'
+};
+
+export type OtpPurpose = (typeof OtpPurpose)[keyof typeof OtpPurpose]
 
 
 export const CategoryType: {
@@ -281,6 +310,10 @@ export const TransactionType: typeof $Enums.TransactionType
 export type NotificationType = $Enums.NotificationType
 
 export const NotificationType: typeof $Enums.NotificationType
+
+export type OtpPurpose = $Enums.OtpPurpose
+
+export const OtpPurpose: typeof $Enums.OtpPurpose
 
 export type CategoryType = $Enums.CategoryType
 
@@ -510,6 +543,36 @@ export class PrismaClient<
     * ```
     */
   get deliveryTracking(): Prisma.DeliveryTrackingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.requestReport`: Exposes CRUD operations for the **RequestReport** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RequestReports
+    * const requestReports = await prisma.requestReport.findMany()
+    * ```
+    */
+  get requestReport(): Prisma.RequestReportDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.trustEvent`: Exposes CRUD operations for the **TrustEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TrustEvents
+    * const trustEvents = await prisma.trustEvent.findMany()
+    * ```
+    */
+  get trustEvent(): Prisma.TrustEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.phoneOtp`: Exposes CRUD operations for the **PhoneOtp** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PhoneOtps
+    * const phoneOtps = await prisma.phoneOtp.findMany()
+    * ```
+    */
+  get phoneOtp(): Prisma.PhoneOtpDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.transaction`: Exposes CRUD operations for the **Transaction** model.
@@ -1064,6 +1127,9 @@ export namespace Prisma {
     Bid: 'Bid',
     BidImage: 'BidImage',
     DeliveryTracking: 'DeliveryTracking',
+    RequestReport: 'RequestReport',
+    TrustEvent: 'TrustEvent',
+    PhoneOtp: 'PhoneOtp',
     Transaction: 'Transaction',
     PaymentAttempt: 'PaymentAttempt',
     Notification: 'Notification',
@@ -1090,7 +1156,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "category" | "brand" | "vendorBrand" | "vendorCategory" | "request" | "requestImage" | "bid" | "bidImage" | "deliveryTracking" | "transaction" | "paymentAttempt" | "notification" | "chatMessage" | "withdrawalRequest" | "platformSetting" | "review" | "complaint" | "governorate" | "city" | "adminAuditLog"
+      modelProps: "user" | "category" | "brand" | "vendorBrand" | "vendorCategory" | "request" | "requestImage" | "bid" | "bidImage" | "deliveryTracking" | "requestReport" | "trustEvent" | "phoneOtp" | "transaction" | "paymentAttempt" | "notification" | "chatMessage" | "withdrawalRequest" | "platformSetting" | "review" | "complaint" | "governorate" | "city" | "adminAuditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1831,6 +1897,228 @@ export namespace Prisma {
           count: {
             args: Prisma.DeliveryTrackingCountArgs<ExtArgs>
             result: $Utils.Optional<DeliveryTrackingCountAggregateOutputType> | number
+          }
+        }
+      }
+      RequestReport: {
+        payload: Prisma.$RequestReportPayload<ExtArgs>
+        fields: Prisma.RequestReportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RequestReportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RequestReportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>
+          }
+          findFirst: {
+            args: Prisma.RequestReportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RequestReportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>
+          }
+          findMany: {
+            args: Prisma.RequestReportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>[]
+          }
+          create: {
+            args: Prisma.RequestReportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>
+          }
+          createMany: {
+            args: Prisma.RequestReportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RequestReportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>[]
+          }
+          delete: {
+            args: Prisma.RequestReportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>
+          }
+          update: {
+            args: Prisma.RequestReportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>
+          }
+          deleteMany: {
+            args: Prisma.RequestReportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RequestReportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RequestReportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>[]
+          }
+          upsert: {
+            args: Prisma.RequestReportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RequestReportPayload>
+          }
+          aggregate: {
+            args: Prisma.RequestReportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRequestReport>
+          }
+          groupBy: {
+            args: Prisma.RequestReportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RequestReportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RequestReportCountArgs<ExtArgs>
+            result: $Utils.Optional<RequestReportCountAggregateOutputType> | number
+          }
+        }
+      }
+      TrustEvent: {
+        payload: Prisma.$TrustEventPayload<ExtArgs>
+        fields: Prisma.TrustEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TrustEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TrustEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>
+          }
+          findFirst: {
+            args: Prisma.TrustEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TrustEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>
+          }
+          findMany: {
+            args: Prisma.TrustEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>[]
+          }
+          create: {
+            args: Prisma.TrustEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>
+          }
+          createMany: {
+            args: Prisma.TrustEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TrustEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>[]
+          }
+          delete: {
+            args: Prisma.TrustEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>
+          }
+          update: {
+            args: Prisma.TrustEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.TrustEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TrustEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TrustEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.TrustEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrustEventPayload>
+          }
+          aggregate: {
+            args: Prisma.TrustEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTrustEvent>
+          }
+          groupBy: {
+            args: Prisma.TrustEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TrustEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TrustEventCountArgs<ExtArgs>
+            result: $Utils.Optional<TrustEventCountAggregateOutputType> | number
+          }
+        }
+      }
+      PhoneOtp: {
+        payload: Prisma.$PhoneOtpPayload<ExtArgs>
+        fields: Prisma.PhoneOtpFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PhoneOtpFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PhoneOtpFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+          }
+          findFirst: {
+            args: Prisma.PhoneOtpFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PhoneOtpFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+          }
+          findMany: {
+            args: Prisma.PhoneOtpFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>[]
+          }
+          create: {
+            args: Prisma.PhoneOtpCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+          }
+          createMany: {
+            args: Prisma.PhoneOtpCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PhoneOtpCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>[]
+          }
+          delete: {
+            args: Prisma.PhoneOtpDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+          }
+          update: {
+            args: Prisma.PhoneOtpUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+          }
+          deleteMany: {
+            args: Prisma.PhoneOtpDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PhoneOtpUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PhoneOtpUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>[]
+          }
+          upsert: {
+            args: Prisma.PhoneOtpUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+          }
+          aggregate: {
+            args: Prisma.PhoneOtpAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePhoneOtp>
+          }
+          groupBy: {
+            args: Prisma.PhoneOtpGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PhoneOtpGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PhoneOtpCountArgs<ExtArgs>
+            result: $Utils.Optional<PhoneOtpCountAggregateOutputType> | number
           }
         }
       }
@@ -2766,6 +3054,9 @@ export namespace Prisma {
     bid?: BidOmit
     bidImage?: BidImageOmit
     deliveryTracking?: DeliveryTrackingOmit
+    requestReport?: RequestReportOmit
+    trustEvent?: TrustEventOmit
+    phoneOtp?: PhoneOtpOmit
     transaction?: TransactionOmit
     paymentAttempt?: PaymentAttemptOmit
     notification?: NotificationOmit
@@ -2871,6 +3162,9 @@ export namespace Prisma {
     reviewsReceived: number
     reviewsGiven: number
     transactions: number
+    trustEvents: number
+    requestReportsFiled: number
+    phoneOtps: number
     vendorBrands: number
     vendorCategories: number
     adminReviewedWithdrawals: number
@@ -2892,6 +3186,9 @@ export namespace Prisma {
     reviewsReceived?: boolean | UserCountOutputTypeCountReviewsReceivedArgs
     reviewsGiven?: boolean | UserCountOutputTypeCountReviewsGivenArgs
     transactions?: boolean | UserCountOutputTypeCountTransactionsArgs
+    trustEvents?: boolean | UserCountOutputTypeCountTrustEventsArgs
+    requestReportsFiled?: boolean | UserCountOutputTypeCountRequestReportsFiledArgs
+    phoneOtps?: boolean | UserCountOutputTypeCountPhoneOtpsArgs
     vendorBrands?: boolean | UserCountOutputTypeCountVendorBrandsArgs
     vendorCategories?: boolean | UserCountOutputTypeCountVendorCategoriesArgs
     adminReviewedWithdrawals?: boolean | UserCountOutputTypeCountAdminReviewedWithdrawalsArgs
@@ -3005,6 +3302,27 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TransactionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTrustEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrustEventWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountRequestReportsFiledArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RequestReportWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPhoneOtpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhoneOtpWhereInput
   }
 
   /**
@@ -3132,6 +3450,7 @@ export namespace Prisma {
   export type RequestCountOutputType = {
     bids: number
     complaints: number
+    reports: number
     deliveryTracking: number
     notifications: number
     images: number
@@ -3142,6 +3461,7 @@ export namespace Prisma {
   export type RequestCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bids?: boolean | RequestCountOutputTypeCountBidsArgs
     complaints?: boolean | RequestCountOutputTypeCountComplaintsArgs
+    reports?: boolean | RequestCountOutputTypeCountReportsArgs
     deliveryTracking?: boolean | RequestCountOutputTypeCountDeliveryTrackingArgs
     notifications?: boolean | RequestCountOutputTypeCountNotificationsArgs
     images?: boolean | RequestCountOutputTypeCountImagesArgs
@@ -3172,6 +3492,13 @@ export namespace Prisma {
    */
   export type RequestCountOutputTypeCountComplaintsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ComplaintWhereInput
+  }
+
+  /**
+   * RequestCountOutputType without action
+   */
+  export type RequestCountOutputTypeCountReportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RequestReportWhereInput
   }
 
   /**
@@ -3348,6 +3675,7 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     id: number | null
+    trustScore: number | null
     walletBalance: Decimal | null
     cityId: number | null
     governorateId: number | null
@@ -3357,6 +3685,7 @@ export namespace Prisma {
 
   export type UserSumAggregateOutputType = {
     id: number | null
+    trustScore: number | null
     walletBalance: Decimal | null
     cityId: number | null
     governorateId: number | null
@@ -3370,11 +3699,16 @@ export namespace Prisma {
     email: string | null
     password: string | null
     phone: string | null
+    phoneVerified: boolean | null
+    phoneVerifiedAt: Date | null
     role: $Enums.UserRole | null
     isActive: boolean | null
     isVerified: boolean | null
     verificationStatus: $Enums.VerificationStatus | null
     isBlocked: boolean | null
+    trustScore: number | null
+    suspendedUntil: Date | null
+    suspensionReason: string | null
     walletBalance: Decimal | null
     fcmToken: string | null
     cityId: number | null
@@ -3398,11 +3732,16 @@ export namespace Prisma {
     email: string | null
     password: string | null
     phone: string | null
+    phoneVerified: boolean | null
+    phoneVerifiedAt: Date | null
     role: $Enums.UserRole | null
     isActive: boolean | null
     isVerified: boolean | null
     verificationStatus: $Enums.VerificationStatus | null
     isBlocked: boolean | null
+    trustScore: number | null
+    suspendedUntil: Date | null
+    suspensionReason: string | null
     walletBalance: Decimal | null
     fcmToken: string | null
     cityId: number | null
@@ -3426,11 +3765,16 @@ export namespace Prisma {
     email: number
     password: number
     phone: number
+    phoneVerified: number
+    phoneVerifiedAt: number
     role: number
     isActive: number
     isVerified: number
     verificationStatus: number
     isBlocked: number
+    trustScore: number
+    suspendedUntil: number
+    suspensionReason: number
     walletBalance: number
     fcmToken: number
     cityId: number
@@ -3452,6 +3796,7 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     id?: true
+    trustScore?: true
     walletBalance?: true
     cityId?: true
     governorateId?: true
@@ -3461,6 +3806,7 @@ export namespace Prisma {
 
   export type UserSumAggregateInputType = {
     id?: true
+    trustScore?: true
     walletBalance?: true
     cityId?: true
     governorateId?: true
@@ -3474,11 +3820,16 @@ export namespace Prisma {
     email?: true
     password?: true
     phone?: true
+    phoneVerified?: true
+    phoneVerifiedAt?: true
     role?: true
     isActive?: true
     isVerified?: true
     verificationStatus?: true
     isBlocked?: true
+    trustScore?: true
+    suspendedUntil?: true
+    suspensionReason?: true
     walletBalance?: true
     fcmToken?: true
     cityId?: true
@@ -3502,11 +3853,16 @@ export namespace Prisma {
     email?: true
     password?: true
     phone?: true
+    phoneVerified?: true
+    phoneVerifiedAt?: true
     role?: true
     isActive?: true
     isVerified?: true
     verificationStatus?: true
     isBlocked?: true
+    trustScore?: true
+    suspendedUntil?: true
+    suspensionReason?: true
     walletBalance?: true
     fcmToken?: true
     cityId?: true
@@ -3530,11 +3886,16 @@ export namespace Prisma {
     email?: true
     password?: true
     phone?: true
+    phoneVerified?: true
+    phoneVerifiedAt?: true
     role?: true
     isActive?: true
     isVerified?: true
     verificationStatus?: true
     isBlocked?: true
+    trustScore?: true
+    suspendedUntil?: true
+    suspensionReason?: true
     walletBalance?: true
     fcmToken?: true
     cityId?: true
@@ -3645,11 +4006,16 @@ export namespace Prisma {
     email: string
     password: string
     phone: string | null
+    phoneVerified: boolean
+    phoneVerifiedAt: Date | null
     role: $Enums.UserRole
     isActive: boolean
     isVerified: boolean
     verificationStatus: $Enums.VerificationStatus
     isBlocked: boolean
+    trustScore: number
+    suspendedUntil: Date | null
+    suspensionReason: string | null
     walletBalance: Decimal
     fcmToken: string | null
     cityId: number | null
@@ -3692,11 +4058,16 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     phone?: boolean
+    phoneVerified?: boolean
+    phoneVerifiedAt?: boolean
     role?: boolean
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: boolean
     isBlocked?: boolean
+    trustScore?: boolean
+    suspendedUntil?: boolean
+    suspensionReason?: boolean
     walletBalance?: boolean
     fcmToken?: boolean
     cityId?: boolean
@@ -3726,6 +4097,9 @@ export namespace Prisma {
     reviewsReceived?: boolean | User$reviewsReceivedArgs<ExtArgs>
     reviewsGiven?: boolean | User$reviewsGivenArgs<ExtArgs>
     transactions?: boolean | User$transactionsArgs<ExtArgs>
+    trustEvents?: boolean | User$trustEventsArgs<ExtArgs>
+    requestReportsFiled?: boolean | User$requestReportsFiledArgs<ExtArgs>
+    phoneOtps?: boolean | User$phoneOtpsArgs<ExtArgs>
     city?: boolean | User$cityArgs<ExtArgs>
     governorate?: boolean | User$governorateArgs<ExtArgs>
     vendorBrands?: boolean | User$vendorBrandsArgs<ExtArgs>
@@ -3741,11 +4115,16 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     phone?: boolean
+    phoneVerified?: boolean
+    phoneVerifiedAt?: boolean
     role?: boolean
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: boolean
     isBlocked?: boolean
+    trustScore?: boolean
+    suspendedUntil?: boolean
+    suspensionReason?: boolean
     walletBalance?: boolean
     fcmToken?: boolean
     cityId?: boolean
@@ -3771,11 +4150,16 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     phone?: boolean
+    phoneVerified?: boolean
+    phoneVerifiedAt?: boolean
     role?: boolean
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: boolean
     isBlocked?: boolean
+    trustScore?: boolean
+    suspendedUntil?: boolean
+    suspensionReason?: boolean
     walletBalance?: boolean
     fcmToken?: boolean
     cityId?: boolean
@@ -3801,11 +4185,16 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     phone?: boolean
+    phoneVerified?: boolean
+    phoneVerifiedAt?: boolean
     role?: boolean
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: boolean
     isBlocked?: boolean
+    trustScore?: boolean
+    suspendedUntil?: boolean
+    suspensionReason?: boolean
     walletBalance?: boolean
     fcmToken?: boolean
     cityId?: boolean
@@ -3823,7 +4212,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fullName" | "email" | "password" | "phone" | "role" | "isActive" | "isVerified" | "verificationStatus" | "isBlocked" | "walletBalance" | "fcmToken" | "cityId" | "governorateId" | "nationalId" | "vehicleType" | "licensePlate" | "latitude" | "longitude" | "vendorAddress" | "idCardFrontUrl" | "idCardBackUrl" | "kycSubmissionDate" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fullName" | "email" | "password" | "phone" | "phoneVerified" | "phoneVerifiedAt" | "role" | "isActive" | "isVerified" | "verificationStatus" | "isBlocked" | "trustScore" | "suspendedUntil" | "suspensionReason" | "walletBalance" | "fcmToken" | "cityId" | "governorateId" | "nationalId" | "vehicleType" | "licensePlate" | "latitude" | "longitude" | "vendorAddress" | "idCardFrontUrl" | "idCardBackUrl" | "kycSubmissionDate" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     adminAuditLogs?: boolean | User$adminAuditLogsArgs<ExtArgs>
     vendorBids?: boolean | User$vendorBidsArgs<ExtArgs>
@@ -3839,6 +4228,9 @@ export namespace Prisma {
     reviewsReceived?: boolean | User$reviewsReceivedArgs<ExtArgs>
     reviewsGiven?: boolean | User$reviewsGivenArgs<ExtArgs>
     transactions?: boolean | User$transactionsArgs<ExtArgs>
+    trustEvents?: boolean | User$trustEventsArgs<ExtArgs>
+    requestReportsFiled?: boolean | User$requestReportsFiledArgs<ExtArgs>
+    phoneOtps?: boolean | User$phoneOtpsArgs<ExtArgs>
     city?: boolean | User$cityArgs<ExtArgs>
     governorate?: boolean | User$governorateArgs<ExtArgs>
     vendorBrands?: boolean | User$vendorBrandsArgs<ExtArgs>
@@ -3873,6 +4265,9 @@ export namespace Prisma {
       reviewsReceived: Prisma.$ReviewPayload<ExtArgs>[]
       reviewsGiven: Prisma.$ReviewPayload<ExtArgs>[]
       transactions: Prisma.$TransactionPayload<ExtArgs>[]
+      trustEvents: Prisma.$TrustEventPayload<ExtArgs>[]
+      requestReportsFiled: Prisma.$RequestReportPayload<ExtArgs>[]
+      phoneOtps: Prisma.$PhoneOtpPayload<ExtArgs>[]
       city: Prisma.$CityPayload<ExtArgs> | null
       governorate: Prisma.$GovernoratePayload<ExtArgs> | null
       vendorBrands: Prisma.$VendorBrandPayload<ExtArgs>[]
@@ -3886,11 +4281,16 @@ export namespace Prisma {
       email: string
       password: string
       phone: string | null
+      phoneVerified: boolean
+      phoneVerifiedAt: Date | null
       role: $Enums.UserRole
       isActive: boolean
       isVerified: boolean
       verificationStatus: $Enums.VerificationStatus
       isBlocked: boolean
+      trustScore: number
+      suspendedUntil: Date | null
+      suspensionReason: string | null
       walletBalance: Prisma.Decimal
       fcmToken: string | null
       cityId: number | null
@@ -4314,6 +4714,9 @@ export namespace Prisma {
     reviewsReceived<T extends User$reviewsReceivedArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     reviewsGiven<T extends User$reviewsGivenArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     transactions<T extends User$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    trustEvents<T extends User$trustEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$trustEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    requestReportsFiled<T extends User$requestReportsFiledArgs<ExtArgs> = {}>(args?: Subset<T, User$requestReportsFiledArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    phoneOtps<T extends User$phoneOtpsArgs<ExtArgs> = {}>(args?: Subset<T, User$phoneOtpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     city<T extends User$cityArgs<ExtArgs> = {}>(args?: Subset<T, User$cityArgs<ExtArgs>>): Prisma__CityClient<$Result.GetResult<Prisma.$CityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     governorate<T extends User$governorateArgs<ExtArgs> = {}>(args?: Subset<T, User$governorateArgs<ExtArgs>>): Prisma__GovernorateClient<$Result.GetResult<Prisma.$GovernoratePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     vendorBrands<T extends User$vendorBrandsArgs<ExtArgs> = {}>(args?: Subset<T, User$vendorBrandsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VendorBrandPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4354,11 +4757,16 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
     readonly phone: FieldRef<"User", 'String'>
+    readonly phoneVerified: FieldRef<"User", 'Boolean'>
+    readonly phoneVerifiedAt: FieldRef<"User", 'DateTime'>
     readonly role: FieldRef<"User", 'UserRole'>
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly isVerified: FieldRef<"User", 'Boolean'>
     readonly verificationStatus: FieldRef<"User", 'VerificationStatus'>
     readonly isBlocked: FieldRef<"User", 'Boolean'>
+    readonly trustScore: FieldRef<"User", 'Int'>
+    readonly suspendedUntil: FieldRef<"User", 'DateTime'>
+    readonly suspensionReason: FieldRef<"User", 'String'>
     readonly walletBalance: FieldRef<"User", 'Decimal'>
     readonly fcmToken: FieldRef<"User", 'String'>
     readonly cityId: FieldRef<"User", 'Int'>
@@ -5108,6 +5516,78 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TransactionScalarFieldEnum | TransactionScalarFieldEnum[]
+  }
+
+  /**
+   * User.trustEvents
+   */
+  export type User$trustEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    where?: TrustEventWhereInput
+    orderBy?: TrustEventOrderByWithRelationInput | TrustEventOrderByWithRelationInput[]
+    cursor?: TrustEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TrustEventScalarFieldEnum | TrustEventScalarFieldEnum[]
+  }
+
+  /**
+   * User.requestReportsFiled
+   */
+  export type User$requestReportsFiledArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    where?: RequestReportWhereInput
+    orderBy?: RequestReportOrderByWithRelationInput | RequestReportOrderByWithRelationInput[]
+    cursor?: RequestReportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RequestReportScalarFieldEnum | RequestReportScalarFieldEnum[]
+  }
+
+  /**
+   * User.phoneOtps
+   */
+  export type User$phoneOtpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    where?: PhoneOtpWhereInput
+    orderBy?: PhoneOtpOrderByWithRelationInput | PhoneOtpOrderByWithRelationInput[]
+    cursor?: PhoneOtpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PhoneOtpScalarFieldEnum | PhoneOtpScalarFieldEnum[]
   }
 
   /**
@@ -10218,6 +10698,7 @@ export namespace Prisma {
     updatedAt?: boolean
     bids?: boolean | Request$bidsArgs<ExtArgs>
     complaints?: boolean | Request$complaintsArgs<ExtArgs>
+    reports?: boolean | Request$reportsArgs<ExtArgs>
     deliveryTracking?: boolean | Request$deliveryTrackingArgs<ExtArgs>
     notifications?: boolean | Request$notificationsArgs<ExtArgs>
     deliveryAgent?: boolean | Request$deliveryAgentArgs<ExtArgs>
@@ -10318,6 +10799,7 @@ export namespace Prisma {
   export type RequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bids?: boolean | Request$bidsArgs<ExtArgs>
     complaints?: boolean | Request$complaintsArgs<ExtArgs>
+    reports?: boolean | Request$reportsArgs<ExtArgs>
     deliveryTracking?: boolean | Request$deliveryTrackingArgs<ExtArgs>
     notifications?: boolean | Request$notificationsArgs<ExtArgs>
     deliveryAgent?: boolean | Request$deliveryAgentArgs<ExtArgs>
@@ -10354,6 +10836,7 @@ export namespace Prisma {
     objects: {
       bids: Prisma.$BidPayload<ExtArgs>[]
       complaints: Prisma.$ComplaintPayload<ExtArgs>[]
+      reports: Prisma.$RequestReportPayload<ExtArgs>[]
       deliveryTracking: Prisma.$DeliveryTrackingPayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       deliveryAgent: Prisma.$UserPayload<ExtArgs> | null
@@ -10784,6 +11267,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     bids<T extends Request$bidsArgs<ExtArgs> = {}>(args?: Subset<T, Request$bidsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BidPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     complaints<T extends Request$complaintsArgs<ExtArgs> = {}>(args?: Subset<T, Request$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reports<T extends Request$reportsArgs<ExtArgs> = {}>(args?: Subset<T, Request$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deliveryTracking<T extends Request$deliveryTrackingArgs<ExtArgs> = {}>(args?: Subset<T, Request$deliveryTrackingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeliveryTrackingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends Request$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, Request$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deliveryAgent<T extends Request$deliveryAgentArgs<ExtArgs> = {}>(args?: Subset<T, Request$deliveryAgentArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -11291,6 +11775,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ComplaintScalarFieldEnum | ComplaintScalarFieldEnum[]
+  }
+
+  /**
+   * Request.reports
+   */
+  export type Request$reportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    where?: RequestReportWhereInput
+    orderBy?: RequestReportOrderByWithRelationInput | RequestReportOrderByWithRelationInput[]
+    cursor?: RequestReportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RequestReportScalarFieldEnum | RequestReportScalarFieldEnum[]
   }
 
   /**
@@ -16180,6 +16688,3433 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: DeliveryTrackingInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RequestReport
+   */
+
+  export type AggregateRequestReport = {
+    _count: RequestReportCountAggregateOutputType | null
+    _avg: RequestReportAvgAggregateOutputType | null
+    _sum: RequestReportSumAggregateOutputType | null
+    _min: RequestReportMinAggregateOutputType | null
+    _max: RequestReportMaxAggregateOutputType | null
+  }
+
+  export type RequestReportAvgAggregateOutputType = {
+    id: number | null
+    requestId: number | null
+    reportedById: number | null
+  }
+
+  export type RequestReportSumAggregateOutputType = {
+    id: number | null
+    requestId: number | null
+    reportedById: number | null
+  }
+
+  export type RequestReportMinAggregateOutputType = {
+    id: number | null
+    requestId: number | null
+    reportedById: number | null
+    reason: string | null
+    details: string | null
+    resolved: boolean | null
+    createdAt: Date | null
+  }
+
+  export type RequestReportMaxAggregateOutputType = {
+    id: number | null
+    requestId: number | null
+    reportedById: number | null
+    reason: string | null
+    details: string | null
+    resolved: boolean | null
+    createdAt: Date | null
+  }
+
+  export type RequestReportCountAggregateOutputType = {
+    id: number
+    requestId: number
+    reportedById: number
+    reason: number
+    details: number
+    resolved: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type RequestReportAvgAggregateInputType = {
+    id?: true
+    requestId?: true
+    reportedById?: true
+  }
+
+  export type RequestReportSumAggregateInputType = {
+    id?: true
+    requestId?: true
+    reportedById?: true
+  }
+
+  export type RequestReportMinAggregateInputType = {
+    id?: true
+    requestId?: true
+    reportedById?: true
+    reason?: true
+    details?: true
+    resolved?: true
+    createdAt?: true
+  }
+
+  export type RequestReportMaxAggregateInputType = {
+    id?: true
+    requestId?: true
+    reportedById?: true
+    reason?: true
+    details?: true
+    resolved?: true
+    createdAt?: true
+  }
+
+  export type RequestReportCountAggregateInputType = {
+    id?: true
+    requestId?: true
+    reportedById?: true
+    reason?: true
+    details?: true
+    resolved?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type RequestReportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RequestReport to aggregate.
+     */
+    where?: RequestReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RequestReports to fetch.
+     */
+    orderBy?: RequestReportOrderByWithRelationInput | RequestReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RequestReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RequestReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RequestReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RequestReports
+    **/
+    _count?: true | RequestReportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: RequestReportAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: RequestReportSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RequestReportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RequestReportMaxAggregateInputType
+  }
+
+  export type GetRequestReportAggregateType<T extends RequestReportAggregateArgs> = {
+        [P in keyof T & keyof AggregateRequestReport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRequestReport[P]>
+      : GetScalarType<T[P], AggregateRequestReport[P]>
+  }
+
+
+
+
+  export type RequestReportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RequestReportWhereInput
+    orderBy?: RequestReportOrderByWithAggregationInput | RequestReportOrderByWithAggregationInput[]
+    by: RequestReportScalarFieldEnum[] | RequestReportScalarFieldEnum
+    having?: RequestReportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RequestReportCountAggregateInputType | true
+    _avg?: RequestReportAvgAggregateInputType
+    _sum?: RequestReportSumAggregateInputType
+    _min?: RequestReportMinAggregateInputType
+    _max?: RequestReportMaxAggregateInputType
+  }
+
+  export type RequestReportGroupByOutputType = {
+    id: number
+    requestId: number
+    reportedById: number
+    reason: string
+    details: string | null
+    resolved: boolean
+    createdAt: Date
+    _count: RequestReportCountAggregateOutputType | null
+    _avg: RequestReportAvgAggregateOutputType | null
+    _sum: RequestReportSumAggregateOutputType | null
+    _min: RequestReportMinAggregateOutputType | null
+    _max: RequestReportMaxAggregateOutputType | null
+  }
+
+  type GetRequestReportGroupByPayload<T extends RequestReportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RequestReportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RequestReportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RequestReportGroupByOutputType[P]>
+            : GetScalarType<T[P], RequestReportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RequestReportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    requestId?: boolean
+    reportedById?: boolean
+    reason?: boolean
+    details?: boolean
+    resolved?: boolean
+    createdAt?: boolean
+    request?: boolean | RequestDefaultArgs<ExtArgs>
+    reportedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["requestReport"]>
+
+  export type RequestReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    requestId?: boolean
+    reportedById?: boolean
+    reason?: boolean
+    details?: boolean
+    resolved?: boolean
+    createdAt?: boolean
+    request?: boolean | RequestDefaultArgs<ExtArgs>
+    reportedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["requestReport"]>
+
+  export type RequestReportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    requestId?: boolean
+    reportedById?: boolean
+    reason?: boolean
+    details?: boolean
+    resolved?: boolean
+    createdAt?: boolean
+    request?: boolean | RequestDefaultArgs<ExtArgs>
+    reportedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["requestReport"]>
+
+  export type RequestReportSelectScalar = {
+    id?: boolean
+    requestId?: boolean
+    reportedById?: boolean
+    reason?: boolean
+    details?: boolean
+    resolved?: boolean
+    createdAt?: boolean
+  }
+
+  export type RequestReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "requestId" | "reportedById" | "reason" | "details" | "resolved" | "createdAt", ExtArgs["result"]["requestReport"]>
+  export type RequestReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    request?: boolean | RequestDefaultArgs<ExtArgs>
+    reportedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type RequestReportIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    request?: boolean | RequestDefaultArgs<ExtArgs>
+    reportedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type RequestReportIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    request?: boolean | RequestDefaultArgs<ExtArgs>
+    reportedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $RequestReportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RequestReport"
+    objects: {
+      request: Prisma.$RequestPayload<ExtArgs>
+      reportedBy: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      requestId: number
+      reportedById: number
+      reason: string
+      details: string | null
+      resolved: boolean
+      createdAt: Date
+    }, ExtArgs["result"]["requestReport"]>
+    composites: {}
+  }
+
+  type RequestReportGetPayload<S extends boolean | null | undefined | RequestReportDefaultArgs> = $Result.GetResult<Prisma.$RequestReportPayload, S>
+
+  type RequestReportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RequestReportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RequestReportCountAggregateInputType | true
+    }
+
+  export interface RequestReportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RequestReport'], meta: { name: 'RequestReport' } }
+    /**
+     * Find zero or one RequestReport that matches the filter.
+     * @param {RequestReportFindUniqueArgs} args - Arguments to find a RequestReport
+     * @example
+     * // Get one RequestReport
+     * const requestReport = await prisma.requestReport.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RequestReportFindUniqueArgs>(args: SelectSubset<T, RequestReportFindUniqueArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RequestReport that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RequestReportFindUniqueOrThrowArgs} args - Arguments to find a RequestReport
+     * @example
+     * // Get one RequestReport
+     * const requestReport = await prisma.requestReport.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RequestReportFindUniqueOrThrowArgs>(args: SelectSubset<T, RequestReportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RequestReport that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportFindFirstArgs} args - Arguments to find a RequestReport
+     * @example
+     * // Get one RequestReport
+     * const requestReport = await prisma.requestReport.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RequestReportFindFirstArgs>(args?: SelectSubset<T, RequestReportFindFirstArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RequestReport that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportFindFirstOrThrowArgs} args - Arguments to find a RequestReport
+     * @example
+     * // Get one RequestReport
+     * const requestReport = await prisma.requestReport.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RequestReportFindFirstOrThrowArgs>(args?: SelectSubset<T, RequestReportFindFirstOrThrowArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RequestReports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RequestReports
+     * const requestReports = await prisma.requestReport.findMany()
+     * 
+     * // Get first 10 RequestReports
+     * const requestReports = await prisma.requestReport.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const requestReportWithIdOnly = await prisma.requestReport.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RequestReportFindManyArgs>(args?: SelectSubset<T, RequestReportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RequestReport.
+     * @param {RequestReportCreateArgs} args - Arguments to create a RequestReport.
+     * @example
+     * // Create one RequestReport
+     * const RequestReport = await prisma.requestReport.create({
+     *   data: {
+     *     // ... data to create a RequestReport
+     *   }
+     * })
+     * 
+     */
+    create<T extends RequestReportCreateArgs>(args: SelectSubset<T, RequestReportCreateArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RequestReports.
+     * @param {RequestReportCreateManyArgs} args - Arguments to create many RequestReports.
+     * @example
+     * // Create many RequestReports
+     * const requestReport = await prisma.requestReport.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RequestReportCreateManyArgs>(args?: SelectSubset<T, RequestReportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RequestReports and returns the data saved in the database.
+     * @param {RequestReportCreateManyAndReturnArgs} args - Arguments to create many RequestReports.
+     * @example
+     * // Create many RequestReports
+     * const requestReport = await prisma.requestReport.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RequestReports and only return the `id`
+     * const requestReportWithIdOnly = await prisma.requestReport.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RequestReportCreateManyAndReturnArgs>(args?: SelectSubset<T, RequestReportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RequestReport.
+     * @param {RequestReportDeleteArgs} args - Arguments to delete one RequestReport.
+     * @example
+     * // Delete one RequestReport
+     * const RequestReport = await prisma.requestReport.delete({
+     *   where: {
+     *     // ... filter to delete one RequestReport
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RequestReportDeleteArgs>(args: SelectSubset<T, RequestReportDeleteArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RequestReport.
+     * @param {RequestReportUpdateArgs} args - Arguments to update one RequestReport.
+     * @example
+     * // Update one RequestReport
+     * const requestReport = await prisma.requestReport.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RequestReportUpdateArgs>(args: SelectSubset<T, RequestReportUpdateArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RequestReports.
+     * @param {RequestReportDeleteManyArgs} args - Arguments to filter RequestReports to delete.
+     * @example
+     * // Delete a few RequestReports
+     * const { count } = await prisma.requestReport.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RequestReportDeleteManyArgs>(args?: SelectSubset<T, RequestReportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RequestReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RequestReports
+     * const requestReport = await prisma.requestReport.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RequestReportUpdateManyArgs>(args: SelectSubset<T, RequestReportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RequestReports and returns the data updated in the database.
+     * @param {RequestReportUpdateManyAndReturnArgs} args - Arguments to update many RequestReports.
+     * @example
+     * // Update many RequestReports
+     * const requestReport = await prisma.requestReport.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RequestReports and only return the `id`
+     * const requestReportWithIdOnly = await prisma.requestReport.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RequestReportUpdateManyAndReturnArgs>(args: SelectSubset<T, RequestReportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RequestReport.
+     * @param {RequestReportUpsertArgs} args - Arguments to update or create a RequestReport.
+     * @example
+     * // Update or create a RequestReport
+     * const requestReport = await prisma.requestReport.upsert({
+     *   create: {
+     *     // ... data to create a RequestReport
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RequestReport we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RequestReportUpsertArgs>(args: SelectSubset<T, RequestReportUpsertArgs<ExtArgs>>): Prisma__RequestReportClient<$Result.GetResult<Prisma.$RequestReportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RequestReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportCountArgs} args - Arguments to filter RequestReports to count.
+     * @example
+     * // Count the number of RequestReports
+     * const count = await prisma.requestReport.count({
+     *   where: {
+     *     // ... the filter for the RequestReports we want to count
+     *   }
+     * })
+    **/
+    count<T extends RequestReportCountArgs>(
+      args?: Subset<T, RequestReportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RequestReportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RequestReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RequestReportAggregateArgs>(args: Subset<T, RequestReportAggregateArgs>): Prisma.PrismaPromise<GetRequestReportAggregateType<T>>
+
+    /**
+     * Group by RequestReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RequestReportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RequestReportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RequestReportGroupByArgs['orderBy'] }
+        : { orderBy?: RequestReportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RequestReportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRequestReportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RequestReport model
+   */
+  readonly fields: RequestReportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RequestReport.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RequestReportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    request<T extends RequestDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RequestDefaultArgs<ExtArgs>>): Prisma__RequestClient<$Result.GetResult<Prisma.$RequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    reportedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RequestReport model
+   */
+  interface RequestReportFieldRefs {
+    readonly id: FieldRef<"RequestReport", 'Int'>
+    readonly requestId: FieldRef<"RequestReport", 'Int'>
+    readonly reportedById: FieldRef<"RequestReport", 'Int'>
+    readonly reason: FieldRef<"RequestReport", 'String'>
+    readonly details: FieldRef<"RequestReport", 'String'>
+    readonly resolved: FieldRef<"RequestReport", 'Boolean'>
+    readonly createdAt: FieldRef<"RequestReport", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RequestReport findUnique
+   */
+  export type RequestReportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * Filter, which RequestReport to fetch.
+     */
+    where: RequestReportWhereUniqueInput
+  }
+
+  /**
+   * RequestReport findUniqueOrThrow
+   */
+  export type RequestReportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * Filter, which RequestReport to fetch.
+     */
+    where: RequestReportWhereUniqueInput
+  }
+
+  /**
+   * RequestReport findFirst
+   */
+  export type RequestReportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * Filter, which RequestReport to fetch.
+     */
+    where?: RequestReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RequestReports to fetch.
+     */
+    orderBy?: RequestReportOrderByWithRelationInput | RequestReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RequestReports.
+     */
+    cursor?: RequestReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RequestReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RequestReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RequestReports.
+     */
+    distinct?: RequestReportScalarFieldEnum | RequestReportScalarFieldEnum[]
+  }
+
+  /**
+   * RequestReport findFirstOrThrow
+   */
+  export type RequestReportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * Filter, which RequestReport to fetch.
+     */
+    where?: RequestReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RequestReports to fetch.
+     */
+    orderBy?: RequestReportOrderByWithRelationInput | RequestReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RequestReports.
+     */
+    cursor?: RequestReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RequestReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RequestReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RequestReports.
+     */
+    distinct?: RequestReportScalarFieldEnum | RequestReportScalarFieldEnum[]
+  }
+
+  /**
+   * RequestReport findMany
+   */
+  export type RequestReportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * Filter, which RequestReports to fetch.
+     */
+    where?: RequestReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RequestReports to fetch.
+     */
+    orderBy?: RequestReportOrderByWithRelationInput | RequestReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RequestReports.
+     */
+    cursor?: RequestReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RequestReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RequestReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RequestReports.
+     */
+    distinct?: RequestReportScalarFieldEnum | RequestReportScalarFieldEnum[]
+  }
+
+  /**
+   * RequestReport create
+   */
+  export type RequestReportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RequestReport.
+     */
+    data: XOR<RequestReportCreateInput, RequestReportUncheckedCreateInput>
+  }
+
+  /**
+   * RequestReport createMany
+   */
+  export type RequestReportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RequestReports.
+     */
+    data: RequestReportCreateManyInput | RequestReportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RequestReport createManyAndReturn
+   */
+  export type RequestReportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * The data used to create many RequestReports.
+     */
+    data: RequestReportCreateManyInput | RequestReportCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RequestReport update
+   */
+  export type RequestReportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RequestReport.
+     */
+    data: XOR<RequestReportUpdateInput, RequestReportUncheckedUpdateInput>
+    /**
+     * Choose, which RequestReport to update.
+     */
+    where: RequestReportWhereUniqueInput
+  }
+
+  /**
+   * RequestReport updateMany
+   */
+  export type RequestReportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RequestReports.
+     */
+    data: XOR<RequestReportUpdateManyMutationInput, RequestReportUncheckedUpdateManyInput>
+    /**
+     * Filter which RequestReports to update
+     */
+    where?: RequestReportWhereInput
+    /**
+     * Limit how many RequestReports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RequestReport updateManyAndReturn
+   */
+  export type RequestReportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * The data used to update RequestReports.
+     */
+    data: XOR<RequestReportUpdateManyMutationInput, RequestReportUncheckedUpdateManyInput>
+    /**
+     * Filter which RequestReports to update
+     */
+    where?: RequestReportWhereInput
+    /**
+     * Limit how many RequestReports to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RequestReport upsert
+   */
+  export type RequestReportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RequestReport to update in case it exists.
+     */
+    where: RequestReportWhereUniqueInput
+    /**
+     * In case the RequestReport found by the `where` argument doesn't exist, create a new RequestReport with this data.
+     */
+    create: XOR<RequestReportCreateInput, RequestReportUncheckedCreateInput>
+    /**
+     * In case the RequestReport was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RequestReportUpdateInput, RequestReportUncheckedUpdateInput>
+  }
+
+  /**
+   * RequestReport delete
+   */
+  export type RequestReportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+    /**
+     * Filter which RequestReport to delete.
+     */
+    where: RequestReportWhereUniqueInput
+  }
+
+  /**
+   * RequestReport deleteMany
+   */
+  export type RequestReportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RequestReports to delete
+     */
+    where?: RequestReportWhereInput
+    /**
+     * Limit how many RequestReports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RequestReport without action
+   */
+  export type RequestReportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RequestReport
+     */
+    select?: RequestReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RequestReport
+     */
+    omit?: RequestReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RequestReportInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TrustEvent
+   */
+
+  export type AggregateTrustEvent = {
+    _count: TrustEventCountAggregateOutputType | null
+    _avg: TrustEventAvgAggregateOutputType | null
+    _sum: TrustEventSumAggregateOutputType | null
+    _min: TrustEventMinAggregateOutputType | null
+    _max: TrustEventMaxAggregateOutputType | null
+  }
+
+  export type TrustEventAvgAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    delta: number | null
+    actorId: number | null
+  }
+
+  export type TrustEventSumAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    delta: number | null
+    actorId: number | null
+  }
+
+  export type TrustEventMinAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    delta: number | null
+    reason: string | null
+    actorId: number | null
+    createdAt: Date | null
+  }
+
+  export type TrustEventMaxAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    delta: number | null
+    reason: string | null
+    actorId: number | null
+    createdAt: Date | null
+  }
+
+  export type TrustEventCountAggregateOutputType = {
+    id: number
+    userId: number
+    delta: number
+    reason: number
+    actorId: number
+    metadata: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type TrustEventAvgAggregateInputType = {
+    id?: true
+    userId?: true
+    delta?: true
+    actorId?: true
+  }
+
+  export type TrustEventSumAggregateInputType = {
+    id?: true
+    userId?: true
+    delta?: true
+    actorId?: true
+  }
+
+  export type TrustEventMinAggregateInputType = {
+    id?: true
+    userId?: true
+    delta?: true
+    reason?: true
+    actorId?: true
+    createdAt?: true
+  }
+
+  export type TrustEventMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    delta?: true
+    reason?: true
+    actorId?: true
+    createdAt?: true
+  }
+
+  export type TrustEventCountAggregateInputType = {
+    id?: true
+    userId?: true
+    delta?: true
+    reason?: true
+    actorId?: true
+    metadata?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type TrustEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrustEvent to aggregate.
+     */
+    where?: TrustEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrustEvents to fetch.
+     */
+    orderBy?: TrustEventOrderByWithRelationInput | TrustEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TrustEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrustEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrustEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TrustEvents
+    **/
+    _count?: true | TrustEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TrustEventAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TrustEventSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TrustEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TrustEventMaxAggregateInputType
+  }
+
+  export type GetTrustEventAggregateType<T extends TrustEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateTrustEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTrustEvent[P]>
+      : GetScalarType<T[P], AggregateTrustEvent[P]>
+  }
+
+
+
+
+  export type TrustEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrustEventWhereInput
+    orderBy?: TrustEventOrderByWithAggregationInput | TrustEventOrderByWithAggregationInput[]
+    by: TrustEventScalarFieldEnum[] | TrustEventScalarFieldEnum
+    having?: TrustEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TrustEventCountAggregateInputType | true
+    _avg?: TrustEventAvgAggregateInputType
+    _sum?: TrustEventSumAggregateInputType
+    _min?: TrustEventMinAggregateInputType
+    _max?: TrustEventMaxAggregateInputType
+  }
+
+  export type TrustEventGroupByOutputType = {
+    id: number
+    userId: number
+    delta: number
+    reason: string
+    actorId: number | null
+    metadata: JsonValue | null
+    createdAt: Date
+    _count: TrustEventCountAggregateOutputType | null
+    _avg: TrustEventAvgAggregateOutputType | null
+    _sum: TrustEventSumAggregateOutputType | null
+    _min: TrustEventMinAggregateOutputType | null
+    _max: TrustEventMaxAggregateOutputType | null
+  }
+
+  type GetTrustEventGroupByPayload<T extends TrustEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TrustEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TrustEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TrustEventGroupByOutputType[P]>
+            : GetScalarType<T[P], TrustEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TrustEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    delta?: boolean
+    reason?: boolean
+    actorId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trustEvent"]>
+
+  export type TrustEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    delta?: boolean
+    reason?: boolean
+    actorId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trustEvent"]>
+
+  export type TrustEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    delta?: boolean
+    reason?: boolean
+    actorId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trustEvent"]>
+
+  export type TrustEventSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    delta?: boolean
+    reason?: boolean
+    actorId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+  }
+
+  export type TrustEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "delta" | "reason" | "actorId" | "metadata" | "createdAt", ExtArgs["result"]["trustEvent"]>
+  export type TrustEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TrustEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TrustEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $TrustEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TrustEvent"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      userId: number
+      delta: number
+      reason: string
+      actorId: number | null
+      metadata: Prisma.JsonValue | null
+      createdAt: Date
+    }, ExtArgs["result"]["trustEvent"]>
+    composites: {}
+  }
+
+  type TrustEventGetPayload<S extends boolean | null | undefined | TrustEventDefaultArgs> = $Result.GetResult<Prisma.$TrustEventPayload, S>
+
+  type TrustEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TrustEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TrustEventCountAggregateInputType | true
+    }
+
+  export interface TrustEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TrustEvent'], meta: { name: 'TrustEvent' } }
+    /**
+     * Find zero or one TrustEvent that matches the filter.
+     * @param {TrustEventFindUniqueArgs} args - Arguments to find a TrustEvent
+     * @example
+     * // Get one TrustEvent
+     * const trustEvent = await prisma.trustEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TrustEventFindUniqueArgs>(args: SelectSubset<T, TrustEventFindUniqueArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TrustEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TrustEventFindUniqueOrThrowArgs} args - Arguments to find a TrustEvent
+     * @example
+     * // Get one TrustEvent
+     * const trustEvent = await prisma.trustEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TrustEventFindUniqueOrThrowArgs>(args: SelectSubset<T, TrustEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TrustEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventFindFirstArgs} args - Arguments to find a TrustEvent
+     * @example
+     * // Get one TrustEvent
+     * const trustEvent = await prisma.trustEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TrustEventFindFirstArgs>(args?: SelectSubset<T, TrustEventFindFirstArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TrustEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventFindFirstOrThrowArgs} args - Arguments to find a TrustEvent
+     * @example
+     * // Get one TrustEvent
+     * const trustEvent = await prisma.trustEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TrustEventFindFirstOrThrowArgs>(args?: SelectSubset<T, TrustEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TrustEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TrustEvents
+     * const trustEvents = await prisma.trustEvent.findMany()
+     * 
+     * // Get first 10 TrustEvents
+     * const trustEvents = await prisma.trustEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const trustEventWithIdOnly = await prisma.trustEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TrustEventFindManyArgs>(args?: SelectSubset<T, TrustEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TrustEvent.
+     * @param {TrustEventCreateArgs} args - Arguments to create a TrustEvent.
+     * @example
+     * // Create one TrustEvent
+     * const TrustEvent = await prisma.trustEvent.create({
+     *   data: {
+     *     // ... data to create a TrustEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends TrustEventCreateArgs>(args: SelectSubset<T, TrustEventCreateArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TrustEvents.
+     * @param {TrustEventCreateManyArgs} args - Arguments to create many TrustEvents.
+     * @example
+     * // Create many TrustEvents
+     * const trustEvent = await prisma.trustEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TrustEventCreateManyArgs>(args?: SelectSubset<T, TrustEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TrustEvents and returns the data saved in the database.
+     * @param {TrustEventCreateManyAndReturnArgs} args - Arguments to create many TrustEvents.
+     * @example
+     * // Create many TrustEvents
+     * const trustEvent = await prisma.trustEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TrustEvents and only return the `id`
+     * const trustEventWithIdOnly = await prisma.trustEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TrustEventCreateManyAndReturnArgs>(args?: SelectSubset<T, TrustEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TrustEvent.
+     * @param {TrustEventDeleteArgs} args - Arguments to delete one TrustEvent.
+     * @example
+     * // Delete one TrustEvent
+     * const TrustEvent = await prisma.trustEvent.delete({
+     *   where: {
+     *     // ... filter to delete one TrustEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TrustEventDeleteArgs>(args: SelectSubset<T, TrustEventDeleteArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TrustEvent.
+     * @param {TrustEventUpdateArgs} args - Arguments to update one TrustEvent.
+     * @example
+     * // Update one TrustEvent
+     * const trustEvent = await prisma.trustEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TrustEventUpdateArgs>(args: SelectSubset<T, TrustEventUpdateArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TrustEvents.
+     * @param {TrustEventDeleteManyArgs} args - Arguments to filter TrustEvents to delete.
+     * @example
+     * // Delete a few TrustEvents
+     * const { count } = await prisma.trustEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TrustEventDeleteManyArgs>(args?: SelectSubset<T, TrustEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TrustEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TrustEvents
+     * const trustEvent = await prisma.trustEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TrustEventUpdateManyArgs>(args: SelectSubset<T, TrustEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TrustEvents and returns the data updated in the database.
+     * @param {TrustEventUpdateManyAndReturnArgs} args - Arguments to update many TrustEvents.
+     * @example
+     * // Update many TrustEvents
+     * const trustEvent = await prisma.trustEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TrustEvents and only return the `id`
+     * const trustEventWithIdOnly = await prisma.trustEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TrustEventUpdateManyAndReturnArgs>(args: SelectSubset<T, TrustEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TrustEvent.
+     * @param {TrustEventUpsertArgs} args - Arguments to update or create a TrustEvent.
+     * @example
+     * // Update or create a TrustEvent
+     * const trustEvent = await prisma.trustEvent.upsert({
+     *   create: {
+     *     // ... data to create a TrustEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TrustEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TrustEventUpsertArgs>(args: SelectSubset<T, TrustEventUpsertArgs<ExtArgs>>): Prisma__TrustEventClient<$Result.GetResult<Prisma.$TrustEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TrustEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventCountArgs} args - Arguments to filter TrustEvents to count.
+     * @example
+     * // Count the number of TrustEvents
+     * const count = await prisma.trustEvent.count({
+     *   where: {
+     *     // ... the filter for the TrustEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends TrustEventCountArgs>(
+      args?: Subset<T, TrustEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TrustEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TrustEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TrustEventAggregateArgs>(args: Subset<T, TrustEventAggregateArgs>): Prisma.PrismaPromise<GetTrustEventAggregateType<T>>
+
+    /**
+     * Group by TrustEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrustEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TrustEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TrustEventGroupByArgs['orderBy'] }
+        : { orderBy?: TrustEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TrustEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrustEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TrustEvent model
+   */
+  readonly fields: TrustEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TrustEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TrustEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TrustEvent model
+   */
+  interface TrustEventFieldRefs {
+    readonly id: FieldRef<"TrustEvent", 'Int'>
+    readonly userId: FieldRef<"TrustEvent", 'Int'>
+    readonly delta: FieldRef<"TrustEvent", 'Int'>
+    readonly reason: FieldRef<"TrustEvent", 'String'>
+    readonly actorId: FieldRef<"TrustEvent", 'Int'>
+    readonly metadata: FieldRef<"TrustEvent", 'Json'>
+    readonly createdAt: FieldRef<"TrustEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TrustEvent findUnique
+   */
+  export type TrustEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrustEvent to fetch.
+     */
+    where: TrustEventWhereUniqueInput
+  }
+
+  /**
+   * TrustEvent findUniqueOrThrow
+   */
+  export type TrustEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrustEvent to fetch.
+     */
+    where: TrustEventWhereUniqueInput
+  }
+
+  /**
+   * TrustEvent findFirst
+   */
+  export type TrustEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrustEvent to fetch.
+     */
+    where?: TrustEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrustEvents to fetch.
+     */
+    orderBy?: TrustEventOrderByWithRelationInput | TrustEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TrustEvents.
+     */
+    cursor?: TrustEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrustEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrustEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrustEvents.
+     */
+    distinct?: TrustEventScalarFieldEnum | TrustEventScalarFieldEnum[]
+  }
+
+  /**
+   * TrustEvent findFirstOrThrow
+   */
+  export type TrustEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrustEvent to fetch.
+     */
+    where?: TrustEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrustEvents to fetch.
+     */
+    orderBy?: TrustEventOrderByWithRelationInput | TrustEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TrustEvents.
+     */
+    cursor?: TrustEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrustEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrustEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrustEvents.
+     */
+    distinct?: TrustEventScalarFieldEnum | TrustEventScalarFieldEnum[]
+  }
+
+  /**
+   * TrustEvent findMany
+   */
+  export type TrustEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrustEvents to fetch.
+     */
+    where?: TrustEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrustEvents to fetch.
+     */
+    orderBy?: TrustEventOrderByWithRelationInput | TrustEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TrustEvents.
+     */
+    cursor?: TrustEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrustEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrustEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrustEvents.
+     */
+    distinct?: TrustEventScalarFieldEnum | TrustEventScalarFieldEnum[]
+  }
+
+  /**
+   * TrustEvent create
+   */
+  export type TrustEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TrustEvent.
+     */
+    data: XOR<TrustEventCreateInput, TrustEventUncheckedCreateInput>
+  }
+
+  /**
+   * TrustEvent createMany
+   */
+  export type TrustEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TrustEvents.
+     */
+    data: TrustEventCreateManyInput | TrustEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TrustEvent createManyAndReturn
+   */
+  export type TrustEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many TrustEvents.
+     */
+    data: TrustEventCreateManyInput | TrustEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TrustEvent update
+   */
+  export type TrustEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TrustEvent.
+     */
+    data: XOR<TrustEventUpdateInput, TrustEventUncheckedUpdateInput>
+    /**
+     * Choose, which TrustEvent to update.
+     */
+    where: TrustEventWhereUniqueInput
+  }
+
+  /**
+   * TrustEvent updateMany
+   */
+  export type TrustEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TrustEvents.
+     */
+    data: XOR<TrustEventUpdateManyMutationInput, TrustEventUncheckedUpdateManyInput>
+    /**
+     * Filter which TrustEvents to update
+     */
+    where?: TrustEventWhereInput
+    /**
+     * Limit how many TrustEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TrustEvent updateManyAndReturn
+   */
+  export type TrustEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * The data used to update TrustEvents.
+     */
+    data: XOR<TrustEventUpdateManyMutationInput, TrustEventUncheckedUpdateManyInput>
+    /**
+     * Filter which TrustEvents to update
+     */
+    where?: TrustEventWhereInput
+    /**
+     * Limit how many TrustEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TrustEvent upsert
+   */
+  export type TrustEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TrustEvent to update in case it exists.
+     */
+    where: TrustEventWhereUniqueInput
+    /**
+     * In case the TrustEvent found by the `where` argument doesn't exist, create a new TrustEvent with this data.
+     */
+    create: XOR<TrustEventCreateInput, TrustEventUncheckedCreateInput>
+    /**
+     * In case the TrustEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TrustEventUpdateInput, TrustEventUncheckedUpdateInput>
+  }
+
+  /**
+   * TrustEvent delete
+   */
+  export type TrustEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+    /**
+     * Filter which TrustEvent to delete.
+     */
+    where: TrustEventWhereUniqueInput
+  }
+
+  /**
+   * TrustEvent deleteMany
+   */
+  export type TrustEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrustEvents to delete
+     */
+    where?: TrustEventWhereInput
+    /**
+     * Limit how many TrustEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TrustEvent without action
+   */
+  export type TrustEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrustEvent
+     */
+    select?: TrustEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrustEvent
+     */
+    omit?: TrustEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrustEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PhoneOtp
+   */
+
+  export type AggregatePhoneOtp = {
+    _count: PhoneOtpCountAggregateOutputType | null
+    _avg: PhoneOtpAvgAggregateOutputType | null
+    _sum: PhoneOtpSumAggregateOutputType | null
+    _min: PhoneOtpMinAggregateOutputType | null
+    _max: PhoneOtpMaxAggregateOutputType | null
+  }
+
+  export type PhoneOtpAvgAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    attempts: number | null
+  }
+
+  export type PhoneOtpSumAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    attempts: number | null
+  }
+
+  export type PhoneOtpMinAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    phone: string | null
+    codeHash: string | null
+    purpose: $Enums.OtpPurpose | null
+    attempts: number | null
+    consumed: boolean | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type PhoneOtpMaxAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    phone: string | null
+    codeHash: string | null
+    purpose: $Enums.OtpPurpose | null
+    attempts: number | null
+    consumed: boolean | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type PhoneOtpCountAggregateOutputType = {
+    id: number
+    userId: number
+    phone: number
+    codeHash: number
+    purpose: number
+    attempts: number
+    consumed: number
+    expiresAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type PhoneOtpAvgAggregateInputType = {
+    id?: true
+    userId?: true
+    attempts?: true
+  }
+
+  export type PhoneOtpSumAggregateInputType = {
+    id?: true
+    userId?: true
+    attempts?: true
+  }
+
+  export type PhoneOtpMinAggregateInputType = {
+    id?: true
+    userId?: true
+    phone?: true
+    codeHash?: true
+    purpose?: true
+    attempts?: true
+    consumed?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type PhoneOtpMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    phone?: true
+    codeHash?: true
+    purpose?: true
+    attempts?: true
+    consumed?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type PhoneOtpCountAggregateInputType = {
+    id?: true
+    userId?: true
+    phone?: true
+    codeHash?: true
+    purpose?: true
+    attempts?: true
+    consumed?: true
+    expiresAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type PhoneOtpAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PhoneOtp to aggregate.
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhoneOtps to fetch.
+     */
+    orderBy?: PhoneOtpOrderByWithRelationInput | PhoneOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PhoneOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhoneOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhoneOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PhoneOtps
+    **/
+    _count?: true | PhoneOtpCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PhoneOtpAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PhoneOtpSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PhoneOtpMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PhoneOtpMaxAggregateInputType
+  }
+
+  export type GetPhoneOtpAggregateType<T extends PhoneOtpAggregateArgs> = {
+        [P in keyof T & keyof AggregatePhoneOtp]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePhoneOtp[P]>
+      : GetScalarType<T[P], AggregatePhoneOtp[P]>
+  }
+
+
+
+
+  export type PhoneOtpGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhoneOtpWhereInput
+    orderBy?: PhoneOtpOrderByWithAggregationInput | PhoneOtpOrderByWithAggregationInput[]
+    by: PhoneOtpScalarFieldEnum[] | PhoneOtpScalarFieldEnum
+    having?: PhoneOtpScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PhoneOtpCountAggregateInputType | true
+    _avg?: PhoneOtpAvgAggregateInputType
+    _sum?: PhoneOtpSumAggregateInputType
+    _min?: PhoneOtpMinAggregateInputType
+    _max?: PhoneOtpMaxAggregateInputType
+  }
+
+  export type PhoneOtpGroupByOutputType = {
+    id: number
+    userId: number
+    phone: string
+    codeHash: string
+    purpose: $Enums.OtpPurpose
+    attempts: number
+    consumed: boolean
+    expiresAt: Date
+    createdAt: Date
+    _count: PhoneOtpCountAggregateOutputType | null
+    _avg: PhoneOtpAvgAggregateOutputType | null
+    _sum: PhoneOtpSumAggregateOutputType | null
+    _min: PhoneOtpMinAggregateOutputType | null
+    _max: PhoneOtpMaxAggregateOutputType | null
+  }
+
+  type GetPhoneOtpGroupByPayload<T extends PhoneOtpGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PhoneOtpGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PhoneOtpGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PhoneOtpGroupByOutputType[P]>
+            : GetScalarType<T[P], PhoneOtpGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PhoneOtpSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phone?: boolean
+    codeHash?: boolean
+    purpose?: boolean
+    attempts?: boolean
+    consumed?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["phoneOtp"]>
+
+  export type PhoneOtpSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phone?: boolean
+    codeHash?: boolean
+    purpose?: boolean
+    attempts?: boolean
+    consumed?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["phoneOtp"]>
+
+  export type PhoneOtpSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phone?: boolean
+    codeHash?: boolean
+    purpose?: boolean
+    attempts?: boolean
+    consumed?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["phoneOtp"]>
+
+  export type PhoneOtpSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    phone?: boolean
+    codeHash?: boolean
+    purpose?: boolean
+    attempts?: boolean
+    consumed?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type PhoneOtpOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "phone" | "codeHash" | "purpose" | "attempts" | "consumed" | "expiresAt" | "createdAt", ExtArgs["result"]["phoneOtp"]>
+  export type PhoneOtpInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PhoneOtpIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PhoneOtpIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $PhoneOtpPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PhoneOtp"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      userId: number
+      phone: string
+      codeHash: string
+      purpose: $Enums.OtpPurpose
+      attempts: number
+      consumed: boolean
+      expiresAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["phoneOtp"]>
+    composites: {}
+  }
+
+  type PhoneOtpGetPayload<S extends boolean | null | undefined | PhoneOtpDefaultArgs> = $Result.GetResult<Prisma.$PhoneOtpPayload, S>
+
+  type PhoneOtpCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PhoneOtpFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PhoneOtpCountAggregateInputType | true
+    }
+
+  export interface PhoneOtpDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PhoneOtp'], meta: { name: 'PhoneOtp' } }
+    /**
+     * Find zero or one PhoneOtp that matches the filter.
+     * @param {PhoneOtpFindUniqueArgs} args - Arguments to find a PhoneOtp
+     * @example
+     * // Get one PhoneOtp
+     * const phoneOtp = await prisma.phoneOtp.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PhoneOtpFindUniqueArgs>(args: SelectSubset<T, PhoneOtpFindUniqueArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PhoneOtp that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PhoneOtpFindUniqueOrThrowArgs} args - Arguments to find a PhoneOtp
+     * @example
+     * // Get one PhoneOtp
+     * const phoneOtp = await prisma.phoneOtp.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PhoneOtpFindUniqueOrThrowArgs>(args: SelectSubset<T, PhoneOtpFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PhoneOtp that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpFindFirstArgs} args - Arguments to find a PhoneOtp
+     * @example
+     * // Get one PhoneOtp
+     * const phoneOtp = await prisma.phoneOtp.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PhoneOtpFindFirstArgs>(args?: SelectSubset<T, PhoneOtpFindFirstArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PhoneOtp that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpFindFirstOrThrowArgs} args - Arguments to find a PhoneOtp
+     * @example
+     * // Get one PhoneOtp
+     * const phoneOtp = await prisma.phoneOtp.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PhoneOtpFindFirstOrThrowArgs>(args?: SelectSubset<T, PhoneOtpFindFirstOrThrowArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PhoneOtps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PhoneOtps
+     * const phoneOtps = await prisma.phoneOtp.findMany()
+     * 
+     * // Get first 10 PhoneOtps
+     * const phoneOtps = await prisma.phoneOtp.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const phoneOtpWithIdOnly = await prisma.phoneOtp.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PhoneOtpFindManyArgs>(args?: SelectSubset<T, PhoneOtpFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PhoneOtp.
+     * @param {PhoneOtpCreateArgs} args - Arguments to create a PhoneOtp.
+     * @example
+     * // Create one PhoneOtp
+     * const PhoneOtp = await prisma.phoneOtp.create({
+     *   data: {
+     *     // ... data to create a PhoneOtp
+     *   }
+     * })
+     * 
+     */
+    create<T extends PhoneOtpCreateArgs>(args: SelectSubset<T, PhoneOtpCreateArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PhoneOtps.
+     * @param {PhoneOtpCreateManyArgs} args - Arguments to create many PhoneOtps.
+     * @example
+     * // Create many PhoneOtps
+     * const phoneOtp = await prisma.phoneOtp.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PhoneOtpCreateManyArgs>(args?: SelectSubset<T, PhoneOtpCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PhoneOtps and returns the data saved in the database.
+     * @param {PhoneOtpCreateManyAndReturnArgs} args - Arguments to create many PhoneOtps.
+     * @example
+     * // Create many PhoneOtps
+     * const phoneOtp = await prisma.phoneOtp.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PhoneOtps and only return the `id`
+     * const phoneOtpWithIdOnly = await prisma.phoneOtp.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PhoneOtpCreateManyAndReturnArgs>(args?: SelectSubset<T, PhoneOtpCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PhoneOtp.
+     * @param {PhoneOtpDeleteArgs} args - Arguments to delete one PhoneOtp.
+     * @example
+     * // Delete one PhoneOtp
+     * const PhoneOtp = await prisma.phoneOtp.delete({
+     *   where: {
+     *     // ... filter to delete one PhoneOtp
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PhoneOtpDeleteArgs>(args: SelectSubset<T, PhoneOtpDeleteArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PhoneOtp.
+     * @param {PhoneOtpUpdateArgs} args - Arguments to update one PhoneOtp.
+     * @example
+     * // Update one PhoneOtp
+     * const phoneOtp = await prisma.phoneOtp.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PhoneOtpUpdateArgs>(args: SelectSubset<T, PhoneOtpUpdateArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PhoneOtps.
+     * @param {PhoneOtpDeleteManyArgs} args - Arguments to filter PhoneOtps to delete.
+     * @example
+     * // Delete a few PhoneOtps
+     * const { count } = await prisma.phoneOtp.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PhoneOtpDeleteManyArgs>(args?: SelectSubset<T, PhoneOtpDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PhoneOtps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PhoneOtps
+     * const phoneOtp = await prisma.phoneOtp.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PhoneOtpUpdateManyArgs>(args: SelectSubset<T, PhoneOtpUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PhoneOtps and returns the data updated in the database.
+     * @param {PhoneOtpUpdateManyAndReturnArgs} args - Arguments to update many PhoneOtps.
+     * @example
+     * // Update many PhoneOtps
+     * const phoneOtp = await prisma.phoneOtp.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PhoneOtps and only return the `id`
+     * const phoneOtpWithIdOnly = await prisma.phoneOtp.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PhoneOtpUpdateManyAndReturnArgs>(args: SelectSubset<T, PhoneOtpUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PhoneOtp.
+     * @param {PhoneOtpUpsertArgs} args - Arguments to update or create a PhoneOtp.
+     * @example
+     * // Update or create a PhoneOtp
+     * const phoneOtp = await prisma.phoneOtp.upsert({
+     *   create: {
+     *     // ... data to create a PhoneOtp
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PhoneOtp we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PhoneOtpUpsertArgs>(args: SelectSubset<T, PhoneOtpUpsertArgs<ExtArgs>>): Prisma__PhoneOtpClient<$Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PhoneOtps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpCountArgs} args - Arguments to filter PhoneOtps to count.
+     * @example
+     * // Count the number of PhoneOtps
+     * const count = await prisma.phoneOtp.count({
+     *   where: {
+     *     // ... the filter for the PhoneOtps we want to count
+     *   }
+     * })
+    **/
+    count<T extends PhoneOtpCountArgs>(
+      args?: Subset<T, PhoneOtpCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PhoneOtpCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PhoneOtp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PhoneOtpAggregateArgs>(args: Subset<T, PhoneOtpAggregateArgs>): Prisma.PrismaPromise<GetPhoneOtpAggregateType<T>>
+
+    /**
+     * Group by PhoneOtp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhoneOtpGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PhoneOtpGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PhoneOtpGroupByArgs['orderBy'] }
+        : { orderBy?: PhoneOtpGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PhoneOtpGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPhoneOtpGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PhoneOtp model
+   */
+  readonly fields: PhoneOtpFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PhoneOtp.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PhoneOtpClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PhoneOtp model
+   */
+  interface PhoneOtpFieldRefs {
+    readonly id: FieldRef<"PhoneOtp", 'Int'>
+    readonly userId: FieldRef<"PhoneOtp", 'Int'>
+    readonly phone: FieldRef<"PhoneOtp", 'String'>
+    readonly codeHash: FieldRef<"PhoneOtp", 'String'>
+    readonly purpose: FieldRef<"PhoneOtp", 'OtpPurpose'>
+    readonly attempts: FieldRef<"PhoneOtp", 'Int'>
+    readonly consumed: FieldRef<"PhoneOtp", 'Boolean'>
+    readonly expiresAt: FieldRef<"PhoneOtp", 'DateTime'>
+    readonly createdAt: FieldRef<"PhoneOtp", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PhoneOtp findUnique
+   */
+  export type PhoneOtpFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which PhoneOtp to fetch.
+     */
+    where: PhoneOtpWhereUniqueInput
+  }
+
+  /**
+   * PhoneOtp findUniqueOrThrow
+   */
+  export type PhoneOtpFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which PhoneOtp to fetch.
+     */
+    where: PhoneOtpWhereUniqueInput
+  }
+
+  /**
+   * PhoneOtp findFirst
+   */
+  export type PhoneOtpFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which PhoneOtp to fetch.
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhoneOtps to fetch.
+     */
+    orderBy?: PhoneOtpOrderByWithRelationInput | PhoneOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PhoneOtps.
+     */
+    cursor?: PhoneOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhoneOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhoneOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhoneOtps.
+     */
+    distinct?: PhoneOtpScalarFieldEnum | PhoneOtpScalarFieldEnum[]
+  }
+
+  /**
+   * PhoneOtp findFirstOrThrow
+   */
+  export type PhoneOtpFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which PhoneOtp to fetch.
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhoneOtps to fetch.
+     */
+    orderBy?: PhoneOtpOrderByWithRelationInput | PhoneOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PhoneOtps.
+     */
+    cursor?: PhoneOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhoneOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhoneOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhoneOtps.
+     */
+    distinct?: PhoneOtpScalarFieldEnum | PhoneOtpScalarFieldEnum[]
+  }
+
+  /**
+   * PhoneOtp findMany
+   */
+  export type PhoneOtpFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which PhoneOtps to fetch.
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhoneOtps to fetch.
+     */
+    orderBy?: PhoneOtpOrderByWithRelationInput | PhoneOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PhoneOtps.
+     */
+    cursor?: PhoneOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhoneOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhoneOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhoneOtps.
+     */
+    distinct?: PhoneOtpScalarFieldEnum | PhoneOtpScalarFieldEnum[]
+  }
+
+  /**
+   * PhoneOtp create
+   */
+  export type PhoneOtpCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PhoneOtp.
+     */
+    data: XOR<PhoneOtpCreateInput, PhoneOtpUncheckedCreateInput>
+  }
+
+  /**
+   * PhoneOtp createMany
+   */
+  export type PhoneOtpCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PhoneOtps.
+     */
+    data: PhoneOtpCreateManyInput | PhoneOtpCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PhoneOtp createManyAndReturn
+   */
+  export type PhoneOtpCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * The data used to create many PhoneOtps.
+     */
+    data: PhoneOtpCreateManyInput | PhoneOtpCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PhoneOtp update
+   */
+  export type PhoneOtpUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PhoneOtp.
+     */
+    data: XOR<PhoneOtpUpdateInput, PhoneOtpUncheckedUpdateInput>
+    /**
+     * Choose, which PhoneOtp to update.
+     */
+    where: PhoneOtpWhereUniqueInput
+  }
+
+  /**
+   * PhoneOtp updateMany
+   */
+  export type PhoneOtpUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PhoneOtps.
+     */
+    data: XOR<PhoneOtpUpdateManyMutationInput, PhoneOtpUncheckedUpdateManyInput>
+    /**
+     * Filter which PhoneOtps to update
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * Limit how many PhoneOtps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PhoneOtp updateManyAndReturn
+   */
+  export type PhoneOtpUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * The data used to update PhoneOtps.
+     */
+    data: XOR<PhoneOtpUpdateManyMutationInput, PhoneOtpUncheckedUpdateManyInput>
+    /**
+     * Filter which PhoneOtps to update
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * Limit how many PhoneOtps to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PhoneOtp upsert
+   */
+  export type PhoneOtpUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PhoneOtp to update in case it exists.
+     */
+    where: PhoneOtpWhereUniqueInput
+    /**
+     * In case the PhoneOtp found by the `where` argument doesn't exist, create a new PhoneOtp with this data.
+     */
+    create: XOR<PhoneOtpCreateInput, PhoneOtpUncheckedCreateInput>
+    /**
+     * In case the PhoneOtp was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PhoneOtpUpdateInput, PhoneOtpUncheckedUpdateInput>
+  }
+
+  /**
+   * PhoneOtp delete
+   */
+  export type PhoneOtpDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
+    /**
+     * Filter which PhoneOtp to delete.
+     */
+    where: PhoneOtpWhereUniqueInput
+  }
+
+  /**
+   * PhoneOtp deleteMany
+   */
+  export type PhoneOtpDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PhoneOtps to delete
+     */
+    where?: PhoneOtpWhereInput
+    /**
+     * Limit how many PhoneOtps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PhoneOtp without action
+   */
+  export type PhoneOtpDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhoneOtp
+     */
+    select?: PhoneOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhoneOtp
+     */
+    omit?: PhoneOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhoneOtpInclude<ExtArgs> | null
   }
 
 
@@ -29088,11 +33023,16 @@ export namespace Prisma {
     email: 'email',
     password: 'password',
     phone: 'phone',
+    phoneVerified: 'phoneVerified',
+    phoneVerifiedAt: 'phoneVerifiedAt',
     role: 'role',
     isActive: 'isActive',
     isVerified: 'isVerified',
     verificationStatus: 'verificationStatus',
     isBlocked: 'isBlocked',
+    trustScore: 'trustScore',
+    suspendedUntil: 'suspendedUntil',
+    suspensionReason: 'suspensionReason',
     walletBalance: 'walletBalance',
     fcmToken: 'fcmToken',
     cityId: 'cityId',
@@ -29241,6 +33181,47 @@ export namespace Prisma {
   };
 
   export type DeliveryTrackingScalarFieldEnum = (typeof DeliveryTrackingScalarFieldEnum)[keyof typeof DeliveryTrackingScalarFieldEnum]
+
+
+  export const RequestReportScalarFieldEnum: {
+    id: 'id',
+    requestId: 'requestId',
+    reportedById: 'reportedById',
+    reason: 'reason',
+    details: 'details',
+    resolved: 'resolved',
+    createdAt: 'createdAt'
+  };
+
+  export type RequestReportScalarFieldEnum = (typeof RequestReportScalarFieldEnum)[keyof typeof RequestReportScalarFieldEnum]
+
+
+  export const TrustEventScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    delta: 'delta',
+    reason: 'reason',
+    actorId: 'actorId',
+    metadata: 'metadata',
+    createdAt: 'createdAt'
+  };
+
+  export type TrustEventScalarFieldEnum = (typeof TrustEventScalarFieldEnum)[keyof typeof TrustEventScalarFieldEnum]
+
+
+  export const PhoneOtpScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    phone: 'phone',
+    codeHash: 'codeHash',
+    purpose: 'purpose',
+    attempts: 'attempts',
+    consumed: 'consumed',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt'
+  };
+
+  export type PhoneOtpScalarFieldEnum = (typeof PhoneOtpScalarFieldEnum)[keyof typeof PhoneOtpScalarFieldEnum]
 
 
   export const TransactionScalarFieldEnum: {
@@ -29475,6 +33456,27 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
    * Reference to a field of type 'UserRole'
    */
   export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -29485,13 +33487,6 @@ export namespace Prisma {
    * Reference to a field of type 'UserRole[]'
    */
   export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -29534,20 +33529,6 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime[]'
-   */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -29608,20 +33589,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'TransactionType'
-   */
-  export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
-    
-
-
-  /**
-   * Reference to a field of type 'TransactionType[]'
-   */
-  export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -29632,6 +33599,34 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'OtpPurpose'
+   */
+  export type EnumOtpPurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OtpPurpose'>
+    
+
+
+  /**
+   * Reference to a field of type 'OtpPurpose[]'
+   */
+  export type ListEnumOtpPurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OtpPurpose[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TransactionType'
+   */
+  export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'TransactionType[]'
+   */
+  export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType[]'>
     
 
 
@@ -29689,11 +33684,16 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
     phone?: StringNullableFilter<"User"> | string | null
+    phoneVerified?: BoolFilter<"User"> | boolean
+    phoneVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     isActive?: BoolFilter<"User"> | boolean
     isVerified?: BoolFilter<"User"> | boolean
     verificationStatus?: EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
     isBlocked?: BoolFilter<"User"> | boolean
+    trustScore?: IntFilter<"User"> | number
+    suspendedUntil?: DateTimeNullableFilter<"User"> | Date | string | null
+    suspensionReason?: StringNullableFilter<"User"> | string | null
     walletBalance?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     fcmToken?: StringNullableFilter<"User"> | string | null
     cityId?: IntNullableFilter<"User"> | number | null
@@ -29723,6 +33723,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewListRelationFilter
     reviewsGiven?: ReviewListRelationFilter
     transactions?: TransactionListRelationFilter
+    trustEvents?: TrustEventListRelationFilter
+    requestReportsFiled?: RequestReportListRelationFilter
+    phoneOtps?: PhoneOtpListRelationFilter
     city?: XOR<CityNullableScalarRelationFilter, CityWhereInput> | null
     governorate?: XOR<GovernorateNullableScalarRelationFilter, GovernorateWhereInput> | null
     vendorBrands?: VendorBrandListRelationFilter
@@ -29737,11 +33740,16 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     phone?: SortOrderInput | SortOrder
+    phoneVerified?: SortOrder
+    phoneVerifiedAt?: SortOrderInput | SortOrder
     role?: SortOrder
     isActive?: SortOrder
     isVerified?: SortOrder
     verificationStatus?: SortOrder
     isBlocked?: SortOrder
+    trustScore?: SortOrder
+    suspendedUntil?: SortOrderInput | SortOrder
+    suspensionReason?: SortOrderInput | SortOrder
     walletBalance?: SortOrder
     fcmToken?: SortOrderInput | SortOrder
     cityId?: SortOrderInput | SortOrder
@@ -29771,6 +33779,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewOrderByRelationAggregateInput
     reviewsGiven?: ReviewOrderByRelationAggregateInput
     transactions?: TransactionOrderByRelationAggregateInput
+    trustEvents?: TrustEventOrderByRelationAggregateInput
+    requestReportsFiled?: RequestReportOrderByRelationAggregateInput
+    phoneOtps?: PhoneOtpOrderByRelationAggregateInput
     city?: CityOrderByWithRelationInput
     governorate?: GovernorateOrderByWithRelationInput
     vendorBrands?: VendorBrandOrderByRelationAggregateInput
@@ -29789,11 +33800,16 @@ export namespace Prisma {
     fullName?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
     phone?: StringNullableFilter<"User"> | string | null
+    phoneVerified?: BoolFilter<"User"> | boolean
+    phoneVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     isActive?: BoolFilter<"User"> | boolean
     isVerified?: BoolFilter<"User"> | boolean
     verificationStatus?: EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
     isBlocked?: BoolFilter<"User"> | boolean
+    trustScore?: IntFilter<"User"> | number
+    suspendedUntil?: DateTimeNullableFilter<"User"> | Date | string | null
+    suspensionReason?: StringNullableFilter<"User"> | string | null
     walletBalance?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     fcmToken?: StringNullableFilter<"User"> | string | null
     cityId?: IntNullableFilter<"User"> | number | null
@@ -29822,6 +33838,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewListRelationFilter
     reviewsGiven?: ReviewListRelationFilter
     transactions?: TransactionListRelationFilter
+    trustEvents?: TrustEventListRelationFilter
+    requestReportsFiled?: RequestReportListRelationFilter
+    phoneOtps?: PhoneOtpListRelationFilter
     city?: XOR<CityNullableScalarRelationFilter, CityWhereInput> | null
     governorate?: XOR<GovernorateNullableScalarRelationFilter, GovernorateWhereInput> | null
     vendorBrands?: VendorBrandListRelationFilter
@@ -29836,11 +33855,16 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     phone?: SortOrderInput | SortOrder
+    phoneVerified?: SortOrder
+    phoneVerifiedAt?: SortOrderInput | SortOrder
     role?: SortOrder
     isActive?: SortOrder
     isVerified?: SortOrder
     verificationStatus?: SortOrder
     isBlocked?: SortOrder
+    trustScore?: SortOrder
+    suspendedUntil?: SortOrderInput | SortOrder
+    suspensionReason?: SortOrderInput | SortOrder
     walletBalance?: SortOrder
     fcmToken?: SortOrderInput | SortOrder
     cityId?: SortOrderInput | SortOrder
@@ -29872,11 +33896,16 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     password?: StringWithAggregatesFilter<"User"> | string
     phone?: StringNullableWithAggregatesFilter<"User"> | string | null
+    phoneVerified?: BoolWithAggregatesFilter<"User"> | boolean
+    phoneVerifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     isVerified?: BoolWithAggregatesFilter<"User"> | boolean
     verificationStatus?: EnumVerificationStatusWithAggregatesFilter<"User"> | $Enums.VerificationStatus
     isBlocked?: BoolWithAggregatesFilter<"User"> | boolean
+    trustScore?: IntWithAggregatesFilter<"User"> | number
+    suspendedUntil?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    suspensionReason?: StringNullableWithAggregatesFilter<"User"> | string | null
     walletBalance?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
     fcmToken?: StringNullableWithAggregatesFilter<"User"> | string | null
     cityId?: IntNullableWithAggregatesFilter<"User"> | number | null
@@ -30178,6 +34207,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Request"> | Date | string
     bids?: BidListRelationFilter
     complaints?: ComplaintListRelationFilter
+    reports?: RequestReportListRelationFilter
     deliveryTracking?: DeliveryTrackingListRelationFilter
     notifications?: NotificationListRelationFilter
     deliveryAgent?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -30215,6 +34245,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     bids?: BidOrderByRelationAggregateInput
     complaints?: ComplaintOrderByRelationAggregateInput
+    reports?: RequestReportOrderByRelationAggregateInput
     deliveryTracking?: DeliveryTrackingOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
     deliveryAgent?: UserOrderByWithRelationInput
@@ -30255,6 +34286,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Request"> | Date | string
     bids?: BidListRelationFilter
     complaints?: ComplaintListRelationFilter
+    reports?: RequestReportListRelationFilter
     deliveryTracking?: DeliveryTrackingListRelationFilter
     notifications?: NotificationListRelationFilter
     deliveryAgent?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -30626,6 +34658,221 @@ export namespace Prisma {
     note?: StringNullableWithAggregatesFilter<"DeliveryTracking"> | string | null
     locationText?: StringNullableWithAggregatesFilter<"DeliveryTracking"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DeliveryTracking"> | Date | string
+  }
+
+  export type RequestReportWhereInput = {
+    AND?: RequestReportWhereInput | RequestReportWhereInput[]
+    OR?: RequestReportWhereInput[]
+    NOT?: RequestReportWhereInput | RequestReportWhereInput[]
+    id?: IntFilter<"RequestReport"> | number
+    requestId?: IntFilter<"RequestReport"> | number
+    reportedById?: IntFilter<"RequestReport"> | number
+    reason?: StringFilter<"RequestReport"> | string
+    details?: StringNullableFilter<"RequestReport"> | string | null
+    resolved?: BoolFilter<"RequestReport"> | boolean
+    createdAt?: DateTimeFilter<"RequestReport"> | Date | string
+    request?: XOR<RequestScalarRelationFilter, RequestWhereInput>
+    reportedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type RequestReportOrderByWithRelationInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
+    reason?: SortOrder
+    details?: SortOrderInput | SortOrder
+    resolved?: SortOrder
+    createdAt?: SortOrder
+    request?: RequestOrderByWithRelationInput
+    reportedBy?: UserOrderByWithRelationInput
+  }
+
+  export type RequestReportWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    requestId_reportedById?: RequestReportRequestIdReportedByIdCompoundUniqueInput
+    AND?: RequestReportWhereInput | RequestReportWhereInput[]
+    OR?: RequestReportWhereInput[]
+    NOT?: RequestReportWhereInput | RequestReportWhereInput[]
+    requestId?: IntFilter<"RequestReport"> | number
+    reportedById?: IntFilter<"RequestReport"> | number
+    reason?: StringFilter<"RequestReport"> | string
+    details?: StringNullableFilter<"RequestReport"> | string | null
+    resolved?: BoolFilter<"RequestReport"> | boolean
+    createdAt?: DateTimeFilter<"RequestReport"> | Date | string
+    request?: XOR<RequestScalarRelationFilter, RequestWhereInput>
+    reportedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "requestId_reportedById">
+
+  export type RequestReportOrderByWithAggregationInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
+    reason?: SortOrder
+    details?: SortOrderInput | SortOrder
+    resolved?: SortOrder
+    createdAt?: SortOrder
+    _count?: RequestReportCountOrderByAggregateInput
+    _avg?: RequestReportAvgOrderByAggregateInput
+    _max?: RequestReportMaxOrderByAggregateInput
+    _min?: RequestReportMinOrderByAggregateInput
+    _sum?: RequestReportSumOrderByAggregateInput
+  }
+
+  export type RequestReportScalarWhereWithAggregatesInput = {
+    AND?: RequestReportScalarWhereWithAggregatesInput | RequestReportScalarWhereWithAggregatesInput[]
+    OR?: RequestReportScalarWhereWithAggregatesInput[]
+    NOT?: RequestReportScalarWhereWithAggregatesInput | RequestReportScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"RequestReport"> | number
+    requestId?: IntWithAggregatesFilter<"RequestReport"> | number
+    reportedById?: IntWithAggregatesFilter<"RequestReport"> | number
+    reason?: StringWithAggregatesFilter<"RequestReport"> | string
+    details?: StringNullableWithAggregatesFilter<"RequestReport"> | string | null
+    resolved?: BoolWithAggregatesFilter<"RequestReport"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"RequestReport"> | Date | string
+  }
+
+  export type TrustEventWhereInput = {
+    AND?: TrustEventWhereInput | TrustEventWhereInput[]
+    OR?: TrustEventWhereInput[]
+    NOT?: TrustEventWhereInput | TrustEventWhereInput[]
+    id?: IntFilter<"TrustEvent"> | number
+    userId?: IntFilter<"TrustEvent"> | number
+    delta?: IntFilter<"TrustEvent"> | number
+    reason?: StringFilter<"TrustEvent"> | string
+    actorId?: IntNullableFilter<"TrustEvent"> | number | null
+    metadata?: JsonNullableFilter<"TrustEvent">
+    createdAt?: DateTimeFilter<"TrustEvent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type TrustEventOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    actorId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type TrustEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: TrustEventWhereInput | TrustEventWhereInput[]
+    OR?: TrustEventWhereInput[]
+    NOT?: TrustEventWhereInput | TrustEventWhereInput[]
+    userId?: IntFilter<"TrustEvent"> | number
+    delta?: IntFilter<"TrustEvent"> | number
+    reason?: StringFilter<"TrustEvent"> | string
+    actorId?: IntNullableFilter<"TrustEvent"> | number | null
+    metadata?: JsonNullableFilter<"TrustEvent">
+    createdAt?: DateTimeFilter<"TrustEvent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type TrustEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    actorId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: TrustEventCountOrderByAggregateInput
+    _avg?: TrustEventAvgOrderByAggregateInput
+    _max?: TrustEventMaxOrderByAggregateInput
+    _min?: TrustEventMinOrderByAggregateInput
+    _sum?: TrustEventSumOrderByAggregateInput
+  }
+
+  export type TrustEventScalarWhereWithAggregatesInput = {
+    AND?: TrustEventScalarWhereWithAggregatesInput | TrustEventScalarWhereWithAggregatesInput[]
+    OR?: TrustEventScalarWhereWithAggregatesInput[]
+    NOT?: TrustEventScalarWhereWithAggregatesInput | TrustEventScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"TrustEvent"> | number
+    userId?: IntWithAggregatesFilter<"TrustEvent"> | number
+    delta?: IntWithAggregatesFilter<"TrustEvent"> | number
+    reason?: StringWithAggregatesFilter<"TrustEvent"> | string
+    actorId?: IntNullableWithAggregatesFilter<"TrustEvent"> | number | null
+    metadata?: JsonNullableWithAggregatesFilter<"TrustEvent">
+    createdAt?: DateTimeWithAggregatesFilter<"TrustEvent"> | Date | string
+  }
+
+  export type PhoneOtpWhereInput = {
+    AND?: PhoneOtpWhereInput | PhoneOtpWhereInput[]
+    OR?: PhoneOtpWhereInput[]
+    NOT?: PhoneOtpWhereInput | PhoneOtpWhereInput[]
+    id?: IntFilter<"PhoneOtp"> | number
+    userId?: IntFilter<"PhoneOtp"> | number
+    phone?: StringFilter<"PhoneOtp"> | string
+    codeHash?: StringFilter<"PhoneOtp"> | string
+    purpose?: EnumOtpPurposeFilter<"PhoneOtp"> | $Enums.OtpPurpose
+    attempts?: IntFilter<"PhoneOtp"> | number
+    consumed?: BoolFilter<"PhoneOtp"> | boolean
+    expiresAt?: DateTimeFilter<"PhoneOtp"> | Date | string
+    createdAt?: DateTimeFilter<"PhoneOtp"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type PhoneOtpOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phone?: SortOrder
+    codeHash?: SortOrder
+    purpose?: SortOrder
+    attempts?: SortOrder
+    consumed?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type PhoneOtpWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: PhoneOtpWhereInput | PhoneOtpWhereInput[]
+    OR?: PhoneOtpWhereInput[]
+    NOT?: PhoneOtpWhereInput | PhoneOtpWhereInput[]
+    userId?: IntFilter<"PhoneOtp"> | number
+    phone?: StringFilter<"PhoneOtp"> | string
+    codeHash?: StringFilter<"PhoneOtp"> | string
+    purpose?: EnumOtpPurposeFilter<"PhoneOtp"> | $Enums.OtpPurpose
+    attempts?: IntFilter<"PhoneOtp"> | number
+    consumed?: BoolFilter<"PhoneOtp"> | boolean
+    expiresAt?: DateTimeFilter<"PhoneOtp"> | Date | string
+    createdAt?: DateTimeFilter<"PhoneOtp"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type PhoneOtpOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phone?: SortOrder
+    codeHash?: SortOrder
+    purpose?: SortOrder
+    attempts?: SortOrder
+    consumed?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: PhoneOtpCountOrderByAggregateInput
+    _avg?: PhoneOtpAvgOrderByAggregateInput
+    _max?: PhoneOtpMaxOrderByAggregateInput
+    _min?: PhoneOtpMinOrderByAggregateInput
+    _sum?: PhoneOtpSumOrderByAggregateInput
+  }
+
+  export type PhoneOtpScalarWhereWithAggregatesInput = {
+    AND?: PhoneOtpScalarWhereWithAggregatesInput | PhoneOtpScalarWhereWithAggregatesInput[]
+    OR?: PhoneOtpScalarWhereWithAggregatesInput[]
+    NOT?: PhoneOtpScalarWhereWithAggregatesInput | PhoneOtpScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"PhoneOtp"> | number
+    userId?: IntWithAggregatesFilter<"PhoneOtp"> | number
+    phone?: StringWithAggregatesFilter<"PhoneOtp"> | string
+    codeHash?: StringWithAggregatesFilter<"PhoneOtp"> | string
+    purpose?: EnumOtpPurposeWithAggregatesFilter<"PhoneOtp"> | $Enums.OtpPurpose
+    attempts?: IntWithAggregatesFilter<"PhoneOtp"> | number
+    consumed?: BoolWithAggregatesFilter<"PhoneOtp"> | boolean
+    expiresAt?: DateTimeWithAggregatesFilter<"PhoneOtp"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"PhoneOtp"> | Date | string
   }
 
   export type TransactionWhereInput = {
@@ -31480,11 +35727,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -31512,6 +35764,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -31526,11 +35781,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -31560,6 +35820,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -31571,11 +35834,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31603,6 +35871,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -31617,11 +35888,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -31651,6 +35927,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -31663,11 +35942,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -31690,11 +35974,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31716,11 +36005,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -31997,6 +36291,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -32034,6 +36329,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -32058,6 +36354,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -32095,6 +36392,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -32471,6 +36769,217 @@ export namespace Prisma {
     speed?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     locationText?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RequestReportCreateInput = {
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+    request: RequestCreateNestedOneWithoutReportsInput
+    reportedBy: UserCreateNestedOneWithoutRequestReportsFiledInput
+  }
+
+  export type RequestReportUncheckedCreateInput = {
+    id?: number
+    requestId: number
+    reportedById: number
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+  }
+
+  export type RequestReportUpdateInput = {
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    request?: RequestUpdateOneRequiredWithoutReportsNestedInput
+    reportedBy?: UserUpdateOneRequiredWithoutRequestReportsFiledNestedInput
+  }
+
+  export type RequestReportUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    requestId?: IntFieldUpdateOperationsInput | number
+    reportedById?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RequestReportCreateManyInput = {
+    id?: number
+    requestId: number
+    reportedById: number
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+  }
+
+  export type RequestReportUpdateManyMutationInput = {
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RequestReportUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    requestId?: IntFieldUpdateOperationsInput | number
+    reportedById?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrustEventCreateInput = {
+    delta: number
+    reason: string
+    actorId?: number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutTrustEventsInput
+  }
+
+  export type TrustEventUncheckedCreateInput = {
+    id?: number
+    userId: number
+    delta: number
+    reason: string
+    actorId?: number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type TrustEventUpdateInput = {
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutTrustEventsNestedInput
+  }
+
+  export type TrustEventUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrustEventCreateManyInput = {
+    id?: number
+    userId: number
+    delta: number
+    reason: string
+    actorId?: number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type TrustEventUpdateManyMutationInput = {
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrustEventUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhoneOtpCreateInput = {
+    phone: string
+    codeHash: string
+    purpose?: $Enums.OtpPurpose
+    attempts?: number
+    consumed?: boolean
+    expiresAt: Date | string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutPhoneOtpsInput
+  }
+
+  export type PhoneOtpUncheckedCreateInput = {
+    id?: number
+    userId: number
+    phone: string
+    codeHash: string
+    purpose?: $Enums.OtpPurpose
+    attempts?: number
+    consumed?: boolean
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PhoneOtpUpdateInput = {
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPhoneOtpsNestedInput
+  }
+
+  export type PhoneOtpUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhoneOtpCreateManyInput = {
+    id?: number
+    userId: number
+    phone: string
+    codeHash: string
+    purpose?: $Enums.OtpPurpose
+    attempts?: number
+    consumed?: boolean
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PhoneOtpUpdateManyMutationInput = {
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhoneOtpUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -33351,16 +37860,27 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type EnumUserRoleFilter<$PrismaModel = never> = {
     equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
     in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type EnumVerificationStatusFilter<$PrismaModel = never> = {
@@ -33401,17 +37921,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -33477,6 +37986,24 @@ export namespace Prisma {
     every?: TransactionWhereInput
     some?: TransactionWhereInput
     none?: TransactionWhereInput
+  }
+
+  export type TrustEventListRelationFilter = {
+    every?: TrustEventWhereInput
+    some?: TrustEventWhereInput
+    none?: TrustEventWhereInput
+  }
+
+  export type RequestReportListRelationFilter = {
+    every?: RequestReportWhereInput
+    some?: RequestReportWhereInput
+    none?: RequestReportWhereInput
+  }
+
+  export type PhoneOtpListRelationFilter = {
+    every?: PhoneOtpWhereInput
+    some?: PhoneOtpWhereInput
+    none?: PhoneOtpWhereInput
   }
 
   export type CityNullableScalarRelationFilter = {
@@ -33548,6 +38075,18 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type TrustEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RequestReportOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PhoneOtpOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type VendorBrandOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -33566,11 +38105,16 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     phone?: SortOrder
+    phoneVerified?: SortOrder
+    phoneVerifiedAt?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
     isVerified?: SortOrder
     verificationStatus?: SortOrder
     isBlocked?: SortOrder
+    trustScore?: SortOrder
+    suspendedUntil?: SortOrder
+    suspensionReason?: SortOrder
     walletBalance?: SortOrder
     fcmToken?: SortOrder
     cityId?: SortOrder
@@ -33590,6 +38134,7 @@ export namespace Prisma {
 
   export type UserAvgOrderByAggregateInput = {
     id?: SortOrder
+    trustScore?: SortOrder
     walletBalance?: SortOrder
     cityId?: SortOrder
     governorateId?: SortOrder
@@ -33603,11 +38148,16 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     phone?: SortOrder
+    phoneVerified?: SortOrder
+    phoneVerifiedAt?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
     isVerified?: SortOrder
     verificationStatus?: SortOrder
     isBlocked?: SortOrder
+    trustScore?: SortOrder
+    suspendedUntil?: SortOrder
+    suspensionReason?: SortOrder
     walletBalance?: SortOrder
     fcmToken?: SortOrder
     cityId?: SortOrder
@@ -33631,11 +38181,16 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     phone?: SortOrder
+    phoneVerified?: SortOrder
+    phoneVerifiedAt?: SortOrder
     role?: SortOrder
     isActive?: SortOrder
     isVerified?: SortOrder
     verificationStatus?: SortOrder
     isBlocked?: SortOrder
+    trustScore?: SortOrder
+    suspendedUntil?: SortOrder
+    suspensionReason?: SortOrder
     walletBalance?: SortOrder
     fcmToken?: SortOrder
     cityId?: SortOrder
@@ -33655,6 +38210,7 @@ export namespace Prisma {
 
   export type UserSumOrderByAggregateInput = {
     id?: SortOrder
+    trustScore?: SortOrder
     walletBalance?: SortOrder
     cityId?: SortOrder
     governorateId?: SortOrder
@@ -33714,6 +38270,28 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
     in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
@@ -33722,14 +38300,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -33788,20 +38358,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -34448,11 +39004,51 @@ export namespace Prisma {
     _max?: NestedEnumDeliveryStatusFilter<$PrismaModel>
   }
 
-  export type EnumTransactionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
+  export type RequestReportRequestIdReportedByIdCompoundUniqueInput = {
+    requestId: number
+    reportedById: number
+  }
+
+  export type RequestReportCountOrderByAggregateInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
+    reason?: SortOrder
+    details?: SortOrder
+    resolved?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RequestReportAvgOrderByAggregateInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
+  }
+
+  export type RequestReportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
+    reason?: SortOrder
+    details?: SortOrder
+    resolved?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RequestReportMinOrderByAggregateInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
+    reason?: SortOrder
+    details?: SortOrder
+    resolved?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RequestReportSumOrderByAggregateInput = {
+    id?: SortOrder
+    requestId?: SortOrder
+    reportedById?: SortOrder
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -34476,6 +39072,146 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type TrustEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    actorId?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TrustEventAvgOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    actorId?: SortOrder
+  }
+
+  export type TrustEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    actorId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TrustEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    actorId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TrustEventSumOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    delta?: SortOrder
+    actorId?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumOtpPurposeFilter<$PrismaModel = never> = {
+    equals?: $Enums.OtpPurpose | EnumOtpPurposeFieldRefInput<$PrismaModel>
+    in?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOtpPurposeFilter<$PrismaModel> | $Enums.OtpPurpose
+  }
+
+  export type PhoneOtpCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phone?: SortOrder
+    codeHash?: SortOrder
+    purpose?: SortOrder
+    attempts?: SortOrder
+    consumed?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PhoneOtpAvgOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    attempts?: SortOrder
+  }
+
+  export type PhoneOtpMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phone?: SortOrder
+    codeHash?: SortOrder
+    purpose?: SortOrder
+    attempts?: SortOrder
+    consumed?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PhoneOtpMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phone?: SortOrder
+    codeHash?: SortOrder
+    purpose?: SortOrder
+    attempts?: SortOrder
+    consumed?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PhoneOtpSumOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    attempts?: SortOrder
+  }
+
+  export type EnumOtpPurposeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OtpPurpose | EnumOtpPurposeFieldRefInput<$PrismaModel>
+    in?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOtpPurposeWithAggregatesFilter<$PrismaModel> | $Enums.OtpPurpose
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOtpPurposeFilter<$PrismaModel>
+    _max?: NestedEnumOtpPurposeFilter<$PrismaModel>
+  }
+
+  export type EnumTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
   export type RequestNullableScalarRelationFilter = {
@@ -34536,32 +39272,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTransactionTypeFilter<$PrismaModel>
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type PaymentAttemptCountOrderByAggregateInput = {
@@ -35214,6 +39924,27 @@ export namespace Prisma {
     connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
   }
 
+  export type TrustEventCreateNestedManyWithoutUserInput = {
+    create?: XOR<TrustEventCreateWithoutUserInput, TrustEventUncheckedCreateWithoutUserInput> | TrustEventCreateWithoutUserInput[] | TrustEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TrustEventCreateOrConnectWithoutUserInput | TrustEventCreateOrConnectWithoutUserInput[]
+    createMany?: TrustEventCreateManyUserInputEnvelope
+    connect?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+  }
+
+  export type RequestReportCreateNestedManyWithoutReportedByInput = {
+    create?: XOR<RequestReportCreateWithoutReportedByInput, RequestReportUncheckedCreateWithoutReportedByInput> | RequestReportCreateWithoutReportedByInput[] | RequestReportUncheckedCreateWithoutReportedByInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutReportedByInput | RequestReportCreateOrConnectWithoutReportedByInput[]
+    createMany?: RequestReportCreateManyReportedByInputEnvelope
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+  }
+
+  export type PhoneOtpCreateNestedManyWithoutUserInput = {
+    create?: XOR<PhoneOtpCreateWithoutUserInput, PhoneOtpUncheckedCreateWithoutUserInput> | PhoneOtpCreateWithoutUserInput[] | PhoneOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhoneOtpCreateOrConnectWithoutUserInput | PhoneOtpCreateOrConnectWithoutUserInput[]
+    createMany?: PhoneOtpCreateManyUserInputEnvelope
+    connect?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+  }
+
   export type CityCreateNestedOneWithoutUsersInput = {
     create?: XOR<CityCreateWithoutUsersInput, CityUncheckedCreateWithoutUsersInput>
     connectOrCreate?: CityCreateOrConnectWithoutUsersInput
@@ -35352,6 +40083,27 @@ export namespace Prisma {
     connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
   }
 
+  export type TrustEventUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<TrustEventCreateWithoutUserInput, TrustEventUncheckedCreateWithoutUserInput> | TrustEventCreateWithoutUserInput[] | TrustEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TrustEventCreateOrConnectWithoutUserInput | TrustEventCreateOrConnectWithoutUserInput[]
+    createMany?: TrustEventCreateManyUserInputEnvelope
+    connect?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+  }
+
+  export type RequestReportUncheckedCreateNestedManyWithoutReportedByInput = {
+    create?: XOR<RequestReportCreateWithoutReportedByInput, RequestReportUncheckedCreateWithoutReportedByInput> | RequestReportCreateWithoutReportedByInput[] | RequestReportUncheckedCreateWithoutReportedByInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutReportedByInput | RequestReportCreateOrConnectWithoutReportedByInput[]
+    createMany?: RequestReportCreateManyReportedByInputEnvelope
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+  }
+
+  export type PhoneOtpUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PhoneOtpCreateWithoutUserInput, PhoneOtpUncheckedCreateWithoutUserInput> | PhoneOtpCreateWithoutUserInput[] | PhoneOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhoneOtpCreateOrConnectWithoutUserInput | PhoneOtpCreateOrConnectWithoutUserInput[]
+    createMany?: PhoneOtpCreateManyUserInputEnvelope
+    connect?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+  }
+
   export type VendorBrandUncheckedCreateNestedManyWithoutVendorInput = {
     create?: XOR<VendorBrandCreateWithoutVendorInput, VendorBrandUncheckedCreateWithoutVendorInput> | VendorBrandCreateWithoutVendorInput[] | VendorBrandUncheckedCreateWithoutVendorInput[]
     connectOrCreate?: VendorBrandCreateOrConnectWithoutVendorInput | VendorBrandCreateOrConnectWithoutVendorInput[]
@@ -35388,16 +40140,28 @@ export namespace Prisma {
     set?: string | null
   }
 
-  export type EnumUserRoleFieldUpdateOperationsInput = {
-    set?: $Enums.UserRole
-  }
-
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type EnumUserRoleFieldUpdateOperationsInput = {
+    set?: $Enums.UserRole
+  }
+
   export type EnumVerificationStatusFieldUpdateOperationsInput = {
     set?: $Enums.VerificationStatus
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type DecimalFieldUpdateOperationsInput = {
@@ -35414,10 +40178,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -35620,6 +40380,48 @@ export namespace Prisma {
     deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
   }
 
+  export type TrustEventUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TrustEventCreateWithoutUserInput, TrustEventUncheckedCreateWithoutUserInput> | TrustEventCreateWithoutUserInput[] | TrustEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TrustEventCreateOrConnectWithoutUserInput | TrustEventCreateOrConnectWithoutUserInput[]
+    upsert?: TrustEventUpsertWithWhereUniqueWithoutUserInput | TrustEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TrustEventCreateManyUserInputEnvelope
+    set?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    disconnect?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    delete?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    connect?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    update?: TrustEventUpdateWithWhereUniqueWithoutUserInput | TrustEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TrustEventUpdateManyWithWhereWithoutUserInput | TrustEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TrustEventScalarWhereInput | TrustEventScalarWhereInput[]
+  }
+
+  export type RequestReportUpdateManyWithoutReportedByNestedInput = {
+    create?: XOR<RequestReportCreateWithoutReportedByInput, RequestReportUncheckedCreateWithoutReportedByInput> | RequestReportCreateWithoutReportedByInput[] | RequestReportUncheckedCreateWithoutReportedByInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutReportedByInput | RequestReportCreateOrConnectWithoutReportedByInput[]
+    upsert?: RequestReportUpsertWithWhereUniqueWithoutReportedByInput | RequestReportUpsertWithWhereUniqueWithoutReportedByInput[]
+    createMany?: RequestReportCreateManyReportedByInputEnvelope
+    set?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    disconnect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    delete?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    update?: RequestReportUpdateWithWhereUniqueWithoutReportedByInput | RequestReportUpdateWithWhereUniqueWithoutReportedByInput[]
+    updateMany?: RequestReportUpdateManyWithWhereWithoutReportedByInput | RequestReportUpdateManyWithWhereWithoutReportedByInput[]
+    deleteMany?: RequestReportScalarWhereInput | RequestReportScalarWhereInput[]
+  }
+
+  export type PhoneOtpUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PhoneOtpCreateWithoutUserInput, PhoneOtpUncheckedCreateWithoutUserInput> | PhoneOtpCreateWithoutUserInput[] | PhoneOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhoneOtpCreateOrConnectWithoutUserInput | PhoneOtpCreateOrConnectWithoutUserInput[]
+    upsert?: PhoneOtpUpsertWithWhereUniqueWithoutUserInput | PhoneOtpUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PhoneOtpCreateManyUserInputEnvelope
+    set?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    disconnect?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    delete?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    connect?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    update?: PhoneOtpUpdateWithWhereUniqueWithoutUserInput | PhoneOtpUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PhoneOtpUpdateManyWithWhereWithoutUserInput | PhoneOtpUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PhoneOtpScalarWhereInput | PhoneOtpScalarWhereInput[]
+  }
+
   export type CityUpdateOneWithoutUsersNestedInput = {
     create?: XOR<CityCreateWithoutUsersInput, CityUncheckedCreateWithoutUsersInput>
     connectOrCreate?: CityCreateOrConnectWithoutUsersInput
@@ -35694,14 +40496,6 @@ export namespace Prisma {
     update?: WithdrawalRequestUpdateWithWhereUniqueWithoutVendorInput | WithdrawalRequestUpdateWithWhereUniqueWithoutVendorInput[]
     updateMany?: WithdrawalRequestUpdateManyWithWhereWithoutVendorInput | WithdrawalRequestUpdateManyWithWhereWithoutVendorInput[]
     deleteMany?: WithdrawalRequestScalarWhereInput | WithdrawalRequestScalarWhereInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -35906,6 +40700,48 @@ export namespace Prisma {
     update?: TransactionUpdateWithWhereUniqueWithoutUserInput | TransactionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: TransactionUpdateManyWithWhereWithoutUserInput | TransactionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
+  }
+
+  export type TrustEventUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TrustEventCreateWithoutUserInput, TrustEventUncheckedCreateWithoutUserInput> | TrustEventCreateWithoutUserInput[] | TrustEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TrustEventCreateOrConnectWithoutUserInput | TrustEventCreateOrConnectWithoutUserInput[]
+    upsert?: TrustEventUpsertWithWhereUniqueWithoutUserInput | TrustEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TrustEventCreateManyUserInputEnvelope
+    set?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    disconnect?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    delete?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    connect?: TrustEventWhereUniqueInput | TrustEventWhereUniqueInput[]
+    update?: TrustEventUpdateWithWhereUniqueWithoutUserInput | TrustEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TrustEventUpdateManyWithWhereWithoutUserInput | TrustEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TrustEventScalarWhereInput | TrustEventScalarWhereInput[]
+  }
+
+  export type RequestReportUncheckedUpdateManyWithoutReportedByNestedInput = {
+    create?: XOR<RequestReportCreateWithoutReportedByInput, RequestReportUncheckedCreateWithoutReportedByInput> | RequestReportCreateWithoutReportedByInput[] | RequestReportUncheckedCreateWithoutReportedByInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutReportedByInput | RequestReportCreateOrConnectWithoutReportedByInput[]
+    upsert?: RequestReportUpsertWithWhereUniqueWithoutReportedByInput | RequestReportUpsertWithWhereUniqueWithoutReportedByInput[]
+    createMany?: RequestReportCreateManyReportedByInputEnvelope
+    set?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    disconnect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    delete?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    update?: RequestReportUpdateWithWhereUniqueWithoutReportedByInput | RequestReportUpdateWithWhereUniqueWithoutReportedByInput[]
+    updateMany?: RequestReportUpdateManyWithWhereWithoutReportedByInput | RequestReportUpdateManyWithWhereWithoutReportedByInput[]
+    deleteMany?: RequestReportScalarWhereInput | RequestReportScalarWhereInput[]
+  }
+
+  export type PhoneOtpUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PhoneOtpCreateWithoutUserInput, PhoneOtpUncheckedCreateWithoutUserInput> | PhoneOtpCreateWithoutUserInput[] | PhoneOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhoneOtpCreateOrConnectWithoutUserInput | PhoneOtpCreateOrConnectWithoutUserInput[]
+    upsert?: PhoneOtpUpsertWithWhereUniqueWithoutUserInput | PhoneOtpUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PhoneOtpCreateManyUserInputEnvelope
+    set?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    disconnect?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    delete?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    connect?: PhoneOtpWhereUniqueInput | PhoneOtpWhereUniqueInput[]
+    update?: PhoneOtpUpdateWithWhereUniqueWithoutUserInput | PhoneOtpUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PhoneOtpUpdateManyWithWhereWithoutUserInput | PhoneOtpUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PhoneOtpScalarWhereInput | PhoneOtpScalarWhereInput[]
   }
 
   export type VendorBrandUncheckedUpdateManyWithoutVendorNestedInput = {
@@ -36264,6 +41100,13 @@ export namespace Prisma {
     connect?: ComplaintWhereUniqueInput | ComplaintWhereUniqueInput[]
   }
 
+  export type RequestReportCreateNestedManyWithoutRequestInput = {
+    create?: XOR<RequestReportCreateWithoutRequestInput, RequestReportUncheckedCreateWithoutRequestInput> | RequestReportCreateWithoutRequestInput[] | RequestReportUncheckedCreateWithoutRequestInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutRequestInput | RequestReportCreateOrConnectWithoutRequestInput[]
+    createMany?: RequestReportCreateManyRequestInputEnvelope
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+  }
+
   export type DeliveryTrackingCreateNestedManyWithoutRequestInput = {
     create?: XOR<DeliveryTrackingCreateWithoutRequestInput, DeliveryTrackingUncheckedCreateWithoutRequestInput> | DeliveryTrackingCreateWithoutRequestInput[] | DeliveryTrackingUncheckedCreateWithoutRequestInput[]
     connectOrCreate?: DeliveryTrackingCreateOrConnectWithoutRequestInput | DeliveryTrackingCreateOrConnectWithoutRequestInput[]
@@ -36355,6 +41198,13 @@ export namespace Prisma {
     connect?: ComplaintWhereUniqueInput | ComplaintWhereUniqueInput[]
   }
 
+  export type RequestReportUncheckedCreateNestedManyWithoutRequestInput = {
+    create?: XOR<RequestReportCreateWithoutRequestInput, RequestReportUncheckedCreateWithoutRequestInput> | RequestReportCreateWithoutRequestInput[] | RequestReportUncheckedCreateWithoutRequestInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutRequestInput | RequestReportCreateOrConnectWithoutRequestInput[]
+    createMany?: RequestReportCreateManyRequestInputEnvelope
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+  }
+
   export type DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput = {
     create?: XOR<DeliveryTrackingCreateWithoutRequestInput, DeliveryTrackingUncheckedCreateWithoutRequestInput> | DeliveryTrackingCreateWithoutRequestInput[] | DeliveryTrackingUncheckedCreateWithoutRequestInput[]
     connectOrCreate?: DeliveryTrackingCreateOrConnectWithoutRequestInput | DeliveryTrackingCreateOrConnectWithoutRequestInput[]
@@ -36434,6 +41284,20 @@ export namespace Prisma {
     update?: ComplaintUpdateWithWhereUniqueWithoutRequestInput | ComplaintUpdateWithWhereUniqueWithoutRequestInput[]
     updateMany?: ComplaintUpdateManyWithWhereWithoutRequestInput | ComplaintUpdateManyWithWhereWithoutRequestInput[]
     deleteMany?: ComplaintScalarWhereInput | ComplaintScalarWhereInput[]
+  }
+
+  export type RequestReportUpdateManyWithoutRequestNestedInput = {
+    create?: XOR<RequestReportCreateWithoutRequestInput, RequestReportUncheckedCreateWithoutRequestInput> | RequestReportCreateWithoutRequestInput[] | RequestReportUncheckedCreateWithoutRequestInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutRequestInput | RequestReportCreateOrConnectWithoutRequestInput[]
+    upsert?: RequestReportUpsertWithWhereUniqueWithoutRequestInput | RequestReportUpsertWithWhereUniqueWithoutRequestInput[]
+    createMany?: RequestReportCreateManyRequestInputEnvelope
+    set?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    disconnect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    delete?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    update?: RequestReportUpdateWithWhereUniqueWithoutRequestInput | RequestReportUpdateWithWhereUniqueWithoutRequestInput[]
+    updateMany?: RequestReportUpdateManyWithWhereWithoutRequestInput | RequestReportUpdateManyWithWhereWithoutRequestInput[]
+    deleteMany?: RequestReportScalarWhereInput | RequestReportScalarWhereInput[]
   }
 
   export type DeliveryTrackingUpdateManyWithoutRequestNestedInput = {
@@ -36598,6 +41462,20 @@ export namespace Prisma {
     update?: ComplaintUpdateWithWhereUniqueWithoutRequestInput | ComplaintUpdateWithWhereUniqueWithoutRequestInput[]
     updateMany?: ComplaintUpdateManyWithWhereWithoutRequestInput | ComplaintUpdateManyWithWhereWithoutRequestInput[]
     deleteMany?: ComplaintScalarWhereInput | ComplaintScalarWhereInput[]
+  }
+
+  export type RequestReportUncheckedUpdateManyWithoutRequestNestedInput = {
+    create?: XOR<RequestReportCreateWithoutRequestInput, RequestReportUncheckedCreateWithoutRequestInput> | RequestReportCreateWithoutRequestInput[] | RequestReportUncheckedCreateWithoutRequestInput[]
+    connectOrCreate?: RequestReportCreateOrConnectWithoutRequestInput | RequestReportCreateOrConnectWithoutRequestInput[]
+    upsert?: RequestReportUpsertWithWhereUniqueWithoutRequestInput | RequestReportUpsertWithWhereUniqueWithoutRequestInput[]
+    createMany?: RequestReportCreateManyRequestInputEnvelope
+    set?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    disconnect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    delete?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    connect?: RequestReportWhereUniqueInput | RequestReportWhereUniqueInput[]
+    update?: RequestReportUpdateWithWhereUniqueWithoutRequestInput | RequestReportUpdateWithWhereUniqueWithoutRequestInput[]
+    updateMany?: RequestReportUpdateManyWithWhereWithoutRequestInput | RequestReportUpdateManyWithWhereWithoutRequestInput[]
+    deleteMany?: RequestReportScalarWhereInput | RequestReportScalarWhereInput[]
   }
 
   export type DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput = {
@@ -36798,6 +41676,66 @@ export namespace Prisma {
     upsert?: RequestUpsertWithoutDeliveryTrackingInput
     connect?: RequestWhereUniqueInput
     update?: XOR<XOR<RequestUpdateToOneWithWhereWithoutDeliveryTrackingInput, RequestUpdateWithoutDeliveryTrackingInput>, RequestUncheckedUpdateWithoutDeliveryTrackingInput>
+  }
+
+  export type RequestCreateNestedOneWithoutReportsInput = {
+    create?: XOR<RequestCreateWithoutReportsInput, RequestUncheckedCreateWithoutReportsInput>
+    connectOrCreate?: RequestCreateOrConnectWithoutReportsInput
+    connect?: RequestWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutRequestReportsFiledInput = {
+    create?: XOR<UserCreateWithoutRequestReportsFiledInput, UserUncheckedCreateWithoutRequestReportsFiledInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRequestReportsFiledInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type RequestUpdateOneRequiredWithoutReportsNestedInput = {
+    create?: XOR<RequestCreateWithoutReportsInput, RequestUncheckedCreateWithoutReportsInput>
+    connectOrCreate?: RequestCreateOrConnectWithoutReportsInput
+    upsert?: RequestUpsertWithoutReportsInput
+    connect?: RequestWhereUniqueInput
+    update?: XOR<XOR<RequestUpdateToOneWithWhereWithoutReportsInput, RequestUpdateWithoutReportsInput>, RequestUncheckedUpdateWithoutReportsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutRequestReportsFiledNestedInput = {
+    create?: XOR<UserCreateWithoutRequestReportsFiledInput, UserUncheckedCreateWithoutRequestReportsFiledInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRequestReportsFiledInput
+    upsert?: UserUpsertWithoutRequestReportsFiledInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRequestReportsFiledInput, UserUpdateWithoutRequestReportsFiledInput>, UserUncheckedUpdateWithoutRequestReportsFiledInput>
+  }
+
+  export type UserCreateNestedOneWithoutTrustEventsInput = {
+    create?: XOR<UserCreateWithoutTrustEventsInput, UserUncheckedCreateWithoutTrustEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTrustEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutTrustEventsNestedInput = {
+    create?: XOR<UserCreateWithoutTrustEventsInput, UserUncheckedCreateWithoutTrustEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTrustEventsInput
+    upsert?: UserUpsertWithoutTrustEventsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTrustEventsInput, UserUpdateWithoutTrustEventsInput>, UserUncheckedUpdateWithoutTrustEventsInput>
+  }
+
+  export type UserCreateNestedOneWithoutPhoneOtpsInput = {
+    create?: XOR<UserCreateWithoutPhoneOtpsInput, UserUncheckedCreateWithoutPhoneOtpsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPhoneOtpsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumOtpPurposeFieldUpdateOperationsInput = {
+    set?: $Enums.OtpPurpose
+  }
+
+  export type UserUpdateOneRequiredWithoutPhoneOtpsNestedInput = {
+    create?: XOR<UserCreateWithoutPhoneOtpsInput, UserUncheckedCreateWithoutPhoneOtpsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPhoneOtpsInput
+    upsert?: UserUpsertWithoutPhoneOtpsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPhoneOtpsInput, UserUpdateWithoutPhoneOtpsInput>, UserUncheckedUpdateWithoutPhoneOtpsInput>
   }
 
   export type RequestCreateNestedOneWithoutTransactionsInput = {
@@ -37341,16 +42279,27 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
     equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
     in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedEnumVerificationStatusFilter<$PrismaModel = never> = {
@@ -37391,17 +42340,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -37476,6 +42414,28 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
     in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
@@ -37484,14 +42444,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -37550,20 +42502,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -37674,23 +42612,6 @@ export namespace Prisma {
     _min?: NestedEnumDeliveryStatusFilter<$PrismaModel>
     _max?: NestedEnumDeliveryStatusFilter<$PrismaModel>
   }
-
-  export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
-  }
-
-  export type NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.TransactionType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTransactionTypeFilter<$PrismaModel>
-    _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
-  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -37713,6 +42634,40 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumOtpPurposeFilter<$PrismaModel = never> = {
+    equals?: $Enums.OtpPurpose | EnumOtpPurposeFieldRefInput<$PrismaModel>
+    in?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOtpPurposeFilter<$PrismaModel> | $Enums.OtpPurpose
+  }
+
+  export type NestedEnumOtpPurposeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OtpPurpose | EnumOtpPurposeFieldRefInput<$PrismaModel>
+    in?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OtpPurpose[] | ListEnumOtpPurposeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOtpPurposeWithAggregatesFilter<$PrismaModel> | $Enums.OtpPurpose
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOtpPurposeFilter<$PrismaModel>
+    _max?: NestedEnumOtpPurposeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
+  }
+
+  export type NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.TransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
   export type NestedEnumNotificationTypeFilter<$PrismaModel = never> = {
@@ -38081,6 +43036,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     brand?: BrandCreateNestedOneWithoutRequestsInput
@@ -38116,6 +43072,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -38150,6 +43107,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -38185,6 +43143,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -38283,6 +43242,91 @@ export namespace Prisma {
 
   export type TransactionCreateManyUserInputEnvelope = {
     data: TransactionCreateManyUserInput | TransactionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TrustEventCreateWithoutUserInput = {
+    delta: number
+    reason: string
+    actorId?: number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type TrustEventUncheckedCreateWithoutUserInput = {
+    id?: number
+    delta: number
+    reason: string
+    actorId?: number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type TrustEventCreateOrConnectWithoutUserInput = {
+    where: TrustEventWhereUniqueInput
+    create: XOR<TrustEventCreateWithoutUserInput, TrustEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type TrustEventCreateManyUserInputEnvelope = {
+    data: TrustEventCreateManyUserInput | TrustEventCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RequestReportCreateWithoutReportedByInput = {
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+    request: RequestCreateNestedOneWithoutReportsInput
+  }
+
+  export type RequestReportUncheckedCreateWithoutReportedByInput = {
+    id?: number
+    requestId: number
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+  }
+
+  export type RequestReportCreateOrConnectWithoutReportedByInput = {
+    where: RequestReportWhereUniqueInput
+    create: XOR<RequestReportCreateWithoutReportedByInput, RequestReportUncheckedCreateWithoutReportedByInput>
+  }
+
+  export type RequestReportCreateManyReportedByInputEnvelope = {
+    data: RequestReportCreateManyReportedByInput | RequestReportCreateManyReportedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PhoneOtpCreateWithoutUserInput = {
+    phone: string
+    codeHash: string
+    purpose?: $Enums.OtpPurpose
+    attempts?: number
+    consumed?: boolean
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PhoneOtpUncheckedCreateWithoutUserInput = {
+    id?: number
+    phone: string
+    codeHash: string
+    purpose?: $Enums.OtpPurpose
+    attempts?: number
+    consumed?: boolean
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PhoneOtpCreateOrConnectWithoutUserInput = {
+    where: PhoneOtpWhereUniqueInput
+    create: XOR<PhoneOtpCreateWithoutUserInput, PhoneOtpUncheckedCreateWithoutUserInput>
+  }
+
+  export type PhoneOtpCreateManyUserInputEnvelope = {
+    data: PhoneOtpCreateManyUserInput | PhoneOtpCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -38798,6 +43842,95 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
   }
 
+  export type TrustEventUpsertWithWhereUniqueWithoutUserInput = {
+    where: TrustEventWhereUniqueInput
+    update: XOR<TrustEventUpdateWithoutUserInput, TrustEventUncheckedUpdateWithoutUserInput>
+    create: XOR<TrustEventCreateWithoutUserInput, TrustEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type TrustEventUpdateWithWhereUniqueWithoutUserInput = {
+    where: TrustEventWhereUniqueInput
+    data: XOR<TrustEventUpdateWithoutUserInput, TrustEventUncheckedUpdateWithoutUserInput>
+  }
+
+  export type TrustEventUpdateManyWithWhereWithoutUserInput = {
+    where: TrustEventScalarWhereInput
+    data: XOR<TrustEventUpdateManyMutationInput, TrustEventUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type TrustEventScalarWhereInput = {
+    AND?: TrustEventScalarWhereInput | TrustEventScalarWhereInput[]
+    OR?: TrustEventScalarWhereInput[]
+    NOT?: TrustEventScalarWhereInput | TrustEventScalarWhereInput[]
+    id?: IntFilter<"TrustEvent"> | number
+    userId?: IntFilter<"TrustEvent"> | number
+    delta?: IntFilter<"TrustEvent"> | number
+    reason?: StringFilter<"TrustEvent"> | string
+    actorId?: IntNullableFilter<"TrustEvent"> | number | null
+    metadata?: JsonNullableFilter<"TrustEvent">
+    createdAt?: DateTimeFilter<"TrustEvent"> | Date | string
+  }
+
+  export type RequestReportUpsertWithWhereUniqueWithoutReportedByInput = {
+    where: RequestReportWhereUniqueInput
+    update: XOR<RequestReportUpdateWithoutReportedByInput, RequestReportUncheckedUpdateWithoutReportedByInput>
+    create: XOR<RequestReportCreateWithoutReportedByInput, RequestReportUncheckedCreateWithoutReportedByInput>
+  }
+
+  export type RequestReportUpdateWithWhereUniqueWithoutReportedByInput = {
+    where: RequestReportWhereUniqueInput
+    data: XOR<RequestReportUpdateWithoutReportedByInput, RequestReportUncheckedUpdateWithoutReportedByInput>
+  }
+
+  export type RequestReportUpdateManyWithWhereWithoutReportedByInput = {
+    where: RequestReportScalarWhereInput
+    data: XOR<RequestReportUpdateManyMutationInput, RequestReportUncheckedUpdateManyWithoutReportedByInput>
+  }
+
+  export type RequestReportScalarWhereInput = {
+    AND?: RequestReportScalarWhereInput | RequestReportScalarWhereInput[]
+    OR?: RequestReportScalarWhereInput[]
+    NOT?: RequestReportScalarWhereInput | RequestReportScalarWhereInput[]
+    id?: IntFilter<"RequestReport"> | number
+    requestId?: IntFilter<"RequestReport"> | number
+    reportedById?: IntFilter<"RequestReport"> | number
+    reason?: StringFilter<"RequestReport"> | string
+    details?: StringNullableFilter<"RequestReport"> | string | null
+    resolved?: BoolFilter<"RequestReport"> | boolean
+    createdAt?: DateTimeFilter<"RequestReport"> | Date | string
+  }
+
+  export type PhoneOtpUpsertWithWhereUniqueWithoutUserInput = {
+    where: PhoneOtpWhereUniqueInput
+    update: XOR<PhoneOtpUpdateWithoutUserInput, PhoneOtpUncheckedUpdateWithoutUserInput>
+    create: XOR<PhoneOtpCreateWithoutUserInput, PhoneOtpUncheckedCreateWithoutUserInput>
+  }
+
+  export type PhoneOtpUpdateWithWhereUniqueWithoutUserInput = {
+    where: PhoneOtpWhereUniqueInput
+    data: XOR<PhoneOtpUpdateWithoutUserInput, PhoneOtpUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PhoneOtpUpdateManyWithWhereWithoutUserInput = {
+    where: PhoneOtpScalarWhereInput
+    data: XOR<PhoneOtpUpdateManyMutationInput, PhoneOtpUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PhoneOtpScalarWhereInput = {
+    AND?: PhoneOtpScalarWhereInput | PhoneOtpScalarWhereInput[]
+    OR?: PhoneOtpScalarWhereInput[]
+    NOT?: PhoneOtpScalarWhereInput | PhoneOtpScalarWhereInput[]
+    id?: IntFilter<"PhoneOtp"> | number
+    userId?: IntFilter<"PhoneOtp"> | number
+    phone?: StringFilter<"PhoneOtp"> | string
+    codeHash?: StringFilter<"PhoneOtp"> | string
+    purpose?: EnumOtpPurposeFilter<"PhoneOtp"> | $Enums.OtpPurpose
+    attempts?: IntFilter<"PhoneOtp"> | number
+    consumed?: BoolFilter<"PhoneOtp"> | boolean
+    expiresAt?: DateTimeFilter<"PhoneOtp"> | Date | string
+    createdAt?: DateTimeFilter<"PhoneOtp"> | Date | string
+  }
+
   export type CityUpsertWithoutUsersInput = {
     update: XOR<CityUpdateWithoutUsersInput, CityUncheckedUpdateWithoutUsersInput>
     create: XOR<CityCreateWithoutUsersInput, CityUncheckedCreateWithoutUsersInput>
@@ -39032,6 +44165,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -39067,6 +44201,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -39221,6 +44356,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -39256,6 +44392,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -39356,11 +44493,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -39388,6 +44530,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorCategories?: VendorCategoryCreateNestedManyWithoutVendorInput
@@ -39401,11 +44546,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -39435,6 +44585,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
     vendorWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutVendorInput
@@ -39493,11 +44646,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39525,6 +44683,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorCategories?: VendorCategoryUpdateManyWithoutVendorNestedInput
@@ -39538,11 +44699,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -39572,6 +44738,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
     vendorWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutVendorNestedInput
@@ -39614,11 +44783,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -39646,6 +44820,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -39659,11 +44836,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -39693,6 +44875,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
     vendorWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutVendorInput
@@ -39757,11 +44942,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39789,6 +44979,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -39802,11 +44995,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -39836,6 +45034,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
     vendorWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutVendorNestedInput
@@ -39915,6 +45116,33 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type RequestReportCreateWithoutRequestInput = {
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+    reportedBy: UserCreateNestedOneWithoutRequestReportsFiledInput
+  }
+
+  export type RequestReportUncheckedCreateWithoutRequestInput = {
+    id?: number
+    reportedById: number
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+  }
+
+  export type RequestReportCreateOrConnectWithoutRequestInput = {
+    where: RequestReportWhereUniqueInput
+    create: XOR<RequestReportCreateWithoutRequestInput, RequestReportUncheckedCreateWithoutRequestInput>
+  }
+
+  export type RequestReportCreateManyRequestInputEnvelope = {
+    data: RequestReportCreateManyRequestInput | RequestReportCreateManyRequestInput[]
+    skipDuplicates?: boolean
+  }
+
   export type DeliveryTrackingCreateWithoutRequestInput = {
     status: $Enums.DeliveryStatus
     latitude?: Decimal | DecimalJsLike | number | string | null
@@ -39982,11 +45210,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -40013,6 +45246,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -40027,11 +45263,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -40060,6 +45301,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -40154,11 +45398,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -40185,6 +45434,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -40199,11 +45451,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -40232,6 +45489,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -40400,6 +45660,22 @@ export namespace Prisma {
     data: XOR<ComplaintUpdateManyMutationInput, ComplaintUncheckedUpdateManyWithoutRequestInput>
   }
 
+  export type RequestReportUpsertWithWhereUniqueWithoutRequestInput = {
+    where: RequestReportWhereUniqueInput
+    update: XOR<RequestReportUpdateWithoutRequestInput, RequestReportUncheckedUpdateWithoutRequestInput>
+    create: XOR<RequestReportCreateWithoutRequestInput, RequestReportUncheckedCreateWithoutRequestInput>
+  }
+
+  export type RequestReportUpdateWithWhereUniqueWithoutRequestInput = {
+    where: RequestReportWhereUniqueInput
+    data: XOR<RequestReportUpdateWithoutRequestInput, RequestReportUncheckedUpdateWithoutRequestInput>
+  }
+
+  export type RequestReportUpdateManyWithWhereWithoutRequestInput = {
+    where: RequestReportScalarWhereInput
+    data: XOR<RequestReportUpdateManyMutationInput, RequestReportUncheckedUpdateManyWithoutRequestInput>
+  }
+
   export type DeliveryTrackingUpsertWithWhereUniqueWithoutRequestInput = {
     where: DeliveryTrackingWhereUniqueInput
     update: XOR<DeliveryTrackingUpdateWithoutRequestInput, DeliveryTrackingUncheckedUpdateWithoutRequestInput>
@@ -40463,11 +45739,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40494,6 +45775,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -40508,11 +45792,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -40541,6 +45830,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -40659,11 +45951,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40690,6 +45987,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -40704,11 +46004,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -40737,6 +46042,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -40874,6 +46182,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -40910,6 +46219,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     review?: ReviewUncheckedCreateNestedOneWithoutRequestInput
@@ -40949,6 +46259,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -40985,6 +46296,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     review?: ReviewUncheckedUpdateOneWithoutRequestNestedInput
@@ -41007,6 +46319,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -41043,6 +46356,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -41061,11 +46375,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -41092,6 +46411,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -41106,11 +46428,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -41139,6 +46466,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -41203,6 +46533,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -41239,6 +46570,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -41263,11 +46595,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41294,6 +46631,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -41308,11 +46648,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -41341,6 +46686,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -41462,6 +46810,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
     brand?: BrandCreateNestedOneWithoutRequestsInput
@@ -41498,6 +46847,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
     review?: ReviewUncheckedCreateNestedOneWithoutRequestInput
@@ -41537,6 +46887,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
     brand?: BrandUpdateOneWithoutRequestsNestedInput
@@ -41573,11 +46924,828 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
     review?: ReviewUncheckedUpdateOneWithoutRequestNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutRequestNestedInput
     chatMessages?: ChatMessageUncheckedUpdateManyWithoutRequestNestedInput
+  }
+
+  export type RequestCreateWithoutReportsInput = {
+    title: string
+    description: string
+    address: string
+    latitude: Decimal | DecimalJsLike | number | string
+    longitude: Decimal | DecimalJsLike | number | string
+    deliveryPhone: string
+    budget?: Decimal | DecimalJsLike | number | string | null
+    notes?: string | null
+    status?: $Enums.RequestStatus
+    selectedBidId?: number | null
+    qrCode?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bids?: BidCreateNestedManyWithoutRequestInput
+    complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
+    notifications?: NotificationCreateNestedManyWithoutRequestInput
+    deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
+    brand?: BrandCreateNestedOneWithoutRequestsInput
+    category: CategoryCreateNestedOneWithoutRequestsInput
+    city?: CityCreateNestedOneWithoutRequestsInput
+    client: UserCreateNestedOneWithoutClientRequestsInput
+    governorate?: GovernorateCreateNestedOneWithoutRequestsInput
+    images?: RequestImageCreateNestedManyWithoutRequestInput
+    review?: ReviewCreateNestedOneWithoutRequestInput
+    transactions?: TransactionCreateNestedManyWithoutRequestInput
+    chatMessages?: ChatMessageCreateNestedManyWithoutRequestInput
+  }
+
+  export type RequestUncheckedCreateWithoutReportsInput = {
+    id?: number
+    clientId: number
+    title: string
+    description: string
+    categoryId: number
+    brandId?: number | null
+    address: string
+    latitude: Decimal | DecimalJsLike | number | string
+    longitude: Decimal | DecimalJsLike | number | string
+    deliveryPhone: string
+    budget?: Decimal | DecimalJsLike | number | string | null
+    notes?: string | null
+    status?: $Enums.RequestStatus
+    selectedBidId?: number | null
+    qrCode?: string | null
+    assignedDeliveryAgentId?: number | null
+    cityId?: number | null
+    governorateId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bids?: BidUncheckedCreateNestedManyWithoutRequestInput
+    complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
+    images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
+    review?: ReviewUncheckedCreateNestedOneWithoutRequestInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutRequestInput
+    chatMessages?: ChatMessageUncheckedCreateNestedManyWithoutRequestInput
+  }
+
+  export type RequestCreateOrConnectWithoutReportsInput = {
+    where: RequestWhereUniqueInput
+    create: XOR<RequestCreateWithoutReportsInput, RequestUncheckedCreateWithoutReportsInput>
+  }
+
+  export type UserCreateWithoutRequestReportsFiledInput = {
+    fullName: string
+    email: string
+    password: string
+    phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
+    role: $Enums.UserRole
+    isActive?: boolean
+    isVerified?: boolean
+    verificationStatus?: $Enums.VerificationStatus
+    isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
+    walletBalance?: Decimal | DecimalJsLike | number | string
+    fcmToken?: string | null
+    nationalId?: string | null
+    vehicleType?: string | null
+    licensePlate?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    vendorAddress?: string | null
+    idCardFrontUrl?: string | null
+    idCardBackUrl?: string | null
+    kycSubmissionDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    adminAuditLogs?: AdminAuditLogCreateNestedManyWithoutAdminInput
+    vendorBids?: BidCreateNestedManyWithoutVendorInput
+    receivedMessages?: ChatMessageCreateNestedManyWithoutReceiverInput
+    sentMessages?: ChatMessageCreateNestedManyWithoutSenderInput
+    complaintsReceived?: ComplaintCreateNestedManyWithoutReportedUserInput
+    resolvedComplaints?: ComplaintCreateNestedManyWithoutResolvedByInput
+    complaints?: ComplaintCreateNestedManyWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    paymentAttempts?: PaymentAttemptCreateNestedManyWithoutUserInput
+    assignedDeliveries?: RequestCreateNestedManyWithoutDeliveryAgentInput
+    clientRequests?: RequestCreateNestedManyWithoutClientInput
+    reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
+    reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
+    transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
+    city?: CityCreateNestedOneWithoutUsersInput
+    governorate?: GovernorateCreateNestedOneWithoutUsersInput
+    vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
+    vendorCategories?: VendorCategoryCreateNestedManyWithoutVendorInput
+    adminReviewedWithdrawals?: WithdrawalRequestCreateNestedManyWithoutReviewedByInput
+    vendorWithdrawals?: WithdrawalRequestCreateNestedManyWithoutVendorInput
+  }
+
+  export type UserUncheckedCreateWithoutRequestReportsFiledInput = {
+    id?: number
+    fullName: string
+    email: string
+    password: string
+    phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
+    role: $Enums.UserRole
+    isActive?: boolean
+    isVerified?: boolean
+    verificationStatus?: $Enums.VerificationStatus
+    isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
+    walletBalance?: Decimal | DecimalJsLike | number | string
+    fcmToken?: string | null
+    cityId?: number | null
+    governorateId?: number | null
+    nationalId?: string | null
+    vehicleType?: string | null
+    licensePlate?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    vendorAddress?: string | null
+    idCardFrontUrl?: string | null
+    idCardBackUrl?: string | null
+    kycSubmissionDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    adminAuditLogs?: AdminAuditLogUncheckedCreateNestedManyWithoutAdminInput
+    vendorBids?: BidUncheckedCreateNestedManyWithoutVendorInput
+    receivedMessages?: ChatMessageUncheckedCreateNestedManyWithoutReceiverInput
+    sentMessages?: ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+    complaintsReceived?: ComplaintUncheckedCreateNestedManyWithoutReportedUserInput
+    resolvedComplaints?: ComplaintUncheckedCreateNestedManyWithoutResolvedByInput
+    complaints?: ComplaintUncheckedCreateNestedManyWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    paymentAttempts?: PaymentAttemptUncheckedCreateNestedManyWithoutUserInput
+    assignedDeliveries?: RequestUncheckedCreateNestedManyWithoutDeliveryAgentInput
+    clientRequests?: RequestUncheckedCreateNestedManyWithoutClientInput
+    reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
+    reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
+    vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
+    vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
+    adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
+    vendorWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutVendorInput
+  }
+
+  export type UserCreateOrConnectWithoutRequestReportsFiledInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutRequestReportsFiledInput, UserUncheckedCreateWithoutRequestReportsFiledInput>
+  }
+
+  export type RequestUpsertWithoutReportsInput = {
+    update: XOR<RequestUpdateWithoutReportsInput, RequestUncheckedUpdateWithoutReportsInput>
+    create: XOR<RequestCreateWithoutReportsInput, RequestUncheckedCreateWithoutReportsInput>
+    where?: RequestWhereInput
+  }
+
+  export type RequestUpdateToOneWithWhereWithoutReportsInput = {
+    where?: RequestWhereInput
+    data: XOR<RequestUpdateWithoutReportsInput, RequestUncheckedUpdateWithoutReportsInput>
+  }
+
+  export type RequestUpdateWithoutReportsInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    latitude?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitude?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deliveryPhone?: StringFieldUpdateOperationsInput | string
+    budget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    selectedBidId?: NullableIntFieldUpdateOperationsInput | number | null
+    qrCode?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bids?: BidUpdateManyWithoutRequestNestedInput
+    complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
+    notifications?: NotificationUpdateManyWithoutRequestNestedInput
+    deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
+    brand?: BrandUpdateOneWithoutRequestsNestedInput
+    category?: CategoryUpdateOneRequiredWithoutRequestsNestedInput
+    city?: CityUpdateOneWithoutRequestsNestedInput
+    client?: UserUpdateOneRequiredWithoutClientRequestsNestedInput
+    governorate?: GovernorateUpdateOneWithoutRequestsNestedInput
+    images?: RequestImageUpdateManyWithoutRequestNestedInput
+    review?: ReviewUpdateOneWithoutRequestNestedInput
+    transactions?: TransactionUpdateManyWithoutRequestNestedInput
+    chatMessages?: ChatMessageUpdateManyWithoutRequestNestedInput
+  }
+
+  export type RequestUncheckedUpdateWithoutReportsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    clientId?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    categoryId?: IntFieldUpdateOperationsInput | number
+    brandId?: NullableIntFieldUpdateOperationsInput | number | null
+    address?: StringFieldUpdateOperationsInput | string
+    latitude?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitude?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deliveryPhone?: StringFieldUpdateOperationsInput | string
+    budget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    selectedBidId?: NullableIntFieldUpdateOperationsInput | number | null
+    qrCode?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedDeliveryAgentId?: NullableIntFieldUpdateOperationsInput | number | null
+    cityId?: NullableIntFieldUpdateOperationsInput | number | null
+    governorateId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
+    complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
+    images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
+    review?: ReviewUncheckedUpdateOneWithoutRequestNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutRequestNestedInput
+    chatMessages?: ChatMessageUncheckedUpdateManyWithoutRequestNestedInput
+  }
+
+  export type UserUpsertWithoutRequestReportsFiledInput = {
+    update: XOR<UserUpdateWithoutRequestReportsFiledInput, UserUncheckedUpdateWithoutRequestReportsFiledInput>
+    create: XOR<UserCreateWithoutRequestReportsFiledInput, UserUncheckedCreateWithoutRequestReportsFiledInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutRequestReportsFiledInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutRequestReportsFiledInput, UserUncheckedUpdateWithoutRequestReportsFiledInput>
+  }
+
+  export type UserUpdateWithoutRequestReportsFiledInput = {
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+    isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    nationalId?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleType?: NullableStringFieldUpdateOperationsInput | string | null
+    licensePlate?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    vendorAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardFrontUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardBackUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    kycSubmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    adminAuditLogs?: AdminAuditLogUpdateManyWithoutAdminNestedInput
+    vendorBids?: BidUpdateManyWithoutVendorNestedInput
+    receivedMessages?: ChatMessageUpdateManyWithoutReceiverNestedInput
+    sentMessages?: ChatMessageUpdateManyWithoutSenderNestedInput
+    complaintsReceived?: ComplaintUpdateManyWithoutReportedUserNestedInput
+    resolvedComplaints?: ComplaintUpdateManyWithoutResolvedByNestedInput
+    complaints?: ComplaintUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    paymentAttempts?: PaymentAttemptUpdateManyWithoutUserNestedInput
+    assignedDeliveries?: RequestUpdateManyWithoutDeliveryAgentNestedInput
+    clientRequests?: RequestUpdateManyWithoutClientNestedInput
+    reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
+    reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
+    transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
+    city?: CityUpdateOneWithoutUsersNestedInput
+    governorate?: GovernorateUpdateOneWithoutUsersNestedInput
+    vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
+    vendorCategories?: VendorCategoryUpdateManyWithoutVendorNestedInput
+    adminReviewedWithdrawals?: WithdrawalRequestUpdateManyWithoutReviewedByNestedInput
+    vendorWithdrawals?: WithdrawalRequestUpdateManyWithoutVendorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutRequestReportsFiledInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+    isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    cityId?: NullableIntFieldUpdateOperationsInput | number | null
+    governorateId?: NullableIntFieldUpdateOperationsInput | number | null
+    nationalId?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleType?: NullableStringFieldUpdateOperationsInput | string | null
+    licensePlate?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    vendorAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardFrontUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardBackUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    kycSubmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    adminAuditLogs?: AdminAuditLogUncheckedUpdateManyWithoutAdminNestedInput
+    vendorBids?: BidUncheckedUpdateManyWithoutVendorNestedInput
+    receivedMessages?: ChatMessageUncheckedUpdateManyWithoutReceiverNestedInput
+    sentMessages?: ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+    complaintsReceived?: ComplaintUncheckedUpdateManyWithoutReportedUserNestedInput
+    resolvedComplaints?: ComplaintUncheckedUpdateManyWithoutResolvedByNestedInput
+    complaints?: ComplaintUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    paymentAttempts?: PaymentAttemptUncheckedUpdateManyWithoutUserNestedInput
+    assignedDeliveries?: RequestUncheckedUpdateManyWithoutDeliveryAgentNestedInput
+    clientRequests?: RequestUncheckedUpdateManyWithoutClientNestedInput
+    reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
+    reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
+    vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
+    vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
+    adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+    vendorWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutVendorNestedInput
+  }
+
+  export type UserCreateWithoutTrustEventsInput = {
+    fullName: string
+    email: string
+    password: string
+    phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
+    role: $Enums.UserRole
+    isActive?: boolean
+    isVerified?: boolean
+    verificationStatus?: $Enums.VerificationStatus
+    isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
+    walletBalance?: Decimal | DecimalJsLike | number | string
+    fcmToken?: string | null
+    nationalId?: string | null
+    vehicleType?: string | null
+    licensePlate?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    vendorAddress?: string | null
+    idCardFrontUrl?: string | null
+    idCardBackUrl?: string | null
+    kycSubmissionDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    adminAuditLogs?: AdminAuditLogCreateNestedManyWithoutAdminInput
+    vendorBids?: BidCreateNestedManyWithoutVendorInput
+    receivedMessages?: ChatMessageCreateNestedManyWithoutReceiverInput
+    sentMessages?: ChatMessageCreateNestedManyWithoutSenderInput
+    complaintsReceived?: ComplaintCreateNestedManyWithoutReportedUserInput
+    resolvedComplaints?: ComplaintCreateNestedManyWithoutResolvedByInput
+    complaints?: ComplaintCreateNestedManyWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    paymentAttempts?: PaymentAttemptCreateNestedManyWithoutUserInput
+    assignedDeliveries?: RequestCreateNestedManyWithoutDeliveryAgentInput
+    clientRequests?: RequestCreateNestedManyWithoutClientInput
+    reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
+    reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
+    transactions?: TransactionCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
+    city?: CityCreateNestedOneWithoutUsersInput
+    governorate?: GovernorateCreateNestedOneWithoutUsersInput
+    vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
+    vendorCategories?: VendorCategoryCreateNestedManyWithoutVendorInput
+    adminReviewedWithdrawals?: WithdrawalRequestCreateNestedManyWithoutReviewedByInput
+    vendorWithdrawals?: WithdrawalRequestCreateNestedManyWithoutVendorInput
+  }
+
+  export type UserUncheckedCreateWithoutTrustEventsInput = {
+    id?: number
+    fullName: string
+    email: string
+    password: string
+    phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
+    role: $Enums.UserRole
+    isActive?: boolean
+    isVerified?: boolean
+    verificationStatus?: $Enums.VerificationStatus
+    isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
+    walletBalance?: Decimal | DecimalJsLike | number | string
+    fcmToken?: string | null
+    cityId?: number | null
+    governorateId?: number | null
+    nationalId?: string | null
+    vehicleType?: string | null
+    licensePlate?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    vendorAddress?: string | null
+    idCardFrontUrl?: string | null
+    idCardBackUrl?: string | null
+    kycSubmissionDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    adminAuditLogs?: AdminAuditLogUncheckedCreateNestedManyWithoutAdminInput
+    vendorBids?: BidUncheckedCreateNestedManyWithoutVendorInput
+    receivedMessages?: ChatMessageUncheckedCreateNestedManyWithoutReceiverInput
+    sentMessages?: ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+    complaintsReceived?: ComplaintUncheckedCreateNestedManyWithoutReportedUserInput
+    resolvedComplaints?: ComplaintUncheckedCreateNestedManyWithoutResolvedByInput
+    complaints?: ComplaintUncheckedCreateNestedManyWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    paymentAttempts?: PaymentAttemptUncheckedCreateNestedManyWithoutUserInput
+    assignedDeliveries?: RequestUncheckedCreateNestedManyWithoutDeliveryAgentInput
+    clientRequests?: RequestUncheckedCreateNestedManyWithoutClientInput
+    reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
+    reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
+    vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
+    vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
+    adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
+    vendorWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutVendorInput
+  }
+
+  export type UserCreateOrConnectWithoutTrustEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutTrustEventsInput, UserUncheckedCreateWithoutTrustEventsInput>
+  }
+
+  export type UserUpsertWithoutTrustEventsInput = {
+    update: XOR<UserUpdateWithoutTrustEventsInput, UserUncheckedUpdateWithoutTrustEventsInput>
+    create: XOR<UserCreateWithoutTrustEventsInput, UserUncheckedCreateWithoutTrustEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutTrustEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTrustEventsInput, UserUncheckedUpdateWithoutTrustEventsInput>
+  }
+
+  export type UserUpdateWithoutTrustEventsInput = {
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+    isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    nationalId?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleType?: NullableStringFieldUpdateOperationsInput | string | null
+    licensePlate?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    vendorAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardFrontUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardBackUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    kycSubmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    adminAuditLogs?: AdminAuditLogUpdateManyWithoutAdminNestedInput
+    vendorBids?: BidUpdateManyWithoutVendorNestedInput
+    receivedMessages?: ChatMessageUpdateManyWithoutReceiverNestedInput
+    sentMessages?: ChatMessageUpdateManyWithoutSenderNestedInput
+    complaintsReceived?: ComplaintUpdateManyWithoutReportedUserNestedInput
+    resolvedComplaints?: ComplaintUpdateManyWithoutResolvedByNestedInput
+    complaints?: ComplaintUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    paymentAttempts?: PaymentAttemptUpdateManyWithoutUserNestedInput
+    assignedDeliveries?: RequestUpdateManyWithoutDeliveryAgentNestedInput
+    clientRequests?: RequestUpdateManyWithoutClientNestedInput
+    reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
+    reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
+    transactions?: TransactionUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
+    city?: CityUpdateOneWithoutUsersNestedInput
+    governorate?: GovernorateUpdateOneWithoutUsersNestedInput
+    vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
+    vendorCategories?: VendorCategoryUpdateManyWithoutVendorNestedInput
+    adminReviewedWithdrawals?: WithdrawalRequestUpdateManyWithoutReviewedByNestedInput
+    vendorWithdrawals?: WithdrawalRequestUpdateManyWithoutVendorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutTrustEventsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+    isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    cityId?: NullableIntFieldUpdateOperationsInput | number | null
+    governorateId?: NullableIntFieldUpdateOperationsInput | number | null
+    nationalId?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleType?: NullableStringFieldUpdateOperationsInput | string | null
+    licensePlate?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    vendorAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardFrontUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardBackUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    kycSubmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    adminAuditLogs?: AdminAuditLogUncheckedUpdateManyWithoutAdminNestedInput
+    vendorBids?: BidUncheckedUpdateManyWithoutVendorNestedInput
+    receivedMessages?: ChatMessageUncheckedUpdateManyWithoutReceiverNestedInput
+    sentMessages?: ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+    complaintsReceived?: ComplaintUncheckedUpdateManyWithoutReportedUserNestedInput
+    resolvedComplaints?: ComplaintUncheckedUpdateManyWithoutResolvedByNestedInput
+    complaints?: ComplaintUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    paymentAttempts?: PaymentAttemptUncheckedUpdateManyWithoutUserNestedInput
+    assignedDeliveries?: RequestUncheckedUpdateManyWithoutDeliveryAgentNestedInput
+    clientRequests?: RequestUncheckedUpdateManyWithoutClientNestedInput
+    reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
+    reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
+    vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
+    vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
+    adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+    vendorWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutVendorNestedInput
+  }
+
+  export type UserCreateWithoutPhoneOtpsInput = {
+    fullName: string
+    email: string
+    password: string
+    phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
+    role: $Enums.UserRole
+    isActive?: boolean
+    isVerified?: boolean
+    verificationStatus?: $Enums.VerificationStatus
+    isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
+    walletBalance?: Decimal | DecimalJsLike | number | string
+    fcmToken?: string | null
+    nationalId?: string | null
+    vehicleType?: string | null
+    licensePlate?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    vendorAddress?: string | null
+    idCardFrontUrl?: string | null
+    idCardBackUrl?: string | null
+    kycSubmissionDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    adminAuditLogs?: AdminAuditLogCreateNestedManyWithoutAdminInput
+    vendorBids?: BidCreateNestedManyWithoutVendorInput
+    receivedMessages?: ChatMessageCreateNestedManyWithoutReceiverInput
+    sentMessages?: ChatMessageCreateNestedManyWithoutSenderInput
+    complaintsReceived?: ComplaintCreateNestedManyWithoutReportedUserInput
+    resolvedComplaints?: ComplaintCreateNestedManyWithoutResolvedByInput
+    complaints?: ComplaintCreateNestedManyWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    paymentAttempts?: PaymentAttemptCreateNestedManyWithoutUserInput
+    assignedDeliveries?: RequestCreateNestedManyWithoutDeliveryAgentInput
+    clientRequests?: RequestCreateNestedManyWithoutClientInput
+    reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
+    reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
+    transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    city?: CityCreateNestedOneWithoutUsersInput
+    governorate?: GovernorateCreateNestedOneWithoutUsersInput
+    vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
+    vendorCategories?: VendorCategoryCreateNestedManyWithoutVendorInput
+    adminReviewedWithdrawals?: WithdrawalRequestCreateNestedManyWithoutReviewedByInput
+    vendorWithdrawals?: WithdrawalRequestCreateNestedManyWithoutVendorInput
+  }
+
+  export type UserUncheckedCreateWithoutPhoneOtpsInput = {
+    id?: number
+    fullName: string
+    email: string
+    password: string
+    phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
+    role: $Enums.UserRole
+    isActive?: boolean
+    isVerified?: boolean
+    verificationStatus?: $Enums.VerificationStatus
+    isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
+    walletBalance?: Decimal | DecimalJsLike | number | string
+    fcmToken?: string | null
+    cityId?: number | null
+    governorateId?: number | null
+    nationalId?: string | null
+    vehicleType?: string | null
+    licensePlate?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    vendorAddress?: string | null
+    idCardFrontUrl?: string | null
+    idCardBackUrl?: string | null
+    kycSubmissionDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    adminAuditLogs?: AdminAuditLogUncheckedCreateNestedManyWithoutAdminInput
+    vendorBids?: BidUncheckedCreateNestedManyWithoutVendorInput
+    receivedMessages?: ChatMessageUncheckedCreateNestedManyWithoutReceiverInput
+    sentMessages?: ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+    complaintsReceived?: ComplaintUncheckedCreateNestedManyWithoutReportedUserInput
+    resolvedComplaints?: ComplaintUncheckedCreateNestedManyWithoutResolvedByInput
+    complaints?: ComplaintUncheckedCreateNestedManyWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    paymentAttempts?: PaymentAttemptUncheckedCreateNestedManyWithoutUserInput
+    assignedDeliveries?: RequestUncheckedCreateNestedManyWithoutDeliveryAgentInput
+    clientRequests?: RequestUncheckedCreateNestedManyWithoutClientInput
+    reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
+    reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
+    vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
+    adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
+    vendorWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutVendorInput
+  }
+
+  export type UserCreateOrConnectWithoutPhoneOtpsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPhoneOtpsInput, UserUncheckedCreateWithoutPhoneOtpsInput>
+  }
+
+  export type UserUpsertWithoutPhoneOtpsInput = {
+    update: XOR<UserUpdateWithoutPhoneOtpsInput, UserUncheckedUpdateWithoutPhoneOtpsInput>
+    create: XOR<UserCreateWithoutPhoneOtpsInput, UserUncheckedCreateWithoutPhoneOtpsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPhoneOtpsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPhoneOtpsInput, UserUncheckedUpdateWithoutPhoneOtpsInput>
+  }
+
+  export type UserUpdateWithoutPhoneOtpsInput = {
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+    isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    nationalId?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleType?: NullableStringFieldUpdateOperationsInput | string | null
+    licensePlate?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    vendorAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardFrontUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardBackUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    kycSubmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    adminAuditLogs?: AdminAuditLogUpdateManyWithoutAdminNestedInput
+    vendorBids?: BidUpdateManyWithoutVendorNestedInput
+    receivedMessages?: ChatMessageUpdateManyWithoutReceiverNestedInput
+    sentMessages?: ChatMessageUpdateManyWithoutSenderNestedInput
+    complaintsReceived?: ComplaintUpdateManyWithoutReportedUserNestedInput
+    resolvedComplaints?: ComplaintUpdateManyWithoutResolvedByNestedInput
+    complaints?: ComplaintUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    paymentAttempts?: PaymentAttemptUpdateManyWithoutUserNestedInput
+    assignedDeliveries?: RequestUpdateManyWithoutDeliveryAgentNestedInput
+    clientRequests?: RequestUpdateManyWithoutClientNestedInput
+    reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
+    reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
+    transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    city?: CityUpdateOneWithoutUsersNestedInput
+    governorate?: GovernorateUpdateOneWithoutUsersNestedInput
+    vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
+    vendorCategories?: VendorCategoryUpdateManyWithoutVendorNestedInput
+    adminReviewedWithdrawals?: WithdrawalRequestUpdateManyWithoutReviewedByNestedInput
+    vendorWithdrawals?: WithdrawalRequestUpdateManyWithoutVendorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPhoneOtpsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+    isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
+    cityId?: NullableIntFieldUpdateOperationsInput | number | null
+    governorateId?: NullableIntFieldUpdateOperationsInput | number | null
+    nationalId?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleType?: NullableStringFieldUpdateOperationsInput | string | null
+    licensePlate?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    vendorAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardFrontUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    idCardBackUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    kycSubmissionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    adminAuditLogs?: AdminAuditLogUncheckedUpdateManyWithoutAdminNestedInput
+    vendorBids?: BidUncheckedUpdateManyWithoutVendorNestedInput
+    receivedMessages?: ChatMessageUncheckedUpdateManyWithoutReceiverNestedInput
+    sentMessages?: ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+    complaintsReceived?: ComplaintUncheckedUpdateManyWithoutReportedUserNestedInput
+    resolvedComplaints?: ComplaintUncheckedUpdateManyWithoutResolvedByNestedInput
+    complaints?: ComplaintUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    paymentAttempts?: PaymentAttemptUncheckedUpdateManyWithoutUserNestedInput
+    assignedDeliveries?: RequestUncheckedUpdateManyWithoutDeliveryAgentNestedInput
+    clientRequests?: RequestUncheckedUpdateManyWithoutClientNestedInput
+    reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
+    reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
+    vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
+    adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+    vendorWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutVendorNestedInput
   }
 
   export type RequestCreateWithoutTransactionsInput = {
@@ -41596,6 +47764,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -41632,6 +47801,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -41649,11 +47819,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -41680,6 +47855,9 @@ export namespace Prisma {
     clientRequests?: RequestCreateNestedManyWithoutClientInput
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -41694,11 +47872,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -41727,6 +47910,9 @@ export namespace Prisma {
     clientRequests?: RequestUncheckedCreateNestedManyWithoutClientInput
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -41765,6 +47951,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -41801,6 +47988,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -41824,11 +48012,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41855,6 +48048,9 @@ export namespace Prisma {
     clientRequests?: RequestUpdateManyWithoutClientNestedInput
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -41869,11 +48065,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -41902,6 +48103,9 @@ export namespace Prisma {
     clientRequests?: RequestUncheckedUpdateManyWithoutClientNestedInput
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -41913,11 +48117,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -41944,6 +48153,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -41958,11 +48170,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -41991,6 +48208,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -42018,11 +48238,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42049,6 +48274,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -42063,11 +48291,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -42096,6 +48329,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -42118,6 +48354,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
     brand?: BrandCreateNestedOneWithoutRequestsInput
@@ -42154,6 +48391,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
     review?: ReviewUncheckedCreateNestedOneWithoutRequestInput
@@ -42171,11 +48409,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -42202,6 +48445,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -42216,11 +48462,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -42249,6 +48500,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -42287,6 +48541,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
     brand?: BrandUpdateOneWithoutRequestsNestedInput
@@ -42323,6 +48578,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
     review?: ReviewUncheckedUpdateOneWithoutRequestNestedInput
@@ -42346,11 +48602,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42377,6 +48638,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -42391,11 +48655,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -42424,6 +48693,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -42435,11 +48707,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -42466,6 +48743,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -42480,11 +48760,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -42513,6 +48798,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -42529,11 +48817,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -42560,6 +48853,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -42574,11 +48870,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -42607,6 +48908,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -42634,6 +48938,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -42670,6 +48975,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -42698,11 +49004,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42729,6 +49040,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -42743,11 +49057,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -42776,6 +49095,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -42798,11 +49120,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42829,6 +49156,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -42843,11 +49173,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -42876,6 +49211,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -42909,6 +49247,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -42945,6 +49284,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -42957,11 +49297,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -42989,6 +49334,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -43002,11 +49350,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -43036,6 +49389,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     vendorWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutVendorInput
@@ -43051,11 +49407,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -43083,6 +49444,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -43096,11 +49460,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -43130,6 +49499,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -43156,11 +49528,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43188,6 +49565,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -43201,11 +49581,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -43235,6 +49620,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     vendorWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutVendorNestedInput
@@ -43256,11 +49644,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43288,6 +49681,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -43301,11 +49697,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -43335,6 +49736,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -43356,6 +49760,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -43392,6 +49797,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -43409,11 +49815,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -43440,6 +49851,9 @@ export namespace Prisma {
     clientRequests?: RequestCreateNestedManyWithoutClientInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -43454,11 +49868,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -43487,6 +49906,9 @@ export namespace Prisma {
     clientRequests?: RequestUncheckedCreateNestedManyWithoutClientInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -43503,11 +49925,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -43534,6 +49961,9 @@ export namespace Prisma {
     clientRequests?: RequestCreateNestedManyWithoutClientInput
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -43548,11 +49978,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -43581,6 +50016,9 @@ export namespace Prisma {
     clientRequests?: RequestUncheckedCreateNestedManyWithoutClientInput
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -43619,6 +50057,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -43655,6 +50094,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -43678,11 +50118,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43709,6 +50154,9 @@ export namespace Prisma {
     clientRequests?: RequestUpdateManyWithoutClientNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -43723,11 +50171,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -43756,6 +50209,9 @@ export namespace Prisma {
     clientRequests?: RequestUncheckedUpdateManyWithoutClientNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -43778,11 +50234,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43809,6 +50270,9 @@ export namespace Prisma {
     clientRequests?: RequestUpdateManyWithoutClientNestedInput
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -43823,11 +50287,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -43856,6 +50325,9 @@ export namespace Prisma {
     clientRequests?: RequestUncheckedUpdateManyWithoutClientNestedInput
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -43867,11 +50339,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -43898,6 +50375,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -43912,11 +50392,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -43945,6 +50430,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -43971,6 +50459,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -44007,6 +50496,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -44025,11 +50515,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -44056,6 +50551,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -44070,11 +50568,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -44103,6 +50606,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -44119,11 +50625,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -44150,6 +50661,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -44164,11 +50678,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -44197,6 +50716,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -44224,11 +50746,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44255,6 +50782,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -44269,11 +50799,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -44302,6 +50837,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -44334,6 +50872,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -44370,6 +50909,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -44394,11 +50934,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44425,6 +50970,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -44439,11 +50987,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -44472,6 +51025,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -44494,11 +51050,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44525,6 +51086,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -44539,11 +51103,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -44572,6 +51141,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -44619,6 +51191,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -44654,6 +51227,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -44677,11 +51251,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -44709,6 +51288,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryCreateNestedManyWithoutVendorInput
@@ -44722,11 +51304,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -44755,6 +51342,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -44838,11 +51428,16 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
     phone?: StringNullableFilter<"User"> | string | null
+    phoneVerified?: BoolFilter<"User"> | boolean
+    phoneVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     isActive?: BoolFilter<"User"> | boolean
     isVerified?: BoolFilter<"User"> | boolean
     verificationStatus?: EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
     isBlocked?: BoolFilter<"User"> | boolean
+    trustScore?: IntFilter<"User"> | number
+    suspendedUntil?: DateTimeNullableFilter<"User"> | Date | string | null
+    suspensionReason?: StringNullableFilter<"User"> | string | null
     walletBalance?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     fcmToken?: StringNullableFilter<"User"> | string | null
     cityId?: IntNullableFilter<"User"> | number | null
@@ -44896,6 +51491,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidCreateNestedManyWithoutRequestInput
     complaints?: ComplaintCreateNestedManyWithoutRequestInput
+    reports?: RequestReportCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingCreateNestedManyWithoutRequestInput
     notifications?: NotificationCreateNestedManyWithoutRequestInput
     deliveryAgent?: UserCreateNestedOneWithoutAssignedDeliveriesInput
@@ -44931,6 +51527,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bids?: BidUncheckedCreateNestedManyWithoutRequestInput
     complaints?: ComplaintUncheckedCreateNestedManyWithoutRequestInput
+    reports?: RequestReportUncheckedCreateNestedManyWithoutRequestInput
     deliveryTracking?: DeliveryTrackingUncheckedCreateNestedManyWithoutRequestInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutRequestInput
     images?: RequestImageUncheckedCreateNestedManyWithoutRequestInput
@@ -44954,11 +51551,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -44986,6 +51588,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryCreateNestedManyWithoutVendorInput
@@ -44999,11 +51604,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     governorateId?: number | null
@@ -45032,6 +51642,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -45111,11 +51724,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     nationalId?: string | null
@@ -45142,6 +51760,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewCreateNestedManyWithoutReviewerInput
     transactions?: TransactionCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpCreateNestedManyWithoutUserInput
     city?: CityCreateNestedOneWithoutUsersInput
     governorate?: GovernorateCreateNestedOneWithoutUsersInput
     vendorBrands?: VendorBrandCreateNestedManyWithoutVendorInput
@@ -45156,11 +51777,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -45189,6 +51815,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviewsGiven?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    trustEvents?: TrustEventUncheckedCreateNestedManyWithoutUserInput
+    requestReportsFiled?: RequestReportUncheckedCreateNestedManyWithoutReportedByInput
+    phoneOtps?: PhoneOtpUncheckedCreateNestedManyWithoutUserInput
     vendorBrands?: VendorBrandUncheckedCreateNestedManyWithoutVendorInput
     vendorCategories?: VendorCategoryUncheckedCreateNestedManyWithoutVendorInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutReviewedByInput
@@ -45216,11 +51845,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45247,6 +51881,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
@@ -45261,11 +51898,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -45294,6 +51936,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -45477,6 +52122,35 @@ export namespace Prisma {
     type: $Enums.TransactionType
     description?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type TrustEventCreateManyUserInput = {
+    id?: number
+    delta: number
+    reason: string
+    actorId?: number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type RequestReportCreateManyReportedByInput = {
+    id?: number
+    requestId: number
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
+  }
+
+  export type PhoneOtpCreateManyUserInput = {
+    id?: number
+    phone: string
+    codeHash: string
+    purpose?: $Enums.OtpPurpose
+    attempts?: number
+    consumed?: boolean
+    expiresAt: Date | string
     createdAt?: Date | string
   }
 
@@ -45845,6 +52519,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     brand?: BrandUpdateOneWithoutRequestsNestedInput
@@ -45880,6 +52555,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -45926,6 +52602,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -45961,6 +52638,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -46069,6 +52747,90 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     description?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrustEventUpdateWithoutUserInput = {
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrustEventUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrustEventUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableIntFieldUpdateOperationsInput | number | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RequestReportUpdateWithoutReportedByInput = {
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    request?: RequestUpdateOneRequiredWithoutReportsNestedInput
+  }
+
+  export type RequestReportUncheckedUpdateWithoutReportedByInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    requestId?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RequestReportUncheckedUpdateManyWithoutReportedByInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    requestId?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhoneOtpUpdateWithoutUserInput = {
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhoneOtpUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhoneOtpUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    phone?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    purpose?: EnumOtpPurposeFieldUpdateOperationsInput | $Enums.OtpPurpose
+    attempts?: IntFieldUpdateOperationsInput | number
+    consumed?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -46256,6 +53018,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -46291,6 +53054,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -46378,6 +53142,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -46413,6 +53178,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -46482,6 +53248,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     reportedUserId?: number | null
+  }
+
+  export type RequestReportCreateManyRequestInput = {
+    id?: number
+    reportedById: number
+    reason: string
+    details?: string | null
+    resolved?: boolean
+    createdAt?: Date | string
   }
 
   export type DeliveryTrackingCreateManyRequestInput = {
@@ -46613,6 +53388,32 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportedUserId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type RequestReportUpdateWithoutRequestInput = {
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedBy?: UserUpdateOneRequiredWithoutRequestReportsFiledNestedInput
+  }
+
+  export type RequestReportUncheckedUpdateWithoutRequestInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    reportedById?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RequestReportUncheckedUpdateManyWithoutRequestInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    reportedById?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    resolved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DeliveryTrackingUpdateWithoutRequestInput = {
@@ -46829,11 +53630,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     cityId?: number | null
@@ -46887,6 +53693,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -46922,6 +53729,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -46957,11 +53765,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46989,6 +53802,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     city?: CityUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUpdateManyWithoutVendorNestedInput
@@ -47002,11 +53818,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -47035,6 +53856,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -47047,11 +53871,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     cityId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -47096,11 +53925,16 @@ export namespace Prisma {
     email: string
     password: string
     phone?: string | null
+    phoneVerified?: boolean
+    phoneVerifiedAt?: Date | string | null
     role: $Enums.UserRole
     isActive?: boolean
     isVerified?: boolean
     verificationStatus?: $Enums.VerificationStatus
     isBlocked?: boolean
+    trustScore?: number
+    suspendedUntil?: Date | string | null
+    suspensionReason?: string | null
     walletBalance?: Decimal | DecimalJsLike | number | string
     fcmToken?: string | null
     governorateId?: number | null
@@ -47133,6 +53967,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUpdateManyWithoutRequestNestedInput
     deliveryAgent?: UserUpdateOneWithoutAssignedDeliveriesNestedInput
@@ -47168,6 +54003,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bids?: BidUncheckedUpdateManyWithoutRequestNestedInput
     complaints?: ComplaintUncheckedUpdateManyWithoutRequestNestedInput
+    reports?: RequestReportUncheckedUpdateManyWithoutRequestNestedInput
     deliveryTracking?: DeliveryTrackingUncheckedUpdateManyWithoutRequestNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutRequestNestedInput
     images?: RequestImageUncheckedUpdateManyWithoutRequestNestedInput
@@ -47203,11 +54039,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     nationalId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47235,6 +54076,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUpdateManyWithoutUserNestedInput
     governorate?: GovernorateUpdateOneWithoutUsersNestedInput
     vendorBrands?: VendorBrandUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUpdateManyWithoutVendorNestedInput
@@ -47248,11 +54092,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     governorateId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -47281,6 +54130,9 @@ export namespace Prisma {
     reviewsReceived?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviewsGiven?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    trustEvents?: TrustEventUncheckedUpdateManyWithoutUserNestedInput
+    requestReportsFiled?: RequestReportUncheckedUpdateManyWithoutReportedByNestedInput
+    phoneOtps?: PhoneOtpUncheckedUpdateManyWithoutUserNestedInput
     vendorBrands?: VendorBrandUncheckedUpdateManyWithoutVendorNestedInput
     vendorCategories?: VendorCategoryUncheckedUpdateManyWithoutVendorNestedInput
     adminReviewedWithdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -47293,11 +54145,16 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationStatus?: EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
     isBlocked?: BoolFieldUpdateOperationsInput | boolean
+    trustScore?: IntFieldUpdateOperationsInput | number
+    suspendedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    suspensionReason?: NullableStringFieldUpdateOperationsInput | string | null
     walletBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     fcmToken?: NullableStringFieldUpdateOperationsInput | string | null
     governorateId?: NullableIntFieldUpdateOperationsInput | number | null

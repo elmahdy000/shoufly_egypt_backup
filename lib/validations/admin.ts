@@ -32,3 +32,15 @@ export const RequestRouteParamSchema = z.object({
 export const BidRouteParamSchema = z.object({
   bidId: z.coerce.number().int().positive(),
 });
+
+export const AdminUserRoleEnum = z.enum(['CLIENT', 'VENDOR', 'ADMIN', 'DELIVERY']);
+export const AdminRequestStatusEnum = z.enum([
+  'PENDING_ADMIN_REVISION',
+  'OPEN_FOR_BIDDING',
+  'BIDS_RECEIVED',
+  'OFFERS_FORWARDED',
+  'ORDER_PAID_PENDING_DELIVERY',
+  'CLOSED_SUCCESS',
+  'CLOSED_CANCELLED',
+  'REJECTED',
+]);

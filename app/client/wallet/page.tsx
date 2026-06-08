@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/shoofly/button";
-import { formatCurrency, formatDate } from "@/lib/formatters";
+import { formatDate, splitCurrency } from "@/lib/formatters";
 import { listClientTransactions, topupClientWallet, withdrawClientWallet, getClientBalance } from "@/lib/api/transactions";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import { 
   FiArrowUpRight, 
   FiArrowDownLeft, 
@@ -150,25 +151,17 @@ export default function WalletPage() {
   const { data: balanceData, loading: balLoading, error: balError, refresh: refreshBal } = useAsyncData(() => getClientBalance(), []);
 
   useEffect(() => {
-    // REAL-TIME SSE FOR WALLET UPDATES
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("💰 Wallet update received via SSE:", payload.type);
-        
-        // Refresh balance and transactions for any financial event
-        if (['PAYMENT', 'SETTLEMENT', 'WITHDRAWAL', 'REFUND', 'WALLET_TOPUP'].includes(payload.type)) {
-          refreshTxs();
-          refreshBal();
-        }
-      } catch (err) {
-        console.error("SSE Wallet Error:", err);
+    // Shared SSE listener — refresh on any wallet-related notification
+    const FINANCIAL_TYPES = new Set(["WALLET_TOPUP", "PAYMENT_RECEIVED", "PAYMENT_FAILED", "REFUND"]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification") return;
+      const innerType = (payload.data as { type?: string } | null)?.type;
+      if (innerType && FINANCIAL_TYPES.has(innerType)) {
+        void refreshTxs();
+        void refreshBal();
       }
-    };
-
-    return () => eventSource.close();
+    });
+    return unsubscribe;
   }, [refreshTxs, refreshBal]);
 
   const ledger = useMemo(() => {
@@ -243,13 +236,11 @@ export default function WalletPage() {
   const executeTopup = async () => {
     const amount = Number(amountInput);
     if (!selectedMethod || isNaN(amount) || amount <= 0) return;
-    
+
+    setIsProcessing(true);
+    setPaymentStep('processing');
+
     try {
-      setIsProcessing(true);
-      setPaymentStep('processing');
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
       const response = await topupClientWallet(amount, selectedMethod.id);
 
       if (response.redirectUrl) {
@@ -258,17 +249,23 @@ export default function WalletPage() {
         successUrl.searchParams.set('amount', amount.toString());
         const fullRedirectUrl = new URL(response.redirectUrl);
         fullRedirectUrl.searchParams.set('callback', successUrl.toString());
+        // Browser is about to navigate — no need to reset state. The `finally`
+        // would still fire, but isProcessing(true) on a page that's unloading is harmless.
         window.location.href = fullRedirectUrl.toString();
-        return; 
+        return;
       }
 
       setPaymentStep('success');
-      setTimeout(() => {
+      // Keep isProcessing=true: the page is about to reload.
+      window.setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (err) {
       setPaymentError(err instanceof Error ? err.message : "فشلت عملية الشحن");
       setPaymentStep('error');
+    } finally {
+      // Only reset on the in-page paths. The redirect paths either
+      // succeed (page unloads) or fail silently (we still recover control).
       setIsProcessing(false);
     }
   };
@@ -342,10 +339,10 @@ export default function WalletPage() {
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-bold text-[#0F1111]">
-                    {formatCurrency(ledger.available).split(' ')[0]}
+                    {splitCurrency(ledger.available).amount}
                   </span>
                   <span className="text-base font-semibold text-[#767684]">
-                    {formatCurrency(ledger.available).split(' ')[1] || 'ج.م'}
+                    {splitCurrency(ledger.available).unit}
                   </span>
                 </div>
               </div>
@@ -392,7 +389,7 @@ export default function WalletPage() {
                     <p className="text-sm text-[#565959] font-medium">فلوس محجوزة للطلبات</p>
                     <FiArrowLeft size={16} className="text-slate-300 mr-auto group-hover:text-[#FF5A00] transition-colors" />
                   </div>
-                  <p className="text-xl font-bold text-[#0F1111]">{formatCurrency(ledger.onHold).split(' ')[0]} <span className="text-sm font-semibold text-[#767684]">{formatCurrency(ledger.onHold).split(' ')[1] || 'ج.م'}</span></p>
+                  <p className="text-xl font-bold text-[#0F1111]">{splitCurrency(ledger.onHold).amount} <span className="text-sm font-semibold text-[#767684]">{splitCurrency(ledger.onHold).unit}</span></p>
                 </div>
               </Link>
               
@@ -405,7 +402,7 @@ export default function WalletPage() {
                   <p className="text-sm text-[#565959] font-medium">إجمالي شحناتك</p>
                   <FiInfo size={16} className="text-slate-300 mr-auto" />
                 </div>
-                <p className="text-xl font-bold text-[#0F1111]">{formatCurrency(ledger.totalDeposits).split(' ')[0]} <span className="text-sm font-semibold text-[#767684]">{formatCurrency(ledger.totalDeposits).split(' ')[1] || 'ج.م'}</span></p>
+                <p className="text-xl font-bold text-[#0F1111]">{splitCurrency(ledger.totalDeposits).amount} <span className="text-sm font-semibold text-[#767684]">{splitCurrency(ledger.totalDeposits).unit}</span></p>
               </div>
             </div>
 
@@ -467,7 +464,7 @@ export default function WalletPage() {
                             </div>
                           </div>
                           <p className={`font-bold text-base ${isDeduction ? 'text-rose-600' : 'text-emerald-600'}`}>
-                            {isDeduction ? '-' : '+'}{formatCurrency(tx.amount).split(' ')[0]} <span className="text-xs font-semibold opacity-80">{formatCurrency(tx.amount).split(' ')[1] || 'ج.م'}</span>
+                            {isDeduction ? '-' : '+'}{splitCurrency(tx.amount).amount} <span className="text-xs font-semibold opacity-80">{splitCurrency(tx.amount).unit}</span>
                           </p>
                         </div>
                       </Link>
@@ -627,7 +624,7 @@ export default function WalletPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-[#565959]">المبلغ</span>
                       <span className="font-bold text-base text-[#0F1111]">
-                        {formatCurrency(Number(amountInput)).split(' ')[0]} <span className="text-sm font-bold text-[#767684]">{formatCurrency(Number(amountInput)).split(' ')[1] || 'ج.م'}</span>
+                        {splitCurrency(Number(amountInput)).amount} <span className="text-sm font-bold text-[#767684]">{splitCurrency(Number(amountInput)).unit}</span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -637,7 +634,7 @@ export default function WalletPage() {
                     <div className="border-t border-[#E7E7E7] pt-3 flex items-center justify-between">
                       <span className="text-sm font-semibold text-[#0F1111]">الإجمالي</span>
                       <span className="font-bold text-lg text-emerald-600">
-                        {formatCurrency(Number(amountInput)).split(' ')[0]} <span className="text-base font-bold text-emerald-500">{formatCurrency(Number(amountInput)).split(' ')[1] || 'ج.م'}</span>
+                        {splitCurrency(Number(amountInput)).amount} <span className="text-base font-bold text-emerald-500">{splitCurrency(Number(amountInput)).unit}</span>
                       </span>
                     </div>
                   </div>
@@ -719,7 +716,7 @@ export default function WalletPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-[#0F1111]">اسحب من المحفظة</h3>
-                  <p className="text-xs text-[#565959] mt-0.5">الرصيد المتاح: <span className="font-semibold text-[#0F1111]">{formatCurrency(ledger.available).split(' ')[0]} {formatCurrency(ledger.available).split(' ')[1] || 'ج.م'}</span></p>
+                  <p className="text-xs text-[#565959] mt-0.5">الرصيد المتاح: <span className="font-semibold text-[#0F1111]">{splitCurrency(ledger.available).amount} {splitCurrency(ledger.available).unit}</span></p>
                 </div>
               </div>
               <button 

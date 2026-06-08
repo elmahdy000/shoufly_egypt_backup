@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/shoofly/button";
@@ -55,6 +55,9 @@ export default function VendorProfilePage() {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
   const [allBrands, setAllBrands] = useState<Record<string, Brand[]>>({});
+  // Tracks brand types that have an in-flight fetch to avoid duplicate concurrent requests
+  // (and any re-render-induced ping-pong).
+  const inflightBrandsRef = useRef<Set<string>>(new Set());
 
   // Fetch categories with subcategories tree
   const { data: cats, loading: catsLoading } = useAsyncData(() => apiFetch<Category[]>('/api/categories/tree', "VENDOR"), []);
@@ -95,12 +98,18 @@ export default function VendorProfilePage() {
     });
 
     neededTypes.forEach(type => {
-      if (!allBrands[type]) {
-        apiFetch<Brand[]>(`/api/brands?type=${type}`, "VENDOR")
-          .then(data => setAllBrands(prev => ({ ...prev, [type]: data })));
-      }
+      if (allBrands[type] || inflightBrandsRef.current.has(type)) return;
+      inflightBrandsRef.current.add(type);
+      apiFetch<Brand[]>(`/api/brands?type=${type}`, "VENDOR")
+        .then(data => {
+          setAllBrands(prev => ({ ...prev, [type]: data }));
+        })
+        .catch(() => {
+          // Release the in-flight flag on failure so a future re-render can retry.
+          inflightBrandsRef.current.delete(type);
+        });
     });
-  }, [cats, selectedCats]);
+  }, [cats, selectedCats, allBrands]);
 
   async function handleLogout() {
     await logoutUser();
@@ -248,8 +257,8 @@ export default function VendorProfilePage() {
           </div>
         </div>
 
-        {/* KYC Verification Card */}
-        {profile?.verificationStatus !== 'VERIFIED' && (
+        {/* KYC Verification Card - hidden once verified (APPROVED) or while under review (PENDING) */}
+        {profile?.verificationStatus !== 'APPROVED' && profile?.verificationStatus !== 'PENDING' && (
           <div className="bg-white rounded-xl border border-amber-100 shadow-sm p-5 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-1 bg-amber-400 h-full" />
             <div className="flex items-center gap-2 mb-4">

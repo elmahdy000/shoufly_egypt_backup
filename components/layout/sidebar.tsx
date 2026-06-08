@@ -61,10 +61,10 @@ export function Sidebar({ title, items }: { title: string; items: SidebarItem[] 
                 AD
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-slate-900">Ø§Ù„Ù…Ø¯ÙŠØ± Ø§Ù„Ø¹Ø§Ù…</p>
+                <p className="truncate text-sm font-bold text-slate-900">المدير العام</p>
                 <p className="flex items-center gap-1 text-[10px] text-slate-500">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Ù…ØªØµÙ„
+                  متصل
                 </p>
               </div>
             </div>

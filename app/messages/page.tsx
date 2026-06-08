@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/shoofly/button";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { listConversations, listChatMessages, sendChatMessage } from "@/lib/api/chat";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import { FiSend, FiMessageSquare, FiSearch, FiArrowRight } from "react-icons/fi";
 import { formatRelative } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -41,30 +42,19 @@ function MessagesContent() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // REAL-TIME SSE FOR CHAT
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        if (payload.type === 'chat') {
-          console.log("💬 New chat message received via SSE");
-          
-          // Only show toast if it's not from me
-          // (Assuming we have userId available, but for now we'll just show it)
-          toast('رسالة جديدة 💬', payload.data.content, 'info');
-
-          if (selectedUser && (payload.data.senderId === selectedUser.id || payload.data.receiverId === selectedUser.id)) {
-            refreshMsgs();
-          }
-          refreshConvs();
-        }
-      } catch (err) {
-        console.error("SSE Chat Error:", err);
+    // Shared SSE — chat events use outer type 'chat', inner data has the message
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "chat" || !payload.data) return;
+      const msg = payload.data as { content?: string; senderId?: number; receiverId?: number };
+      if (msg.content) {
+        toast("رسالة جديدة 💬", msg.content, "info");
       }
-    };
-
-    return () => eventSource.close();
+      if (selectedUser && (msg.senderId === selectedUser.id || msg.receiverId === selectedUser.id)) {
+        void refreshMsgs();
+      }
+      void refreshConvs();
+    });
+    return unsubscribe;
   }, [selectedUser, refreshMsgs, refreshConvs, toast]);
 
   async function handleSend(e: React.FormEvent) {
@@ -77,8 +67,8 @@ function MessagesContent() {
       setMessage("");
       refreshMsgs();
       refreshConvs();
-    } catch (err) {
-      console.error(err);
+    } catch {
+      toast('فشل إرسال الرسالة', 'حاول مرة أخرى', 'error');
     } finally {
       setIsSending(false);
     }
@@ -89,14 +79,19 @@ function MessagesContent() {
     if (user.role === 'ADMIN') return "إدارة شوفلي";
     if (user.role === 'VENDOR') return `مورّد #${user.id}`;
     if (user.role === 'CLIENT') return `عميل #${user.id}`;
-    return user.name;
+    return user.name || "مستخدم";
+  };
+
+  const safeInitial = (user: any) => {
+    const name = user?.name || user?.phone || "?";
+    return String(name).charAt(0).toUpperCase();
   };
 
   return (
     <div className="flex flex-col h-screen bg-slate-50 font-sans dir-rtl text-right overflow-hidden">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center gap-4">
-        <Link href="/client" className="text-slate-500 hover:text-primary transition-colors">
+        <Link href="/client" className="text-slate-500 hover:text-primary transition-colors" aria-label="العودة إلى لوحة التحكم">
           <FiArrowRight size={20} />
         </Link>
         <div>
@@ -107,7 +102,7 @@ function MessagesContent() {
 
       <main className="flex-1 flex overflow-hidden">
         {/* Sidebar - Conversation List */}
-        <div className="w-full md:w-80 lg:w-96 flex flex-col border-l border-slate-200 bg-white">
+        <div className={`${selectedUser ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 flex-col border-l border-slate-200 bg-white`}>
           <div className="p-4 border-b border-slate-200">
             <div className="relative">
               <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
@@ -140,7 +135,7 @@ function MessagesContent() {
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
                     selectedUser?.id === c.id ? 'bg-primary text-white' : 'bg-slate-200 text-slate-600'
                   }`}>
-                    {c.name[0]}
+                    {safeInitial(c)}
                   </div>
                   <div className="flex-1 min-w-0">
                      <p className={`text-sm font-medium truncate ${selectedUser?.id === c.id ? 'text-slate-900' : 'text-slate-700'}`}>
@@ -155,16 +150,23 @@ function MessagesContent() {
         </div>
 
         {/* Chat Area */}
-        <div className="hidden md:flex flex-1 flex-col bg-slate-50">
+        <div className={`${selectedUser ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-slate-50`}>
           {selectedUser ? (
             <>
               {/* Chat Header */}
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-3 bg-white">
-                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                  {selectedUser.name[0]}
+              <div className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-200 flex items-center gap-3 bg-white">
+                <button
+                  onClick={() => setSelectedUser(null)}
+                  className="md:hidden p-2 -mr-2 text-slate-500 hover:text-slate-900 transition-colors"
+                  aria-label="العودة إلى قائمة المحادثات"
+                >
+                  <FiArrowRight size={20} />
+                </button>
+                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shrink-0">
+                  {safeInitial(selectedUser)}
                 </div>
-                <div>
-                  <h2 className="font-medium text-slate-900">{getAnonymizedName(selectedUser)}</h2>
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-medium text-slate-900 truncate">{getAnonymizedName(selectedUser)}</h2>
                   <p className="text-xs text-emerald-600 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> متصل
                   </p>

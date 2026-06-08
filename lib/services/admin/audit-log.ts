@@ -1,20 +1,23 @@
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
 
-export type AuditAction = 
+export type AuditAction =
   | 'REQUEST_APPROVED'
   | 'REQUEST_REJECTED'
+  | 'REQUEST_CANCELLED'
+  | 'REQUEST_DISPATCHED'
   | 'OFFER_FORWARDED'
   | 'USER_BLOCKED'
   | 'USER_UNBLOCKED'
+  | 'USER_SUSPENDED'
+  | 'USER_REINSTATED'
   | 'USER_VERIFIED'
   | 'USER_UNVERIFIED'
   | 'WITHDRAWAL_APPROVED'
   | 'WITHDRAWAL_REJECTED'
   | 'REFUND_ISSUED'
   | 'DISPUTE_RESOLVED'
-  | 'SETTINGS_UPDATED'
-  | 'REQUEST_DISPATCHED';
+  | 'SETTINGS_UPDATED';
 
 interface AuditLogEntry {
   adminId: number;
@@ -74,11 +77,21 @@ export async function getAuditLogs(
   adminId?: number,
   action?: AuditAction,
   limit = 50,
-  offset = 0
+  offset = 0,
+  search?: string,
 ) {
   const where: any = {};
   if (adminId) where.adminId = adminId;
   if (action) where.action = action;
+  if (search && search.trim()) {
+    const q = search.trim();
+    where.OR = [
+      { action: { contains: q } },
+      { targetType: { contains: q } },
+      { admin: { fullName: { contains: q } } },
+      { admin: { email: { contains: q } } },
+    ];
+  }
 
   const [logs, total] = await Promise.all([
     prisma.adminAuditLog.findMany({

@@ -25,11 +25,17 @@ export default function ChatPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const partnerId = Number(params.partnerId);
-  const requestId = Number(searchParams.get('requestId'));
+  const rawRequestId = searchParams.get('requestId');
+  const parsedRequestId = rawRequestId ? Number(rawRequestId) : NaN;
+  const requestId = Number.isFinite(parsedRequestId) && parsedRequestId > 0 ? parsedRequestId : null;
 
   const { data: me } = useAsyncData<Me>(() => apiFetch('/api/auth/me', 'CLIENT'), []);
   const { data: msgs, loading, error, refresh } = useAsyncData<Message[]>(
-    () => apiFetch(`/api/messages/${partnerId}?requestId=${requestId}`, 'CLIENT'), [partnerId, requestId]
+    () => {
+      if (requestId == null) return Promise.resolve([] as Message[]);
+      return apiFetch(`/api/messages/${partnerId}?requestId=${requestId}`, 'CLIENT');
+    },
+    [partnerId, requestId]
   );
 
   const [text, setText] = useState('');
@@ -42,8 +48,8 @@ export default function ChatPage() {
   }, [msgs]);
 
   async function send() {
-    if (!text.trim() || !requestId) {
-        if (!requestId) setSendError('لا يمكن إرسال رسالة بدون رقم طلب');
+    if (!text.trim() || requestId == null) {
+        if (requestId == null) setSendError('لا يمكن إرسال رسالة بدون رقم طلب');
         return;
     }
     try {

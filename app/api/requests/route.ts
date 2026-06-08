@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = CreateRequestSchema.parse(body);
 
-    const request = await createRequest(user.id, validated);
+    const request = await createRequest(user.id, validated, req.headers);
     return NextResponse.json(request, { status: 201 });
   } catch (error: unknown) {
     logError('REQUEST_POST', error);

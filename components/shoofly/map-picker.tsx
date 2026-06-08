@@ -74,7 +74,7 @@ export default function MapPickerComponent({
         <Marker 
           position={position}
           draggable={true}
-          icon={MAP_MARKERS.TARGET(isLoaded)}
+          icon={MAP_MARKERS.SELECTED(isLoaded)}
           onDragEnd={(e) => {
             if (e.latLng) {
               const lat = e.latLng.lat();

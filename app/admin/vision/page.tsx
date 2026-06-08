@@ -6,10 +6,11 @@ import { apiFetch } from "@/lib/api/client";
 import { formatDate } from "@/lib/formatters";
 import { 
   Eye, ShieldAlert, Sparkles, AlertTriangle, 
-  CheckCircle, XCircle, Search, Filter,
-  ArrowLeft, MessageSquare, FileText, Zap
+  CheckCircle, XCircle, Search, Filter, Clock,
+  MessageSquare, FileText, Zap, ChevronLeft
 } from "lucide-react";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge } from "@/components/admin/primitives";
+import { AdminFilterChip } from "@/components/admin/ui";
 
 interface FlaggedContent {
   id: number;
@@ -28,7 +29,11 @@ export default function AdminVisionPage() {
   const [selected, setSelected] = useState<FlaggedContent | null>(null);
 
   const { data: flaggedItems, loading, refresh, setData } = useAsyncData<FlaggedContent[]>(
-    () => apiFetch("/api/admin/vision/flagged", "ADMIN"),
+    () =>
+      apiFetch<{ data: FlaggedContent[]; total: number }>(
+        "/api/admin/vision/flagged",
+        "ADMIN",
+      ).then((res) => res?.data ?? []),
     []
   );
 
@@ -67,11 +72,11 @@ export default function AdminVisionPage() {
   }
 
   return (
-    <div className="admin-page admin-page--spacious" dir="rtl">
+    <div className="min-h-screen bg-[#f8fafc] font-cairo text-right antialiased" dir="rtl">
       
       {/* 🚀 Header: AI Monitoring Hub */}
       <section className="bg-white border-b border-slate-200 sticky top-0 z-40 overflow-hidden">
-        <div className="px-6 lg:px-10 py-8 relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div className="max-w-[1500px] mx-auto px-6 lg:px-10 py-8 relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-1">
              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -95,7 +100,7 @@ export default function AdminVisionPage() {
         </div>
       </section>
 
-      <div className="px-6 lg:px-10 py-8 space-y-8">
+      <div className="max-w-[1500px] mx-auto px-6 lg:px-10 py-8 space-y-8">
         
         {/* 📊 KPI Strip */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -109,14 +114,20 @@ export default function AdminVisionPage() {
            {/* 📋 Flagged Content Feed */}
            <div className="lg:col-span-8 space-y-4">
               <div className="flex items-center gap-2 mb-2 overflow-x-auto no-scrollbar pb-2">
-                {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setFilter(s as any)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${filter === s ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
-                  >
-                    {s === 'ALL' ? 'الكل' : s === 'CRITICAL' ? '⚠️ حرجة جداً' : s}
-                  </button>
+                {[
+                  { key: 'ALL', label: 'الكل' },
+                  { key: 'CRITICAL', label: 'حرجة جداً' },
+                  { key: 'HIGH', label: 'HIGH' },
+                  { key: 'MEDIUM', label: 'MEDIUM' },
+                  { key: 'LOW', label: 'LOW' },
+                ].map((s) => (
+                  <AdminFilterChip
+                    key={s.key}
+                    label={s.label}
+                    active={filter === s.key}
+                    tone={s.key === 'CRITICAL' ? 'rose' : s.key === 'HIGH' ? 'amber' : 'primary'}
+                    onClick={() => setFilter(s.key as any)}
+                  />
                 ))}
               </div>
 
@@ -158,7 +169,12 @@ export default function AdminVisionPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <StatusBadge status={item.status} className="scale-90" />
+                          <StatusBadge
+                            tone={item.status === "PENDING" ? "amber" : item.status === "RESOLVED" ? "emerald" : "slate"}
+                            label={item.status === "PENDING" ? "معلق" : item.status === "RESOLVED" ? "تم الحل" : "تم التجاهل"}
+                            dot
+                            size="xs"
+                          />
                           <ChevronLeft size={16} className="text-slate-300 group-hover:text-primary transition-all" />
                         </div>
                       </div>
@@ -243,10 +259,4 @@ function VisionStat({ label, val, icon: Icon, color }: any) {
   );
 }
 
-function Clock({ size }: { size?: number }) {
-  return <Eye size={size} />;
-}
 
-function ChevronLeft({ size, className }: { size?: number; className?: string }) {
-  return <ArrowLeft size={size} className={className} />;
-}

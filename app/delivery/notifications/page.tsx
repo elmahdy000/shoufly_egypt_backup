@@ -135,7 +135,7 @@ export default function DeliveryNotificationsPage() {
             <button 
               onClick={() => setFilter('all')}
               className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all ${
-                filter === 'all' ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200'
+                filter === 'all' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
               الكل ({data?.length || 0})
@@ -143,7 +143,7 @@ export default function DeliveryNotificationsPage() {
             <button 
               onClick={() => setFilter('unread')}
               className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all ${
-                filter === 'unread' ? 'bg-rose-500 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200'
+                filter === 'unread' ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
               غير مقروء ({unreadCount})

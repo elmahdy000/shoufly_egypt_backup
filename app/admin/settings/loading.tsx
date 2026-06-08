@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="admin-page admin-page--spacious animate-pulse" dir="rtl">
+    <div className="min-h-screen bg-[#f8fafc] animate-pulse" dir="rtl">
       {/* Header skeleton */}
       <div className="bg-white border-b border-slate-200 px-6 lg:px-10 py-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-3">

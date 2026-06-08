@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/shoofly/button";
 import { ErrorState } from "@/components/shared/error-state";
@@ -17,6 +17,13 @@ function DeliveryPageContent({ requestId }: { requestId: number }) {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
 
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
+
   async function confirmDelivery() {
     if (!data?.qrCode) {
       setFeedback({ type: 'error', text: "لا يوجد كود تأكيد لهذا الطلب" });
@@ -27,7 +34,8 @@ function DeliveryPageContent({ requestId }: { requestId: number }) {
       setFeedback(null);
       await confirmClientDelivery(requestId, data.qrCode);
       setFeedback({ type: 'success', text: "تم تأكيد استلام الخدمة وإغلاق الطلب بنجاح!" });
-      setTimeout(() => router.push(`/client/requests/${requestId}`), 3000);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = setTimeout(() => router.push(`/client/requests/${requestId}`), 3000);
     } catch (err) {
       setFeedback({ type: 'error', text: `${err instanceof Error ? err.message : "حدث خطأ أثناء التأكيد"}` });
     } finally {

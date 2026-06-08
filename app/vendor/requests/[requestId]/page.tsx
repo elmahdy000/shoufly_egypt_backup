@@ -9,10 +9,10 @@ import { createVendorBid } from "@/lib/api/bids";
 import { getRequestDetails } from "@/lib/api/requests";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
-import { 
-  FileText, 
-  MapPin, 
-  CheckCircle, 
+import {
+  FileText,
+  MapPin,
+  CheckCircle,
   ArrowLeft,
   Briefcase,
   Info,
@@ -23,9 +23,18 @@ import {
   Package,
   ArrowRight,
   ShieldCheck,
-  CircleDollarSign
+  CircleDollarSign,
+  Flag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const REPORT_REASONS: Array<{ value: string; label: string }> = [
+  { value: "SPAM", label: "سبام / إعلان" },
+  { value: "FAKE", label: "طلب وهمي" },
+  { value: "DUPLICATE", label: "مكرر" },
+  { value: "OUT_OF_SCOPE", label: "خارج نطاق خدماتي" },
+  { value: "OTHER", label: "سبب آخر" },
+];
 
 function VendorRequestDetails({ requestId }: { requestId: number }) {
   const router = useRouter();
@@ -40,6 +49,15 @@ function VendorRequestDetails({ requestId }: { requestId: number }) {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 🚩 Report-this-request modal state
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState<string>("SPAM");
+  const [reportDetails, setReportDetails] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [reportFeedback, setReportFeedback] = useState<
+    { type: "ok" | "err"; text: string } | null
+  >(null);
 
   // 🔄 Fetch platform commission rate from settings (dynamic)
   const [commissionRate, setCommissionRate] = useState(0.15); // default 15%
@@ -76,6 +94,39 @@ function VendorRequestDetails({ requestId }: { requestId: number }) {
     } catch (err) {
       console.error('Upload failed', err);
       return null;
+    }
+  }
+
+  async function submitReport(e: FormEvent) {
+    e.preventDefault();
+    setReportSubmitting(true);
+    setReportFeedback(null);
+    try {
+      const res = await apiFetch<{ ok: boolean; reportsCount: number; autoClosed: boolean }>(
+        `/api/vendor/requests/${requestId}/report`,
+        "VENDOR",
+        { method: "POST", body: { reason: reportReason, details: reportDetails || undefined } },
+      );
+      if (res.autoClosed) {
+        setReportFeedback({
+          type: "ok",
+          text: "شكراً. تم تأكيد البلاغ وتم إغلاق الطلب تلقائياً.",
+        });
+        setTimeout(() => router.push("/vendor/requests"), 2000);
+      } else {
+        setReportFeedback({
+          type: "ok",
+          text: `شكراً. تم تسجيل البلاغ (${res.reportsCount} بلاغ حتى الآن).`,
+        });
+        setTimeout(() => setReportOpen(false), 1500);
+      }
+    } catch (err) {
+      setReportFeedback({
+        type: "err",
+        text: err instanceof Error ? err.message : "حصل مشكلة في تسجيل البلاغ.",
+      });
+    } finally {
+      setReportSubmitting(false);
     }
   }
 
@@ -156,7 +207,17 @@ function VendorRequestDetails({ requestId }: { requestId: number }) {
           <ArrowRight size={20} />
         </button>
         <h1 className="font-black text-slate-900">تفاصيل الطلب #{requestId}</h1>
-        <div className="w-10 invisible" />
+        <button
+          onClick={() => {
+            setReportFeedback(null);
+            setReportOpen(true);
+          }}
+          className="w-10 h-10 rounded-xl hover:bg-rose-50 text-slate-500 hover:text-rose-600 flex items-center justify-center transition-colors"
+          aria-label="الإبلاغ عن الطلب"
+          title="الإبلاغ عن الطلب"
+        >
+          <Flag size={18} />
+        </button>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
@@ -386,6 +447,135 @@ function VendorRequestDetails({ requestId }: { requestId: number }) {
           <img src={selectedImage} className="max-w-full max-h-full object-contain rounded-2xl" />
         </div>
       )}
+
+      {/* 🚩 Report modal */}
+      <AnimatePresence>
+        {reportOpen && (
+          <motion.div
+            className="fixed inset-0 z-[70] bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !reportSubmitting) setReportOpen(false);
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="report-modal-title"
+          >
+            <motion.div
+              className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-100 overflow-hidden"
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 60, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 220, damping: 22 }}
+            >
+              <form onSubmit={submitReport}>
+                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-rose-600">
+                    <Flag size={18} />
+                    <h2 id="report-modal-title" className="font-black text-slate-900">
+                      الإبلاغ عن الطلب
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setReportOpen(false)}
+                    disabled={reportSubmitting}
+                    className="w-9 h-9 rounded-xl hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors disabled:opacity-40"
+                    aria-label="إغلاق"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="px-6 py-5 space-y-4">
+                  <p className="text-sm text-slate-500 leading-relaxed">
+                    لو الطلب ده مزيف، سبام، أو خارج عن نطاقك، ابلّغنا وهنراجعه فوراً.
+                    البلاغات المتكررة من موردين مختلفين بتتسبب في إغلاق الطلب تلقائياً.
+                  </p>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      سبب البلاغ
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {REPORT_REASONS.map((r) => {
+                        const active = reportReason === r.value;
+                        return (
+                          <button
+                            key={r.value}
+                            type="button"
+                            onClick={() => setReportReason(r.value)}
+                            className={`px-3 py-2.5 rounded-2xl text-sm font-semibold border-2 transition-all text-right ${
+                              active
+                                ? "border-rose-500 bg-rose-50 text-rose-700"
+                                : "border-slate-100 text-slate-600 hover:border-slate-200"
+                            }`}
+                          >
+                            {r.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      تفاصيل إضافية (اختياري)
+                    </label>
+                    <textarea
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      maxLength={500}
+                      rows={3}
+                      placeholder="لو عندك معلومة إضافية تساعد المراجعة..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-400 focus:bg-white outline-none transition-colors resize-none"
+                    />
+                  </div>
+
+                  {reportFeedback && (
+                    <div
+                      className={`rounded-2xl px-4 py-3 text-sm font-semibold flex items-center gap-2 ${
+                        reportFeedback.type === "ok"
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border border-rose-200"
+                      }`}
+                      role="status"
+                    >
+                      {reportFeedback.type === "ok" ? (
+                        <CheckCircle size={16} />
+                      ) : (
+                        <AlertTriangle size={16} />
+                      )}
+                      {reportFeedback.text}
+                    </div>
+                  )}
+                </div>
+
+                <div className="px-6 py-4 border-t border-slate-100 flex items-center gap-3 justify-end bg-slate-50/50">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setReportOpen(false)}
+                    disabled={reportSubmitting}
+                    className="rounded-2xl"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    type="submit"
+                    isLoading={reportSubmitting}
+                    className="rounded-2xl !bg-rose-600 hover:!bg-rose-700"
+                  >
+                    ابعت البلاغ
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

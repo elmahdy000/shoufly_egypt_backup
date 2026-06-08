@@ -6,6 +6,7 @@ import { ErrorState } from "@/components/shared/error-state";
 import { RequestGridSkeleton } from "@/components/shoofly/skeleton";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { listVendorOpenRequests } from "@/lib/api/requests";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import {
   FiBriefcase, FiMapPin, FiFilter, FiInbox, FiChevronLeft
 } from "react-icons/fi";
@@ -85,31 +86,14 @@ export default function VendorRequestsPage() {
   );
 
   useEffect(() => {
-    // REAL-TIME SSE FOR NEW REQUESTS
-    let eventSource: EventSource;
-    
-    const connectSSE = () => {
-      eventSource = new EventSource("/api/notifications/stream");
-      
-      eventSource.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          if (payload.type === 'NEW_REQUEST' || payload.type === 'ORDER_STATUS_CHANGED') {
-            refresh();
-          }
-        } catch (err) {
-          console.error("SSE Marketplace Error:", err);
-        }
-      };
-
-      eventSource.onerror = () => {
-        eventSource.close();
-        setTimeout(connectSSE, 3000); // Retry after 3s
-      };
-    };
-
-    connectSSE();
-    return () => eventSource?.close();
+    // Shared SSE — refresh for new requests and order status changes
+    const REFRESH_ON = new Set(["NEW_REQUEST", "ORDER_STATUS_CHANGED", "REQUEST_CREATED", "REQUEST_REJECTED"]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification") return;
+      const innerType = (payload.data as { type?: string } | null)?.type;
+      if (innerType && REFRESH_ON.has(innerType)) refresh();
+    });
+    return unsubscribe;
   }, [refresh]);
 
   const rows = useMemo(() => {

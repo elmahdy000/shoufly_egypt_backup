@@ -12,7 +12,7 @@ export function LandingFooter({ userRole }: LandingFooterProps) {
   const showVendorCTA = userRole !== 'VENDOR' && userRole !== 'ADMIN';
 
   return (
-    <footer className="bg-slate-900 text-white mt-12">
+    <footer className="bg-slate-900 text-white mt-12 pb-24 lg:pb-0">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-10">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           
@@ -50,19 +50,19 @@ export function LandingFooter({ userRole }: LandingFooterProps) {
             {
               title: "منصة شوفلي",
               links: [
-                { name: "عن شوفلي", href: "#" },
-                { name: "كيف يعمل", href: "#" },
-                { name: "أمان المعاملات", href: "#" },
-                { name: "نظام النقاط", href: "#" },
+                { name: "عن شوفلي", href: "/about" },
+                { name: "كيف يعمل", href: "/how-it-works" },
+                { name: "أمان المعاملات", href: "/security" },
+                { name: "نظام النقاط", href: "/rewards" },
               ]
             },
             {
               title: "الدعم والخصوصية",
               links: [
-                { name: "شروط الاستخدام", href: "#" },
-                { name: "سياسة الخصوصية", href: "#" },
-                { name: "الأسئلة الشائعة", href: "#" },
-                { name: "مركز المساعدة", href: "#" },
+                { name: "شروط الاستخدام", href: "/terms" },
+                { name: "سياسة الخصوصية", href: "/privacy" },
+                { name: "الأسئلة الشائعة", href: "/faq" },
+                { name: "مركز المساعدة", href: "/help" },
               ]
             }
           ].map((col) => (
@@ -87,7 +87,7 @@ export function LandingFooter({ userRole }: LandingFooterProps) {
                 { icon: FiTwitter, href: "https://twitter.com/shoofly" },
                 { icon: FiInstagram, href: "https://instagram.com/shoofly" },
               ].map((social, i) => (
-                <a key={i} href={social.href} target="_blank" className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm">
+                <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.href} className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm">
                   <social.icon size={16} />
                 </a>
               ))}

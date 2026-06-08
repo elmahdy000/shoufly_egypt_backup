@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/shoofly/button";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
@@ -20,6 +20,7 @@ interface UserProfile {
   fullName: string;
   email: string;
   phone: string;
+  phoneVerified: boolean;
   role: string;
   isActive: boolean;
   walletBalance: number;
@@ -37,6 +38,20 @@ export default function ClientProfilePage() {
   const [editPhone, setEditPhone] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Phone verification state
+  const [verifyPhone, setVerifyPhone] = useState('');
+  const [verifyCode, setVerifyCode] = useState('');
+  const [verifyStep, setVerifyStep] = useState<'idle' | 'code' | 'done'>('idle');
+  const [verifyMsg, setVerifyMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [verifySending, setVerifySending] = useState(false);
+  const [verifyCountdown, setVerifyCountdown] = useState(0);
+
+  useEffect(() => {
+    if (verifyCountdown <= 0) return;
+    const t = setTimeout(() => setVerifyCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [verifyCountdown]);
 
   function openEdit() {
     setEditName(user?.fullName ?? '');
@@ -67,6 +82,50 @@ export default function ClientProfilePage() {
     await logoutUser();
     document.cookie = 'session_token=; Max-Age=0; path=/';
     router.push("/login");
+  }
+
+  async function sendOtp() {
+    if (!verifyPhone.trim()) {
+      setVerifyMsg({ type: 'error', text: 'اكتب رقم موبايلك الأول.' });
+      return;
+    }
+    setVerifySending(true);
+    setVerifyMsg(null);
+    try {
+      await apiFetch('/api/auth/phone/request-otp', 'CLIENT', {
+        method: 'POST',
+        body: { phone: verifyPhone },
+      });
+      setVerifyStep('code');
+      setVerifyCountdown(60);
+      setVerifyMsg({ type: 'success', text: 'تم إرسال الكود على الموبايل.' });
+    } catch (err) {
+      setVerifyMsg({ type: 'error', text: err instanceof Error ? err.message : 'فشل إرسال الكود.' });
+    } finally {
+      setVerifySending(false);
+    }
+  }
+
+  async function submitOtp() {
+    if (!verifyCode.trim() || verifyCode.length !== 6) {
+      setVerifyMsg({ type: 'error', text: 'اكتب الكود المكوّن من 6 أرقام.' });
+      return;
+    }
+    setVerifySending(true);
+    setVerifyMsg(null);
+    try {
+      await apiFetch('/api/auth/phone/verify-otp', 'CLIENT', {
+        method: 'POST',
+        body: { phone: verifyPhone, code: verifyCode },
+      });
+      setVerifyStep('done');
+      setVerifyMsg({ type: 'success', text: 'تم تأكيد رقمك بنجاح! تقدر تعمل طلبات دلوقتي.' });
+      refresh();
+    } catch (err) {
+      setVerifyMsg({ type: 'error', text: err instanceof Error ? err.message : 'الكود غير صحيح.' });
+    } finally {
+      setVerifySending(false);
+    }
   }
 
   const initials = user?.fullName
@@ -123,6 +182,91 @@ export default function ClientProfilePage() {
           <FiEdit3 size={15} /> تعديل البيانات
         </button>
       </div>
+
+      {/* 📱 Phone verification card — required for creating requests */}
+      {!loading && user && user.role === 'CLIENT' && !user.phoneVerified && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+              <FiPhone size={18} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-amber-900">أكّد رقم موبايلك</h3>
+              <p className="text-sm text-amber-800 mt-1 leading-relaxed">
+                لازم تأكد رقمك قبل ما تقدر تعمل طلب جديد. هنبعتلك كود 6 أرقام على الموبايل.
+              </p>
+            </div>
+          </div>
+
+          {verifyStep === 'idle' && (
+            <div className="flex items-center gap-2">
+              <input
+                type="tel"
+                inputMode="tel"
+                value={verifyPhone}
+                onChange={(e) => setVerifyPhone(e.target.value)}
+                placeholder={user.phone ?? '01XXXXXXXXX'}
+                className="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-500 outline-none"
+              />
+              <Button
+                onClick={sendOtp}
+                isLoading={verifySending}
+                className="rounded-xl !bg-amber-600 hover:!bg-amber-700"
+              >
+                ابعت الكود
+              </Button>
+            </div>
+          )}
+
+          {verifyStep === 'code' && (
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-amber-800">
+                الكود المكوّن من 6 أرقام
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={verifyCode}
+                onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                className="w-full bg-white border border-amber-200 rounded-xl px-3 py-2.5 text-center text-2xl font-bold tracking-widest text-slate-900 placeholder:text-slate-300 focus:border-amber-500 outline-none"
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={submitOtp}
+                  isLoading={verifySending}
+                  className="flex-1 rounded-xl !bg-amber-600 hover:!bg-amber-700"
+                >
+                  أكّد الكود
+                </Button>
+                <Button
+                  onClick={sendOtp}
+                  isLoading={verifySending}
+                  disabled={verifyCountdown > 0}
+                  variant="secondary"
+                  className="rounded-xl"
+                >
+                  {verifyCountdown > 0 ? `إعادة بعد ${verifyCountdown}ث` : 'إعادة الإرسال'}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {verifyMsg && (
+            <div
+              className={`rounded-xl px-3 py-2 text-sm font-semibold ${
+                verifyMsg.type === 'success'
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : 'bg-rose-100 text-rose-800'
+              }`}
+              role="status"
+            >
+              {verifyMsg.text}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Info rows */}
       <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100">

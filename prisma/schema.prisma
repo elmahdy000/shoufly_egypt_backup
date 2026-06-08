@@ -14,11 +14,16 @@ model User {
   email                    String              @unique
   password                 String
   phone                    String?
+  phoneVerified            Boolean             @default(false)
+  phoneVerifiedAt          DateTime?
   role                     UserRole
   isActive                 Boolean             @default(true)
   isVerified               Boolean             @default(false)
   verificationStatus       VerificationStatus  @default(NOT_SUBMITTED)
   isBlocked                Boolean             @default(false)
+  trustScore               Int                 @default(100)
+  suspendedUntil           DateTime?
+  suspensionReason         String?
   walletBalance            Decimal             @default(0) @db.Decimal(12, 2)
   fcmToken                 String?
   cityId                   Int?
@@ -48,6 +53,9 @@ model User {
   reviewsReceived          Review[]            @relation("ReviewsReceived")
   reviewsGiven             Review[]            @relation("ReviewsGiven")
   transactions             Transaction[]
+  trustEvents              TrustEvent[]
+  requestReportsFiled      RequestReport[]     @relation("ReportFiler")
+  phoneOtps                PhoneOtp[]
   city                     City?               @relation(fields: [cityId], references: [id])
   governorate              Governorate?        @relation(fields: [governorateId], references: [id])
   vendorBrands             VendorBrand[]
@@ -60,6 +68,8 @@ model User {
   @@index([phone])
   @@index([isActive, isVerified])
   @@index([verificationStatus])
+  @@index([trustScore])
+  @@index([suspendedUntil])
 }
 
 model Category {
@@ -145,6 +155,7 @@ model Request {
   updatedAt               DateTime           @updatedAt
   bids                    Bid[]
   complaints              Complaint[]
+  reports                 RequestReport[]
   deliveryTracking        DeliveryTracking[]
   notifications           Notification[]
   deliveryAgent           User?              @relation("DeliveryAgent", fields: [assignedDeliveryAgentId], references: [id])
@@ -231,6 +242,55 @@ model DeliveryTracking {
 
   @@index([requestId])
   @@index([status])
+}
+
+/// Vendor reports on a request (fake/spam/duplicate/...).
+model RequestReport {
+  id           Int      @id @default(autoincrement())
+  requestId    Int
+  reportedById Int
+  reason       String
+  details      String?
+  resolved     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  request      Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reportedBy   User     @relation("ReportFiler", fields: [reportedById], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, reportedById])
+  @@index([requestId])
+  @@index([reportedById])
+  @@index([resolved])
+}
+
+/// Append-only trust score audit log for a user.
+model TrustEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  delta     Int
+  reason    String
+  actorId   Int?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// One-time-password codes sent to a user's phone for verification.
+model PhoneOtp {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  phone      String
+  codeHash   String
+  purpose    OtpPurpose @default(PHONE_VERIFY)
+  attempts   Int      @default(0)
+  consumed   Boolean  @default(false)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, consumed, expiresAt])
+  @@index([phone, purpose])
 }
 
 model Transaction {
@@ -498,6 +558,17 @@ enum NotificationType {
   DISPUTE_RESOLVED
   KYC_APPROVED
   KYC_REJECTED
+  PHONE_OTP
+  REQUEST_REPORTED
+  REQUEST_AUTO_CLOSED
+  USER_SUSPENDED
+  USER_REINSTATED
+  AI_FLAGGED_REQUEST
+}
+
+enum OtpPurpose {
+  PHONE_VERIFY
+  LOGIN
 }
 
 enum CategoryType {

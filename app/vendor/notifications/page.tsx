@@ -206,7 +206,7 @@ export default function VendorNotificationsPage() {
                 onClick={() => setFilter(tab.id)}
                 className={`px-5 py-2.5 text-xs font-black rounded-xl whitespace-nowrap transition-all flex items-center gap-2 ${
                   filter === tab.id 
-                    ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
+                    ? 'bg-primary/10 text-primary border border-primary/20' 
                     : 'bg-transparent text-slate-500 hover:bg-slate-50'
                 }`}
               >

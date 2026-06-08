@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useMemo, useCallback } from "react";
 import { ErrorState } from "@/components/shared/error-state";
 import { formatDate } from "@/lib/formatters";
@@ -21,8 +20,6 @@ import {
   FiCheckSquare,
   FiXCircle,
   FiClock,
-  FiFilter,
-  FiTrash2,
   FiExternalLink,
   FiChevronLeft,
   FiCalendar
@@ -215,32 +212,16 @@ function getNotificationConfig(type: string) {
 type FilterType = 'all' | 'unread' | 'orders' | 'financial' | 'delivery';
 
 export default function ClientNotificationsPage() {
-  const router = useRouter();
-  const { data, loading, error, markRead } = useNotificationsStream("CLIENT", 4000);
+  const { data, loading, error, markRead, markAllRead } = useNotificationsStream("CLIENT", 4000);
   const [filter, setFilter] = useState<FilterType>('all');
 
-  // Mark all as read
-  const handleMarkAllRead = useCallback(async () => {
-    const unreadIds = data?.filter((n: { isRead: boolean; id: number }) => !n.isRead).map((n: { id: number }) => n.id) || [];
-    await Promise.all(unreadIds.map((id: number) => markRead(id)));
-  }, [data, markRead]);
-
-  // Handle notification click - navigate directly to relevant page
-  const handleNotificationClick = useCallback((item: { isRead: boolean; id: number; type: string; requestId?: number }) => {
-    if (!item.isRead) {
-      markRead(item.id);
-    }
-    
-    // Get route and navigate
-    const config = getNotificationConfig(item.type);
-    const route = config.route?.(item.requestId);
-    
-    if (route && route !== '#') {
-      router.push(route);
-    }
-  }, [markRead, router]);
-
   const unreadCount = data?.filter((n: { isRead: boolean }) => !n.isRead).length ?? 0;
+
+  // Mark all as read (single bulk call, not N fan-out)
+  const handleMarkAllRead = useCallback(async () => {
+    if (unreadCount === 0) return;
+    await markAllRead();
+  }, [unreadCount, markAllRead]);
 
   // Filter notifications
   const filteredNotifications = useMemo(() => {
@@ -259,12 +240,13 @@ export default function ClientNotificationsPage() {
     return data;
   }, [data, filter]);
 
-  // Group notifications by date
+  // Group notifications by local date (stable ISO key, formatted in ar-EG)
   const groupedNotifications = useMemo(() => {
     return filteredNotifications.reduce((groups: Record<string, { createdAt: string }[]>, item: { createdAt: string }) => {
-      const date = new Date(item.createdAt).toDateString();
-      if (!groups[date]) groups[date] = [];
-      groups[date].push(item);
+      const d = new Date(item.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(item);
       return groups;
     }, {});
   }, [filteredNotifications]);
@@ -324,7 +306,7 @@ export default function ClientNotificationsPage() {
             onClick={() => setFilter('all')}
             className={`px-4 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all flex items-center gap-2 ${
               filter === 'all' 
-                ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' 
+                ? 'bg-primary/10 text-primary border border-primary/20' 
                 : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
             }`}
           >
@@ -334,7 +316,7 @@ export default function ClientNotificationsPage() {
             onClick={() => setFilter('unread')}
             className={`px-4 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all flex items-center gap-2 ${
               filter === 'unread' 
-                ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' 
+                ? 'bg-rose-50 text-rose-600 border border-rose-200' 
                 : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
             }`}
           >
@@ -344,7 +326,7 @@ export default function ClientNotificationsPage() {
             onClick={() => setFilter('orders')}
             className={`px-4 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all flex items-center gap-2 ${
               filter === 'orders' 
-                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' 
+                ? 'bg-blue-50 text-blue-600 border border-blue-200' 
                 : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
             }`}
           >
@@ -354,7 +336,7 @@ export default function ClientNotificationsPage() {
             onClick={() => setFilter('financial')}
             className={`px-4 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all flex items-center gap-2 ${
               filter === 'financial' 
-                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
+                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' 
                 : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
             }`}
           >
@@ -364,7 +346,7 @@ export default function ClientNotificationsPage() {
             onClick={() => setFilter('delivery')}
             className={`px-4 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all flex items-center gap-2 ${
               filter === 'delivery' 
-                ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' 
+                ? 'bg-amber-50 text-amber-600 border border-amber-200' 
                 : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
             }`}
           >
@@ -406,11 +388,14 @@ export default function ClientNotificationsPage() {
 
         {/* Notifications Grouped by Date */}
         <div className="space-y-8">
-          {Object.entries(groupedNotifications).map(([date, items]: [string, any]) => (  
-            <div key={date} className="space-y-4">
+          {Object.entries(groupedNotifications).map(([dateKey, items]: [string, any]) => {
+            const [y, m, d] = dateKey.split('-').map(Number);
+            const headerDate = new Date(y, m - 1, d);
+            return (
+            <div key={dateKey} className="space-y-4">
               <h3 className="text-sm font-bold text-slate-400 flex items-center gap-2">
                 <FiCalendar size={14} />
-                {new Date(date).toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {headerDate.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </h3>
               
               <div className="space-y-3">
@@ -418,15 +403,18 @@ export default function ClientNotificationsPage() {
                   const isUnread = !item.isRead;
                   const config = getNotificationConfig(item.type);
                   const Icon = config.icon;
-                  const route = config.route?.(item.requestId) || '#';
+                  const notificationRoute = config.route?.(item.requestId);
+                  
+                  const handleClick = () => {
+                    if (isUnread) markRead(item.id);
+                  };
                   
                   const NotificationCard = (
                     <div 
-                      onClick={() => isUnread && markRead(item.id)}
                       className={`relative text-right rounded-2xl p-5 transition-all border-2 group ${
                         isUnread 
-                          ? `bg-white ${config.border} shadow-sm hover:shadow-md cursor-pointer` 
-                          : 'bg-white/50 border-slate-100 hover:bg-white hover:border-slate-200 cursor-pointer'
+                          ? `bg-white ${config.border} shadow-sm hover:shadow-md` 
+                          : 'bg-white/50 border-slate-100 hover:bg-white hover:border-slate-200'
                       }`}
                     >
                       {/* Unread indicator */}
@@ -477,25 +465,26 @@ export default function ClientNotificationsPage() {
                       </div>
                     </div>
                   );
-                  
-                  const notificationRoute = config.route?.(item.requestId);
                 
                 return notificationRoute ? (
                     <Link 
                       key={item.id} 
                       href={notificationRoute}
-                      onClick={() => !item.isRead && markRead(item.id)}
-                      className="block"
+                      onClick={handleClick}
+                      className="block cursor-pointer"
                     >
                       {NotificationCard}
                     </Link>
-                  ) : (
-                    <div key={item.id}>{NotificationCard}</div>
+                   ) : (
+                    <div key={item.id} onClick={handleClick} className="cursor-pointer">
+                      {NotificationCard}
+                    </div>
                   );
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

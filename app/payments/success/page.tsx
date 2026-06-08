@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api/client";
@@ -15,12 +15,42 @@ import {
 
 type PaymentStatus = "loading" | "success" | "failed" | "pending";
 
+const STATUS_CONFIG: Record<PaymentStatus, { icon: React.ReactNode; color: string; bgColor: string; title: string }> = {
+  loading: {
+    icon: <FiRefreshCw className="animate-spin" size={48} />,
+    color: "text-blue-500",
+    bgColor: "bg-blue-50",
+    title: "جاري التحقق من الدفع...",
+  },
+  success: {
+    icon: <FiCheckCircle size={48} />,
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-50",
+    title: "تم الدفع بنجاح!",
+  },
+  failed: {
+    icon: <FiAlertCircle size={48} />,
+    color: "text-rose-500",
+    bgColor: "bg-rose-50",
+    title: "فشل الدفع",
+  },
+  pending: {
+    icon: <FiClock size={48} />,
+    color: "text-amber-500",
+    bgColor: "bg-amber-50",
+    title: "في انتظار التأكيد",
+  },
+};
+
+const MAX_POLL_RETRIES = 5;
+
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<PaymentStatus>("loading");
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState<number>(0);
+  const retryCountRef = useRef(0);
 
   useEffect(() => {
     const txnId = searchParams.get("txnId");
@@ -31,7 +61,11 @@ export default function PaymentSuccessPage() {
       setAmount(Number(amountParam));
     }
 
+    let cancelled = false;
+    let pollTimer: ReturnType<typeof setTimeout> | null = null;
+
     const verifyPayment = async () => {
+      if (cancelled) return;
       if (!txnId) {
         setStatus("failed");
         setMessage("معرف المعاملة غير موجود");
@@ -52,6 +86,7 @@ export default function PaymentSuccessPage() {
 
       try {
         const result = await apiFetch(`/api/client/wallet/verify/${txnId}`, "CLIENT") as { success: boolean; balance?: number; message?: string };
+        if (cancelled) return;
         if (result.success) {
           setStatus("success");
           setMessage("تم إضافة الرصيد إلى محفظتك بنجاح!");
@@ -61,60 +96,32 @@ export default function PaymentSuccessPage() {
         } else {
           setStatus("pending");
           setMessage(result.message || "جاري التحقق من حالة الدفع...");
-          setTimeout(verifyPayment, 3000);
+          // Bound retries so we don't poll forever if the provider never confirms.
+          if (retryCountRef.current < MAX_POLL_RETRIES) {
+            retryCountRef.current += 1;
+            pollTimer = setTimeout(verifyPayment, 3000);
+          } else {
+            setStatus("failed");
+            setMessage("استغرق التحقق وقتاً طويلاً. حاول تحديث الصفحة أو التواصل مع الدعم.");
+          }
         }
       } catch (error) {
+        if (cancelled) return;
         setStatus("failed");
         setMessage(error instanceof Error ? error.message : "فشلت عملية التحقق");
       }
     };
 
     verifyPayment();
+
+    return () => {
+      cancelled = true;
+      if (pollTimer) clearTimeout(pollTimer);
+    };
   }, [searchParams]);
 
-  const getStatusConfig = () => {
-    switch (status) {
-      case "loading":
-        return {
-          icon: <FiRefreshCw className="animate-spin" size={48} />,
-          color: "text-blue-500",
-          bgColor: "bg-blue-50",
-        };
-      case "success":
-        return {
-          icon: <FiCheckCircle size={48} />,
-          color: "text-emerald-500",
-          bgColor: "bg-emerald-50",
-        };
-      case "failed":
-        return {
-          icon: <FiAlertCircle size={48} />,
-          color: "text-rose-500",
-          bgColor: "bg-rose-50",
-        };
-      case "pending":
-        return {
-          icon: <FiClock size={48} />,
-          color: "text-amber-500",
-          bgColor: "bg-amber-50",
-        };
-    }
-  };
-
-  const config = getStatusConfig();
-
-  const getStatusTitle = () => {
-    switch (status) {
-      case "loading":
-        return "جاري التحقق من الدفع...";
-      case "success":
-        return "تم الدفع بنجاح!";
-      case "failed":
-        return "فشل الدفع";
-      case "pending":
-        return "في انتظار التأكيد";
-    }
-  };
+  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.loading;
+  const title = config.title;
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -126,7 +133,7 @@ export default function PaymentSuccessPage() {
 
         {/* Title */}
         <h1 className="text-xl font-bold text-slate-900 mb-2">
-          {getStatusTitle()}
+          {title}
         </h1>
 
         {/* Message */}

@@ -7,6 +7,8 @@ import { ar } from "date-fns/locale";
 import Link from "next/link";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
+import { markAllNotificationsRead } from "@/lib/api/notifications";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import { useToast } from "@/components/providers/toast-provider";
 import { playNotificationSound } from "@/lib/utils/sounds";
 
@@ -64,40 +66,31 @@ export function NotificationDropdown() {
 
     const unreadCount = (notifications ?? []).filter(n => !n.isRead).length;
 
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setIsOpen(false);
-        }
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
       }
-      document.addEventListener("mousedown", handleClickOutside);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
 
-      // REAL-TIME SSE LISTENER
-      const eventSource = new EventSource("/api/notifications/stream");
-      
-      eventSource.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          if (payload.type === 'notification') {
-            console.log("🔔 Live notification received:", payload.data);
-            playNotificationSound();
-            toast(payload.data.title, payload.data.message, 'info');
-            refresh(); // Re-fetch from API to keep state consistent
-          }
-        } catch (err) {
-          console.error("SSE Parse Error:", err);
+    // Shared SSE listener (one connection per tab)
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type === "notification" && payload.data && typeof payload.data === "object") {
+        const data = payload.data as { title?: string; message?: string };
+        if (data.title || data.message) {
+          playNotificationSound();
+          toast(data.title ?? "", data.message ?? "", "info");
         }
-      };
-
-    eventSource.onerror = () => {
-      console.warn("SSE Connection lost. Reconnecting...");
-    };
+        refresh();
+      }
+    });
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      eventSource.close();
+      unsubscribe();
     };
-  }, [refresh]);
+  }, [refresh, toast]);
 
   async function markAsRead(id: number) {
     try {
@@ -110,8 +103,7 @@ export function NotificationDropdown() {
 
   async function markAllAsRead() {
     try {
-      // Assuming endpoint exists for all
-      await apiFetch("/api/notifications/mark-all-read", userRole || "CLIENT", { method: "POST" });
+      await markAllNotificationsRead(userRole || "CLIENT");
       refresh();
     } catch (err) {
       console.error(err);

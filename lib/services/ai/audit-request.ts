@@ -69,68 +69,109 @@ export async function auditRequest(title: string, description: string): Promise<
 }
 
 /**
- * Integration helper: Automatically flags the request in DB based on AI audit
+ * Integration helper: Automatically flags the request in DB based on AI audit.
+ *
+ * In the new flow the request is auto-dispatched to OPEN_FOR_BIDDING on
+ * creation. The AI's job is *re-classification*:
+ *   - REJECT        → flip to REJECTED, penalize trust, notify client.
+ *   - ADMIN_REVIEW  → flip to PENDING_ADMIN_REVISION (vendors can no longer
+ *                     see it because the vendor feed filters on
+ *                     OPEN_FOR_BIDDING), notify client + admin queue.
+ *   - APPROVE       → keep as-is (already broadcast). No-op for the status,
+ *                     but the trust event + notification confirm to the
+ *                     client that the system is paying attention.
  */
 export async function processAiAudit(requestId: number) {
     const request = await prisma.request.findUnique({ where: { id: requestId } });
-    if (!request || request.status !== 'PENDING_ADMIN_REVISION') {
-        logger.info('ai.audit.skipped', { requestId, currentStatus: request?.status });
+    if (!request) {
+        logger.info('ai.audit.skipped', { requestId, reason: 'not_found' });
+        return;
+    }
+
+    // Only score requests that are still in the live state. If the client
+    // already cancelled or admins already moved the request, do nothing.
+    if (
+        request.status === 'CLOSED_CANCELLED' ||
+        request.status === 'CLOSED_SUCCESS' ||
+        request.status === 'REJECTED' ||
+        request.status === 'ORDER_PAID_PENDING_DELIVERY'
+    ) {
+        logger.info('ai.audit.skipped', { requestId, currentStatus: request.status });
         return;
     }
 
     const audit = await auditRequest(request.title, request.description);
     const { createNotification } = await import('../notifications/create-notification');
+    const { awardTrustEvent } = await import('../users/trust-score');
 
-    // If AI rejects it, we move it to REJECTED status immediately
     if (audit.recommendedAction === 'REJECT') {
         await prisma.request.update({
             where: { id: requestId },
-            data: { status: 'REJECTED', notes: `رفض آلي (AI): ${audit.reasoning}` }
+            data: { status: 'REJECTED', notes: `رفض آلي (AI): ${audit.reasoning}` },
+        });
+
+        await awardTrustEvent({
+            userId: request.clientId,
+            delta: -5,
+            reason: 'ai_flagged_request',
+            metadata: { requestId, aiAction: 'REJECT', score: audit.score },
         });
 
         await createNotification({
             userId: request.clientId,
             type: 'REQUEST_REJECTED' as any,
-            title: 'تم رفض طلبك',
+            title: 'تم رفض طلبك تلقائياً',
             message: `عذراً، تم رفض طلبك "${request.title}" بسبب: ${audit.reasoning}`,
-            requestId: request.id
+            requestId: request.id,
         });
-
     } else if (audit.recommendedAction === 'ADMIN_REVIEW') {
+        // Pull back from the live vendor feed. The vendors already received
+        // a notification but the feed query (status = OPEN_FOR_BIDDING) will
+        // exclude this from now on, so they can't act on it.
         await prisma.request.update({
             where: { id: requestId },
-            data: { status: 'PENDING_ADMIN_REVISION', notes: `مراجعة مطلوبة (AI): ${audit.reasoning}` }
+            data: { status: 'PENDING_ADMIN_REVISION', notes: `مراجعة مطلوبة (AI): ${audit.reasoning}` },
+        });
+
+        await awardTrustEvent({
+            userId: request.clientId,
+            delta: -2,
+            reason: 'ai_flagged_request',
+            metadata: { requestId, aiAction: 'ADMIN_REVIEW', score: audit.score },
         });
 
         await createNotification({
             userId: request.clientId,
             type: 'REQUEST_NEEDS_REVISION' as any,
             title: 'طلبك قيد المراجعة',
-            message: `طلبك "${request.title}" يحتاج مراجعة من الإدارة: ${audit.reasoning}`,
-            requestId: request.id
+            message: `طلبك "${request.title}" اتحول لمراجعة الإدارة للتأكد: ${audit.reasoning}`,
+            requestId: request.id,
         });
 
+        // Notify every active admin so the queue gets attention
+        const admins = await prisma.user.findMany({
+            where: { role: 'ADMIN', isActive: true },
+            select: { id: true },
+        });
+        await Promise.all(
+            admins.map((a) =>
+                createNotification({
+                    userId: a.id,
+                    type: 'AI_FLAGGED_REQUEST' as any,
+                    title: 'طلب يحتاج مراجعة 🤖⚠️',
+                    message: `طلب #${requestId} (${request.title}) اتفلتر من الذكاء الاصطناعي. السبب: ${audit.reasoning}`,
+                    requestId: request.id,
+                }),
+            ),
+        );
     } else {
-        // AI approves - automatically open for bidding! (Massive speed up)
-        await prisma.request.update({
-            where: { id: requestId },
-            data: { status: 'OPEN_FOR_BIDDING', notes: 'موافقة آلية فورية (AI)' }
-        });
-
-        // 🚀 NEW: Automatically notify relevant vendors
-        try {
-            const { dispatchRequest } = await import('../admin/dispatch-request');
-            await dispatchRequest(requestId);
-        } catch (e) {
-            logger.error('ai.audit.dispatch_failed', { requestId, error: e });
-        }
-
+        // AI approves - already broadcast, no DB change needed.
         await createNotification({
             userId: request.clientId,
-            type: 'OFFER_RECEIVED' as any, // Or a generic type
+            type: 'OFFER_RECEIVED' as any,
             title: 'بدأ استقبال العروض',
-            message: `تمت الموافقة على طلبك "${request.title}" وهو الآن متاح للموردين لت تقديم عروضهم.`,
-            requestId: request.id
+            message: `طلبك "${request.title}" متاح الآن للموردين. هتبدأ تشوف عروض هنا.`,
+            requestId: request.id,
         });
     }
 

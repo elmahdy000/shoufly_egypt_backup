@@ -60,7 +60,7 @@ export async function dispatchAdminRequest(requestId: number) {
 
 export async function cancelClientRequest(requestId: number) {
   return apiFetch<{ success: true }>(`/api/requests/${requestId}`, "CLIENT", {
-    method: "PATCH",
+    method: "POST",
     body: { action: "cancel" },
   });
 }

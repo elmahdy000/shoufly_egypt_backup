@@ -81,14 +81,14 @@ export default function DeliveryProfilePage() {
         </div>
 
         {/* Wallet Balance */}
-        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
               <FiDollarSign size={20} />
             </div>
-            <p className="text-sm font-medium text-white/90">رصيد المحفظة</p>
+            <p className="text-sm font-medium text-emerald-700">رصيد المحفظة</p>
           </div>
-          <p className="text-2xl font-black">
+          <p className="text-2xl font-black text-emerald-700">
             {loading ? "جاري التحميل..." : formatCurrency(stats?.walletBalance ?? 0)}
           </p>
         </div>

@@ -6,6 +6,7 @@ import { TransactionSkeleton } from "@/components/shoofly/skeleton";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { listVendorTransactions, requestVendorWithdrawal } from "@/lib/api/transactions";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import {
   FiArrowUpRight,
   FiArrowDownLeft,
@@ -22,24 +23,20 @@ export default function VendorEarningsPage() {
   const { data, loading, error, refresh } = useAsyncData(() => listVendorTransactions(), []);
 
   useEffect(() => {
-    // REAL-TIME SSE FOR EARNING UPDATES
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("💰 Vendor earnings update received via SSE:", payload.type);
-        
-        // Refresh when a payment or settlement happens
-        if (['PAYMENT', 'SETTLEMENT', 'WITHDRAWAL', 'REFUND_TO_VENDOR', 'VENDOR_PAYOUT'].includes(payload.type)) {
-          refresh();
-        }
-      } catch (err) {
-        console.error("SSE Earnings Error:", err);
-      }
-    };
-
-    return () => eventSource.close();
+    // Shared SSE — refresh on any financial event
+    const REFRESH_ON = new Set([
+      "PAYMENT_RECEIVED",
+      "PAYMENT_FAILED",
+      "VENDOR_PAYOUT",
+      "WITHDRAWAL",
+      "REFUND_TO_VENDOR",
+    ]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification") return;
+      const innerType = (payload.data as { type?: string } | null)?.type;
+      if (innerType && REFRESH_ON.has(innerType)) refresh();
+    });
+    return unsubscribe;
   }, [refresh]);
 
   const [isProcessing, setIsProcessing] = useState(false);

@@ -19,8 +19,8 @@ export function Pagination({ page, totalPages }: { page: number; totalPages: num
   return (
     <div className="flex items-center justify-center gap-3 mt-8">
       <button 
-        disabled={page >= totalPages}
-        onClick={() => setPage(page + 1)}
+        disabled={page <= 1}
+        onClick={() => setPage(page - 1)}
         className="h-10 px-4 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 hover:text-primary transition-colors shadow-sm gap-2"
       >
         <FiChevronRight size={16} /> السابق
@@ -31,8 +31,8 @@ export function Pagination({ page, totalPages }: { page: number; totalPages: num
       </div>
       
       <button 
-        disabled={page <= 1}
-        onClick={() => setPage(page - 1)}
+        disabled={page >= totalPages}
+        onClick={() => setPage(page + 1)}
         className="h-10 px-4 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 hover:text-primary transition-colors shadow-sm gap-2"
       >
         التالي <FiChevronLeft size={16} />

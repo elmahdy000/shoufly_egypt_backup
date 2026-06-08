@@ -44,7 +44,7 @@ export default async function ClientLayout({ children }: { children: React.React
 
   return (
     <div>
-      <AppHeader title="تطبيق العميل" subtitle="تجربة جوال أولاً" />
+      <AppHeader title="شوفلي" subtitle="اطلب أي خدمة من موردين موثوقين" />
       <PageShell>{children}</PageShell>
       <ClientNav />
     </div>

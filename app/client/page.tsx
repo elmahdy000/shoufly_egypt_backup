@@ -2,28 +2,26 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { StatCard } from "@/components/shoofly/stat-card";
 import { Button } from "@/components/shoofly/button";
 import { StatusBadge } from "@/components/shoofly/status-badge";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { listClientRequests } from "@/lib/api/requests";
 import { formatCurrency } from "@/lib/formatters";
 import { StatSkeleton, RequestSkeleton } from "@/components/shoofly/skeleton";
-import { 
-  FiPlus, 
-  FiGrid, 
-  FiArrowLeft, 
-  FiClock,
-  FiMessageSquare,
-  FiAlertCircle,
-  FiCheckCircle, 
-  FiBox,
-  FiMapPin,
-  FiTrendingUp,
-  FiDollarSign,
-  FiPackage,
-  FiCornerDownLeft
-} from "react-icons/fi";
+import {
+  IconPlus,
+  IconLayoutGrid,
+  IconArrowLeft,
+  IconClock,
+  IconMessage,
+  IconAlertCircle,
+  IconCircleCheck,
+  IconBox,
+  IconMapPin,
+  IconTrendingUp,
+  IconCoin,
+  IconPackage,
+} from "@tabler/icons-react";
 
 import { ShooflyLoader } from "@/components/shoofly/loader";
 
@@ -55,12 +53,12 @@ export default function ClientHomePage() {
         <div className="flex items-center gap-3">
           <Link href="/client/wallet">
             <Button variant="secondary" className="h-11 px-4 text-sm font-medium gap-2">
-              <FiDollarSign size={16} /> المحفظة
+              <IconCoin size={16} stroke={1.6} /> المحفظة
             </Button>
           </Link>
           <Link href="/client/requests/new">
             <Button className="h-11 px-6 text-sm font-medium gap-2 bg-primary text-white hover:bg-primary/90">
-              <FiPlus size={16} /> طلب جديد
+              <IconPlus size={16} stroke={1.6} /> طلب جديد
             </Button>
           </Link>
         </div>
@@ -80,7 +78,7 @@ export default function ClientHomePage() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600">
-                  <FiGrid size={20} />
+                  <IconLayoutGrid size={20} stroke={1.6} />
                 </div>
                 <p className="text-xs text-slate-500 font-medium">كل الطلبات</p>
               </div>
@@ -90,7 +88,7 @@ export default function ClientHomePage() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                  <FiClock size={20} />
+                  <IconClock size={20} stroke={1.6} />
                 </div>
                 <p className="text-xs text-slate-500 font-medium">شغالة دلوقتي</p>
               </div>
@@ -100,7 +98,7 @@ export default function ClientHomePage() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                  <FiCheckCircle size={20} />
+                  <IconCircleCheck size={20} stroke={1.6} />
                 </div>
                 <p className="text-xs text-slate-500 font-medium">خلصانة</p>
               </div>
@@ -110,7 +108,7 @@ export default function ClientHomePage() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md border-b-primary/30">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
-                  <FiTrendingUp size={20} />
+                  <IconTrendingUp size={20} stroke={1.6} />
                 </div>
                 <p className="text-xs text-slate-500 font-medium">عروض جديدة</p>
               </div>
@@ -127,7 +125,7 @@ export default function ClientHomePage() {
             <h2 className="text-lg font-semibold text-slate-900">آخر الطلبات</h2>
             <Link href="/client/requests">
               <Button variant="ghost" className="text-sm font-medium text-primary hover:text-primary/80 gap-1">
-                شوف الكل <FiArrowLeft size={14} />
+                شوف الكل <IconArrowLeft size={14} stroke={1.6} />
               </Button>
             </Link>
           </div>
@@ -159,14 +157,14 @@ export default function ClientHomePage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600">
-                          <FiPackage size={16} />
+                          <IconPackage size={16} stroke={1.6} />
                         </div>
                         <h3 className="font-semibold text-slate-900 truncate">
                           {request.title}
                         </h3>
                       </div>
                       <p className="text-sm text-slate-500 flex items-center gap-2 mb-2">
-                        <FiMapPin size={14} className="shrink-0" />
+                        <IconMapPin size={14} stroke={1.6} className="shrink-0" />
                         <span className="truncate">{request.address}</span>
                       </p>
                       <div className="flex items-center gap-2">
@@ -184,7 +182,7 @@ export default function ClientHomePage() {
                         status={hasOffers ? 'pending' : request.status === 'CLOSED_SUCCESS' ? 'completed' : 'active'} 
                         label={hasOffers ? 'عروض جديدة' : request.status === 'OPEN_FOR_BIDDING' ? 'مستني عروض' : request.status === 'CLOSED_SUCCESS' ? 'خلصان' : request.status === 'ORDER_PAID_PENDING_DELIVERY' ? 'شغالين فيه' : request.status === 'PENDING_ADMIN_REVISION' ? 'بيتراجع' : "طلب شغال"} 
                       />
-                      <FiArrowLeft className="text-slate-300 group-hover:text-primary group-hover:-translate-x-1 transition-all" size={18} />
+                      <IconArrowLeft className="text-slate-300 group-hover:text-primary group-hover:-translate-x-1 transition-all" size={18} />
                     </div>
                   </div>
                 </Link>
@@ -195,7 +193,7 @@ export default function ClientHomePage() {
           {!loading && !error && (data?.length ?? 0) === 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
               <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
-                <FiBox size={28} />
+                <IconBox size={28} stroke={1.6} />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">مفيش طلبات لسه</h3>
               <p className="text-sm text-slate-500 mb-6">يلا اعمل أول طلب ليك دلوقتي</p>
@@ -218,65 +216,65 @@ export default function ClientHomePage() {
             <Link href="/client/requests/new" className="bg-white rounded-2xl border border-slate-200 p-4 block hover:shadow-md hover:border-primary/30 transition-all group">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                  <FiPlus size={20} />
+                  <IconPlus size={20} stroke={1.6} />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-slate-900 text-sm">اطلب خدمة جديدة</p>
                   <p className="text-xs text-slate-500">اطلب صيانة أو أي خدمة محتاجها</p>
                 </div>
-                <FiArrowLeft className="text-slate-300" size={16} />
+                <IconArrowLeft className="text-slate-300" size={16} />
               </div>
             </Link>
 
             <Link href="/client/wallet" className="bg-white rounded-2xl border border-slate-200 p-4 block hover:shadow-md hover:border-primary/30 transition-all group">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                  <FiDollarSign size={20} />
+                  <IconCoin size={20} stroke={1.6} />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-slate-900 text-sm">اشحن المحفظة</p>
                   <p className="text-xs text-slate-500">زوّد رصيدك عشان تدفع للطلبات</p>
                 </div>
-                <FiArrowLeft className="text-slate-300" size={16} />
+                <IconArrowLeft className="text-slate-300" size={16} />
               </div>
             </Link>
 
             <Link href="/client/requests" className="bg-white rounded-2xl border border-slate-200 p-4 block hover:shadow-md hover:border-primary/30 transition-all group">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
-                  <FiClock size={20} />
+                  <IconClock size={20} stroke={1.6} />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-slate-900 text-sm">طلباتي</p>
                   <p className="text-xs text-slate-500">شوف كل طلباتك</p>
                 </div>
-                <FiArrowLeft className="text-slate-300" size={16} />
+                <IconArrowLeft className="text-slate-300" size={16} />
               </div>
             </Link>
 
             <Link href="/client/chat" className="bg-white rounded-2xl border border-slate-200 p-4 block hover:shadow-md hover:border-primary/30 transition-all group">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center text-violet-600 group-hover:bg-violet-500 group-hover:text-white transition-colors">
-                  <FiMessageSquare size={20} />
+                  <IconMessage size={20} stroke={1.6} />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-slate-900 text-sm">الرسايل</p>
                   <p className="text-xs text-slate-500">كلامك مع الصنايعية والتجار</p>
                 </div>
-                <FiArrowLeft className="text-slate-300" size={16} />
+                <IconArrowLeft className="text-slate-300" size={16} />
               </div>
             </Link>
 
             <Link href="/client/complaints" className="bg-white rounded-2xl border border-slate-200 p-4 block hover:shadow-md hover:border-rose-200 transition-all group">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-colors">
-                  <FiAlertCircle size={20} />
+                  <IconAlertCircle size={20} stroke={1.6} />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-slate-900 text-sm">قدم شكوى</p>
                   <p className="text-xs text-slate-500">بلغنا لو في مشكلة</p>
                 </div>
-                <FiArrowLeft className="text-slate-300" size={16} />
+                <IconArrowLeft className="text-slate-300" size={16} />
               </div>
             </Link>
           </div>
@@ -285,7 +283,7 @@ export default function ClientHomePage() {
           <div className="bg-primary rounded-2xl p-5 text-white">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <FiTrendingUp size={16} />
+                <IconTrendingUp size={16} stroke={1.6} />
               </div>
               <p className="text-xs font-medium opacity-90">خد بالك</p>
             </div>

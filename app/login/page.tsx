@@ -126,21 +126,22 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Development Fast Access */}
-         <div className="space-y-3">
-           <div className="flex items-center gap-3">
-              <div className="h-px bg-slate-200 flex-1" />
-              <span className="text-xs text-slate-400">تسجيل سريع للمطورين</span>
-              <div className="h-px bg-slate-200 flex-1" />
-           </div>
-           
-           <div className="grid grid-cols-4 gap-3">
-              <FastAccessBtn icon={<FiCpu />} label="أدمن" onClick={() => performLogin("admin@shoofly.com", "password123")} disabled={isLoading} />
-              <FastAccessBtn icon={<FiUser />} label="عميل" onClick={() => performLogin("client1@shoofly.com", "password123")} disabled={isLoading} />
-              <FastAccessBtn icon={<FiBriefcase />} label="تاجر" onClick={() => performLogin("vendor1@shoofly.com", "password123")} disabled={isLoading} />
-              <FastAccessBtn icon={<FiZap />} label="مندوب" onClick={() => performLogin("delivery1@shoofly.com", "password123")} disabled={isLoading} />
-           </div>
-        </div>
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+               <div className="h-px bg-slate-200 flex-1" />
+               <span className="text-xs text-slate-400">تسجيل سريع للمطورين</span>
+               <div className="h-px bg-slate-200 flex-1" />
+            </div>
+            
+            <div className="grid grid-cols-4 gap-3">
+               <FastAccessBtn icon={<FiCpu />} label="أدمن" onClick={() => performLogin("admin@shoofly.com", "password123")} disabled={isLoading} />
+               <FastAccessBtn icon={<FiUser />} label="عميل" onClick={() => performLogin("client1@shoofly.com", "password123")} disabled={isLoading} />
+               <FastAccessBtn icon={<FiBriefcase />} label="تاجر" onClick={() => performLogin("vendor1@shoofly.com", "password123")} disabled={isLoading} />
+               <FastAccessBtn icon={<FiZap />} label="مندوب" onClick={() => performLogin("delivery1@shoofly.com", "password123")} disabled={isLoading} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

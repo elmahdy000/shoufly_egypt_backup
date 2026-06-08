@@ -18,9 +18,20 @@ function MockGatewayContent() {
   const amount = searchParams.get('amount');
   
   const [status, setStatus] = useState<'pending' | 'processing' | 'success'>('pending');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // When payment succeeds, redirect to the wallet after a short pause so users see the success state.
+  useEffect(() => {
+    if (status !== 'success') return;
+    const t = setTimeout(() => {
+      router.push('/client/wallet');
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [status, router]);
 
   const handlePay = async () => {
     setStatus('processing');
+    setErrorMsg(null);
     
     // Simulate network delay to the bank
     await new Promise(r => setTimeout(r, 2000));
@@ -34,6 +45,9 @@ function MockGatewayContent() {
         return match ? match[2] : null;
       };
       
+      // Generate a unique external id using timestamp + random suffix to avoid collisions
+      const externalId = `EXT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      
       const res = await fetch('/api/payments/webhook', {
         method: 'POST',
         headers: { 
@@ -43,7 +57,7 @@ function MockGatewayContent() {
         credentials: 'include',
         body: JSON.stringify({
           transactionId: txnId,
-          externalId: `EXT-${Math.floor(Math.random() * 999999)}`,
+          externalId,
           status: 'SUCCESS',
           amount: Number(amount)
         })
@@ -51,12 +65,12 @@ function MockGatewayContent() {
 
       if (res.ok) {
         setStatus('success');
-        setTimeout(() => {
-          router.push('/client/wallet');
-        }, 3000);
+      } else {
+        setErrorMsg(`تعذر تأكيد الدفع (${res.status}). حاول مرة تانية.`);
+        setStatus('pending');
       }
-    } catch (err) {
-      alert("Payment confirmation failed");
+    } catch {
+      setErrorMsg('حصلت مشكلة في الاتصال. تأكد من الإنترنت وحاول مرة تانية.');
       setStatus('pending');
     }
   };
@@ -97,15 +111,22 @@ function MockGatewayContent() {
                   </div>
                </div>
 
-               <div className="space-y-6">
-                  <p className="text-sm font-bold text-slate-500">اختر طريقة الدفع (للمحاكاة):</p>
-                  <div className="grid gap-3">
-                     <div className="p-4 border-2 border-slate-900 rounded-xl flex items-center gap-4 bg-slate-50">
-                        <FiCreditCard size={24} />
-                        <span className="font-bold text-sm">البطاقة البنكية (Visa / Master)</span>
-                     </div>
+                <div className="space-y-6">
+                   <p className="text-sm font-bold text-slate-500">اختر طريقة الدفع (للمحاكاة):</p>
+                   <div className="grid gap-3">
+                      <div className="p-4 border-2 border-slate-900 rounded-xl flex items-center gap-4 bg-slate-50">
+                         <FiCreditCard size={24} />
+                         <span className="font-bold text-sm">البطاقة البنكية (Visa / Master)</span>
+                      </div>
+                   </div>
+                </div>
+
+                {errorMsg && (
+                  <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm font-bold flex items-center gap-2" role="alert">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                    {errorMsg}
                   </div>
-               </div>
+                )}
 
                <Button 
                 onClick={handlePay} 

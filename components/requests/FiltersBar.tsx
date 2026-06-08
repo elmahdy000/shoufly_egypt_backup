@@ -1,69 +1,95 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { FiSearch } from "react-icons/fi";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { IconSearch } from "@tabler/icons-react";
+import { requestStatusLabel } from "@/lib/i18n/request-status";
 
-const STATUSES = [
-  { value: "ALL", label: "الكل" },
-  { value: "PENDING_ADMIN_REVISION", label: "مراجعة" },
-  { value: "OPEN_FOR_BIDDING", label: "مفتوح" },
-  { value: "OFFERS_FORWARDED", label: "عروض" },
-  { value: "ORDER_PAID_PENDING_DELIVERY", label: "تنفيذ" },
-  { value: "CLOSED_SUCCESS", label: "مكتمل" },
-  { value: "CLOSED_CANCELLED", label: "ملغي" },
-];
+const STATUS_VALUES = [
+  "ALL",
+  "PENDING_ADMIN_REVISION",
+  "OPEN_FOR_BIDDING",
+  "OFFERS_FORWARDED",
+  "ORDER_PAID_PENDING_DELIVERY",
+  "CLOSED_SUCCESS",
+  "CLOSED_CANCELLED",
+] as const;
 
-export function FiltersBar({ initialSearch, initialStatus }: { initialSearch: string; initialStatus: string }) {
+const STATUS_FILTERS = STATUS_VALUES.map((value) => ({
+  value,
+  label: value === "ALL" ? "الكل" : requestStatusLabel(value),
+}));
+
+export function FiltersBar({
+  initialSearch,
+  initialStatus,
+}: {
+  initialSearch: string;
+  initialStatus: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  
+
   const [search, setSearch] = useState(initialSearch);
   const [status, setStatus] = useState(initialStatus);
+  const isFirstRun = useRef(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
+      if (isFirstRun.current) {
+        isFirstRun.current = false;
+        return;
+      }
+      const params = new URLSearchParams(window.location.search);
       if (search) params.set("search", search);
       else params.delete("search");
-      
+
       if (status && status !== "ALL") params.set("status", status);
       else params.delete("status");
 
-      params.set("page", "1"); // reset to page 1 on filter change
-      
+      params.set("page", "1");
+
       router.push(`${pathname}?${params.toString()}`);
-    }, 300); // 300ms debounce
-    
+    }, 300);
+
     return () => clearTimeout(timer);
-  }, [search, status, pathname, router, searchParams]);
+  }, [search, status, pathname, router]);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl p-4 flex flex-col md:flex-row gap-4 items-center shadow-sm">
-      <div className="relative flex-1 w-full group">
-        <FiSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
-        <input 
+    <div className="surface-card-soft flex flex-col items-stretch gap-3 p-4 md:flex-row md:items-center">
+      <div className="relative w-full flex-1">
+        <IconSearch
+          className="pointer-events-none absolute top-1/2 end-4 -translate-y-1/2 text-slate-400 transition-colors"
+          size={18}
+          stroke={1.7}
+        />
+        <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="ابحث برقم الطلب أو العنوان..."
-          className="w-full bg-slate-50 border border-slate-100 rounded-2xl pr-12 pl-4 py-3 text-sm font-bold focus:bg-white focus:border-primary/50 outline-none transition-all"
+          className="sf-input h-12 pe-12"
+          aria-label="بحث"
         />
       </div>
-      <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-         {STATUSES.map(s => (
-           <button
-             key={s.value}
-             onClick={() => setStatus(s.value)}
-             className={`shrink-0 px-5 py-3 rounded-2xl text-[11px] uppercase tracking-widest font-black transition-all border ${
-               status === s.value 
-                 ? "bg-primary text-white border-primary shadow-md shadow-primary/20" 
-                 : "bg-white text-slate-500 border-slate-100 hover:bg-slate-50 hover:text-slate-900"
-             }`}
-           >
-             {s.label}
-           </button>
-         ))}
+      <div className="no-scrollbar -mx-4 flex w-full items-center gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:w-auto md:px-0 md:pb-0">
+        {STATUS_FILTERS.map((s) => {
+          const isActive = status === s.value;
+          return (
+            <button
+              key={s.value}
+              type="button"
+              onClick={() => setStatus(s.value)}
+              aria-pressed={isActive}
+              className={`shrink-0 h-10 rounded-full border px-4 text-[12px] font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
+                isActive
+                  ? "border-primary bg-primary text-white shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+              }`}
+            >
+              {s.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

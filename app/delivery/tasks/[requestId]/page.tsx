@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/shoofly/button";
@@ -9,12 +9,13 @@ import { useAsyncData } from "@/lib/hooks/use-async-data";
 import {
   completeDeliveryTask,
   failDeliveryTask,
-  listDeliveryTasks,
 } from "@/lib/api/delivery-agent";
-import { 
-  MapPin, 
-  Phone, 
-  CheckCircle, 
+import { apiFetch } from "@/lib/api/client";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
+import {
+  MapPin,
+  Phone,
+  CheckCircle,
   XCircle,
   Truck,
   ArrowLeft,
@@ -23,31 +24,41 @@ import {
   AlertCircle
 } from "lucide-react";
 
+interface TaskDetailData {
+  id: number;
+  title: string;
+  address: string;
+  deliveryPhone: string;
+  status: string;
+  category?: { name: string };
+  deliveryTracking?: Array<{ status: string; createdAt: string }>;
+}
+
 function TaskDetail({ requestId }: { requestId: number }) {
   const router = useRouter();
   const { data, loading, error, refresh } = useAsyncData(
-    () => listDeliveryTasks(),
+    () => apiFetch<TaskDetailData>(`/api/delivery/tasks/${requestId}`, "DELIVERY"),
     [requestId],
   );
 
   useEffect(() => {
-    // REAL-TIME SSE FOR TASK UPDATES
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        // Refresh if the event is related to this specific request
-        if (payload.data?.requestId === requestId || payload.type === 'ORDER_STATUS_CHANGED') {
-          console.log("🔄 Delivery task update received via SSE, refreshing...");
-          refresh();
-        }
-      } catch (err) {
-        console.error("SSE Task Detail Error:", err);
+    // Shared SSE — refresh on any event for this specific request
+    const REFRESH_ON = new Set([
+      "ORDER_STATUS_CHANGED",
+      "DELIVERY_ASSIGNED",
+      "DELIVERY_PICKED_UP",
+      "DELIVERY_DELIVERED",
+    ]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification" || !payload.data) return;
+      const inner = payload.data as { type?: string; requestId?: number };
+      if (inner.requestId === requestId) {
+        refresh();
+        return;
       }
-    };
-
-    return () => eventSource.close();
+      if (inner.type && REFRESH_ON.has(inner.type)) refresh();
+    });
+    return unsubscribe;
   }, [requestId, refresh]);
   const [message, setMessage] = useState<string | null>(null);
   const [failReason, setFailReason] = useState("");
@@ -56,7 +67,17 @@ function TaskDetail({ requestId }: { requestId: number }) {
   const [isFailing, setIsFailing] = useState(false);
   const [qrError, setQrError] = useState(false);
 
-  const task = data?.myTasks.find((t) => t.id === requestId);
+  // Stored redirect timers so we can clear them on unmount or on a
+  // second action (avoids leaving the buttons disabled after unmount,
+  // and avoids double-redirects).
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
+
+  const task = data;
 
   async function handleComplete() {
     if (!qrCode) {
@@ -65,26 +86,34 @@ function TaskDetail({ requestId }: { requestId: number }) {
       return;
     }
 
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    setIsCompleting(true);
+    setQrError(false);
     try {
-      setIsCompleting(true);
-      setQrError(false);
       await completeDeliveryTask(requestId, qrCode);
       setMessage("تم تأكيد التسليم بنجاح");
-      setTimeout(() => router.push("/delivery"), 1500);
+      redirectTimerRef.current = setTimeout(() => {
+        router.push("/delivery");
+      }, 1500);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "فشلنا في تأكيد التسليم");
+    } finally {
       setIsCompleting(false);
     }
   }
 
   async function handleFail() {
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    setIsFailing(true);
     try {
-      setIsFailing(true);
       await failDeliveryTask(requestId, failReason || undefined);
       setMessage("سجلنا المشكلة بنجاح");
-      setTimeout(() => router.push("/delivery"), 1500);
+      redirectTimerRef.current = setTimeout(() => {
+        router.push("/delivery");
+      }, 1500);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "فشل تسجيل المشكلة");
+    } finally {
       setIsFailing(false);
     }
   }

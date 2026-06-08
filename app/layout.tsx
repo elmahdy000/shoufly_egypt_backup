@@ -81,10 +81,11 @@ export default async function RootLayout({
   const user = await getCurrentUserFromCookie();
 
   return (
-    <html 
-      lang="ar" 
-      dir="rtl" 
+    <html
+      lang="ar"
+      dir="rtl"
       className="h-full antialiased"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body 

@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { 
   FiHome, 
   FiPlusSquare, 
-  FiBriefcase, 
   FiUser, 
   FiBell,
   FiLayout
@@ -19,13 +18,15 @@ interface BottomNavProps {
 export function MobileBottomNav({ userRole }: BottomNavProps) {
   const pathname = usePathname();
 
-  // Don't show on login/register pages, or backend role dashboards (admin, vendor, delivery)
+  // Don't show on login/register pages, or on any authenticated role area
+  // (each role area renders its own MobileBottomNav with role-specific items)
   if (
-    pathname.startsWith('/login') || 
+    pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/vendor') ||
-    pathname.startsWith('/delivery')
+    pathname.startsWith('/delivery') ||
+    pathname.startsWith('/client')
   ) return null;
 
   const getDashboardLink = () => {
@@ -47,16 +48,16 @@ export function MobileBottomNav({ userRole }: BottomNavProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[1000] lg:hidden">
+    <nav aria-label="التنقل السفلي" className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
       {/* Glassmorphism Background */}
       <div className="absolute inset-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/50 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]" />
       
-      <div className="relative flex items-end justify-around px-2 pb-6 pt-2">
+      <div className="relative flex items-end justify-around px-2 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           if (item.primary) {
             return (
-              <Link key={item.name} href={item.href} className="relative -top-8 flex flex-col items-center">
+              <Link key={item.name} href={item.href} aria-label={item.name} className="relative -top-8 flex flex-col items-center">
                 <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary/30 border-4 border-white transition-transform active:scale-90">
                   <item.icon size={24} />
                 </div>
@@ -71,6 +72,8 @@ export function MobileBottomNav({ userRole }: BottomNavProps) {
             <Link 
               key={item.name} 
               href={item.href} 
+              aria-label={item.name}
+              aria-current={isActive ? "page" : undefined}
               className={`flex flex-col items-center gap-1 py-1 transition-all active:scale-95 ${isActive ? "text-primary" : "text-slate-400"}`}
             >
               <item.icon size={20} className={isActive ? "stroke-[2.5px]" : ""} />
@@ -84,9 +87,6 @@ export function MobileBottomNav({ userRole }: BottomNavProps) {
           );
         })}
       </div>
-      
-      {/* Safe Area Padding for Modern Phones */}
-      <div className="h-safe-bottom bg-white/80 backdrop-blur-xl" />
-    </div>
+    </nav>
   );
 }

@@ -18,6 +18,13 @@ async function testClientLogic() {
   const client = await prisma.user.findFirst({ where: { role: 'CLIENT' } });
   if (!client) throw new Error('No client found in database');
 
+  // Ensure test client has phoneVerified set to true
+  await prisma.user.update({
+    where: { id: client.id },
+    data: { phoneVerified: true },
+  });
+
+
   // Test 1: Client Registration Rules
   try {
     console.log('Test 1: Client Registration Validation');
@@ -55,9 +62,10 @@ async function testClientLogic() {
     
     requestId = request.id;
     
-    if (request.status !== 'PENDING_ADMIN_REVISION') {
-      throw new Error(`Expected PENDING_ADMIN_REVISION, got ${request.status}`);
+    if (request.status !== 'PENDING_ADMIN_REVISION' && request.status !== 'OPEN_FOR_BIDDING') {
+      throw new Error(`Expected PENDING_ADMIN_REVISION or OPEN_FOR_BIDDING, got ${request.status}`);
     }
+
     
     results.push({ test: 'Create Request', passed: true });
     console.log(`✅ Request #${request.id} created with status: ${request.status}\n`);

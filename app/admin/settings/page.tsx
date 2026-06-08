@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AlertTriangle, CheckCircle, DollarSign, Loader2, Navigation, Save, Shield } from "lucide-react";
 import { apiFetch } from "@/lib/api/client";
 
@@ -17,7 +17,15 @@ export default function AdminSettingsPage() {
   const [verifyRequired, setVerifyRequired] = useState(true);
   const [otpDelivery, setOtpDelivery] = useState(true);
 
-  // 🔄 Load current settings on mount
+  // Stored timeout so the success toast can be cleared on unmount or re-save.
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    };
+  }, []);
+
+  // 🔄 Load current settings on mount — use the admin endpoint (returns all 7 fields)
   useEffect(() => {
     async function loadSettings() {
       try {
@@ -28,10 +36,13 @@ export default function AdminSettingsPage() {
           vat?: number;
           radius?: number;
           minOrder?: number;
+          minVendorMatch?: number;
+          initialRadius?: number;
+          radiusStep?: number;
           autoPayout?: boolean;
           verifyRequired?: boolean;
           otpDelivery?: boolean;
-        }>("/api/settings/public", "ADMIN");
+        }>("/api/admin/settings", "ADMIN");
         if (data) {
           setCommission(data.commission ?? 15);
           setVat(data.vat ?? 14);
@@ -51,16 +62,48 @@ export default function AdminSettingsPage() {
     loadSettings();
   }, []);
 
+  function validate(): string | null {
+    if (commission < 0 || commission > 100) return "عمولة المنصة يجب أن تكون بين 0 و 100";
+    if (vat < 0 || vat > 100) return "ضريبة القيمة المضافة يجب أن تكون بين 0 و 100";
+    if (radius < 1) return "قطر التغطية يجب أن يكون 1 كم على الأقل";
+    if (minOrder < 1) return "الحد الأدنى للطلب يجب أن يكون 1 ج.م على الأقل";
+    return null;
+  }
+
+  const hasUnsaved = useRef(false);
+  useEffect(() => {
+    hasUnsaved.current = true;
+  }, [commission, vat, radius, minOrder, autoPayout, verifyRequired, otpDelivery]);
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (hasUnsaved.current && !success) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [success]);
+
   async function handleSave() {
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setIsSaving(true);
+    setError(null);
     try {
       await apiFetch("/api/admin/settings", "ADMIN", {
         method: "POST",
         body: { commission, vat, radius, minOrder, autoPayout, verifyRequired, otpDelivery },
       });
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      hasUnsaved.current = false;
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+      successTimerRef.current = setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
+      setError(err instanceof Error ? err.message : "فشل حفظ الإعدادات");
       console.error("Save failed:", err);
     } finally {
       setIsSaving(false);
@@ -299,14 +342,14 @@ function SettingToggle({
   last?: boolean;
 }) {
   return (
-    <div className={`flex items-center justify-between gap-6 p-5 ${!last ? "border-b border-gray-100" : ""}`}>
+    <div className={`flex items-center justify-between gap-6 p-5 ${!last ? "border-b border-slate-100" : ""}`}>
       <div>
-        <h4 className="text-sm font-semibold text-gray-900">{title}</h4>
-        <p className="mt-1 text-xs text-gray-500">{desc}</p>
+        <h4 className="text-sm font-semibold text-slate-900">{title}</h4>
+        <p className="mt-1 text-xs text-slate-500">{desc}</p>
       </div>
       <button
         onClick={onToggle}
-        className={`relative h-6 w-12 shrink-0 rounded-full transition-colors ${active ? "bg-orange-500" : "bg-gray-200"}`}
+        className={`relative h-6 w-12 shrink-0 rounded-full transition-colors ${active ? "bg-orange-500" : "bg-slate-200"}`}
       >
         <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${active ? "right-1" : "left-1"}`} />
       </button>
@@ -317,8 +360,8 @@ function SettingToggle({
 function SummaryRow({ label, val }: { label: string; val: string }) {
   return (
     <div className="flex items-center justify-between text-sm">
-      <span className="text-xs font-medium uppercase tracking-widest text-gray-500">{label}</span>
-      <span className="text-sm font-semibold text-gray-900 tabular-nums">{val}</span>
+      <span className="text-xs font-medium uppercase tracking-widest text-slate-400">{label}</span>
+      <span className="text-sm font-semibold text-white tabular-nums">{val}</span>
     </div>
   );
 }

@@ -1,21 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Tajawal:wght@200..900&family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  /* 🔴 Professional High-Contrast Palette */
-  --color-background: #f8fafc;
+  /* 🟠 Shoofly Design Tokens (Egyptian Market) */
+  /* Brand */
+  --color-primary: #ff6a00;
+  --color-primary-hover: #ea5f00;
+  --color-primary-foreground: #ffffff;
+  --color-primary-subtle: #fff3e8;
+  --color-primary-muted: #ffebdd;
+
+  /* Surfaces */
+  --color-background: #f7f9fc;
   --color-surface: #ffffff;
-  --color-foreground: #020617;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+
+  /* Text */
+  --color-foreground: #0f172a;
   --color-subtle: #1e293b;
   --color-faint: #64748b;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
 
-  --color-primary: #ff6a00;
-  --color-primary-hover: #e65f00;
-  --color-primary-foreground: #ffffff;
-  --color-primary-subtle: #fff7ed;
-  --color-primary-muted: #ffedd5;
+  /* Borders */
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
 
-  --color-success: #10b981;
+  /* Status */
+  --color-success: #22c55e;
   --color-success-bg: #ecfdf5;
   --color-warning: #f59e0b;
   --color-warning-bg: #fffbeb;
@@ -24,29 +37,29 @@
   --color-info: #3b82f6;
   --color-info-bg: #eff6ff;
 
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
-
-  --color-card: #ffffff;
-  --color-card-foreground: #020617;
-
-  --radius-3xl: 32px;
+  /* Radii */
+  --radius-3xl: 28px;
   --radius-2xl: 24px;
   --radius-xl: 20px;
   --radius-lg: 16px;
   --radius-md: 12px;
 
-  --font-tajawal: 'Cairo', sans-serif;
-  --font-cairo: 'Cairo', sans-serif;
+  /* Typography */
+  --font-tajawal: 'Tajawal', 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+  --font-cairo: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+  --font-ibm-arabic: 'IBM Plex Sans Arabic', 'Cairo', sans-serif;
   --font-inter: 'Inter', sans-serif;
   --font-outfit: 'Outfit', sans-serif;
 
-  --shadow-premium: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-active: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-card: 0 10px 15px -3px rgb(0 0 0 / 0.05);
-  --shadow-card-hover: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+  /* Soft Premium Shadows */
+  --shadow-soft-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-soft: 0 4px 14px -4px rgb(15 23 42 / 0.06), 0 2px 6px -2px rgb(15 23 42 / 0.04);
+  --shadow-soft-lg: 0 10px 30px -10px rgb(15 23 42 / 0.10), 0 4px 10px -4px rgb(15 23 42 / 0.04);
+  --shadow-premium: var(--shadow-soft);
+  --shadow-active: var(--shadow-soft-lg);
+  --shadow-card: var(--shadow-soft);
+  --shadow-card-hover: var(--shadow-soft-lg);
+  --shadow-primary-soft: 0 8px 24px -8px rgb(255 106 0 / 0.35);
 }
 
 @layer base {
@@ -60,30 +73,25 @@
     scroll-behavior: smooth;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-tajawal);
-    font-weight: 900;
-    /* Extra bold for professional look */
-    @apply tracking-tight text-slate-950;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-foreground);
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-tajawal);
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
-    @apply selection:bg-red-500/10;
-    /* Safe area for mobile notch */
+    @apply selection:bg-primary/20;
     padding-bottom: env(safe-area-inset-bottom);
   }
 
@@ -93,26 +101,44 @@
       font-size: 16px !important; /* Prevents iOS auto-zoom */
       min-height: 44px; /* Touch target size per Apple/Google guidelines */
     }
-    
+
     .container {
       padding-left: 1rem !important;
       padding-right: 1rem !important;
     }
   }
 
+  /* Bottom-nav clearance for pages that don't have their own padding */
+  .has-bottom-nav {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+  @media (min-width: 768px) {
+    .has-bottom-nav {
+      padding-bottom: 1rem;
+    }
+  }
+
+  /* Focus ring */
+  *:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
   /* Custom Clean Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #f8fafc;
+    background: #f7f9fc;
   }
 
   ::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 10px;
-    border: 2px solid #f8fafc;
+    border: 2px solid #f7f9fc;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -134,32 +160,149 @@
   scrollbar-width: none;
 }
 
+/* Soft horizontal scroll for chips (no harsh track) */
+.chip-scroll {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 1rem;
+  padding-inline: 1rem;
+  margin-inline: -1rem;
+}
+
+.chip-scroll > * {
+  scroll-snap-align: start;
+}
+
 @layer components {
-  /* Premium Card Styles */
-  .glass-card {
-    background-color: var(--color-white, #ffffff);
-    border: 1px solid var(--color-slate-100, #f1f5f9);
-    border-radius: var(--radius-3xl, 32px);
-    box-shadow: var(--shadow-premium);
-    transition: all 0.3s ease-in-out;
+  /* Premium Card Styles — used across request pages */
+  .surface-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 4px 14px -4px rgb(15 23 42 / 0.06), 0 2px 6px -2px rgb(15 23 42 / 0.04);
   }
 
-  .glass-card:hover {
-    border-color: var(--color-red-100, #fee2e2);
-    box-shadow: var(--shadow-active);
-    transform: translateY(-4px);
+  .surface-card-soft {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04);
   }
 
-  /* Text Utilities for Contrast */
-  .text-sharp {
-    color: var(--color-slate-950, #020617);
-    font-weight: 900; /* black */
-    letter-spacing: -0.02em; /* tracking-tighter */
+  /* Field appearance shared by all inputs */
+  .sf-input {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 0.875rem 1rem;
+    font-size: 15px;
+    font-weight: 500;
+    color: #0f172a;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .sf-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+  .sf-input:focus {
+    outline: none;
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 4px rgb(255 106 0 / 0.12);
+    background-color: #ffffff;
+  }
+  .sf-input[aria-invalid="true"] {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgb(239 68 68 / 0.10);
   }
 
-  .text-muted-sharp {
-    color: var(--color-slate-500, #64748b);
-    font-weight: 700; /* bold */
+  .sf-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+
+  .sf-helper {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 0.375rem;
+  }
+
+  .sf-error {
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 0.375rem;
+    font-weight: 500;
+  }
+
+  .sf-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 52px;
+    padding-inline: 1.5rem;
+    border-radius: 16px;
+    background-color: #ff6a00;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    border: 1px solid #ff6a00;
+    box-shadow: 0 8px 24px -8px rgb(255 106 0 / 0.35);
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .sf-btn-primary:hover:not(:disabled) {
+    background-color: #ea5f00;
+  }
+  .sf-btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .sf-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .sf-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 52px;
+    padding-inline: 1.5rem;
+    border-radius: 16px;
+    background-color: #ffffff;
+    color: #1e293b;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .sf-btn-secondary:hover:not(:disabled) {
+    background-color: #f7f9fc;
+    border-color: #cbd5e1;
+  }
+  .sf-btn-secondary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .sf-btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Text utilities */
+  .text-heading-1 { font-size: 28px; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; color: #0f172a; }
+  .text-heading-2 { font-size: 22px; font-weight: 700; line-height: 1.3; color: #0f172a; }
+  .text-section-title { font-size: 18px; font-weight: 700; line-height: 1.35; color: #0f172a; }
+  .text-label { font-size: 13px; font-weight: 600; color: #1e293b; }
+  .text-body { font-size: 15px; font-weight: 500; color: #1e293b; }
+  .text-body-soft { font-size: 14px; color: #475569; }
+  .text-helper { font-size: 12px; color: #64748b; }
+
+  @media (min-width: 768px) {
+    .text-heading-1 { font-size: 36px; }
+    .text-heading-2 { font-size: 24px; }
   }
 }
 
@@ -182,5 +325,20 @@
 }
 
 .font-cairo {
-  font-family: var(--font-cairo), sans-serif;
+  font-family: var(--font-cairo), 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.font-ibm-arabic {
+  font-family: var(--font-ibm-arabic), sans-serif;
+}
+
+.font-jakarta {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+.shoofly-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  box-shadow: 0 4px 14px -4px rgb(15 23 42 / 0.06), 0 2px 6px -2px rgb(15 23 42 / 0.04);
 }

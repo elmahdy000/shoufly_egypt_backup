@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shoofly_core/core/theme/app_colors.dart';
@@ -74,22 +75,94 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage>
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         ),
       };
-
-      _polylines = {
-        Polyline(
-          polylineId: const PolylineId('route'),
-          points: [deliveryPos, destinationPos],
-          color: AppColors.primary,
-          width: 4,
-          patterns: [
-            PatternItem.dash(20),
-            PatternItem.gap(8),
-          ],
-        ),
-      };
     });
 
+    _fetchRoutePolylines(deliveryPos, destinationPos);
     _moveCameraToFitBoth(deliveryPos, destinationPos);
+  }
+
+  Future<void> _fetchRoutePolylines(LatLng deliveryPos, LatLng destinationPos) async {
+    const String apiKey = 'AIzaSyDN-UrO0TkaBjN75hsU31yW6746o5nPsfk';
+    final url = 'https://maps.googleapis.com/maps/api/directions/json'
+        '?origin=${deliveryPos.latitude},${deliveryPos.longitude}'
+        '&destination=${destinationPos.latitude},${destinationPos.longitude}'
+        '&key=$apiKey';
+
+    try {
+      final dio = Dio();
+      final response = await dio.get(url);
+      if (response.statusCode == 200 && response.data != null) {
+        final routes = response.data['routes'] as List;
+        if (routes.isNotEmpty) {
+          final pointsStr = routes[0]['overview_polyline']['points'] as String;
+          final decodedPoints = _decodePolyline(pointsStr);
+          
+          if (mounted) {
+            setState(() {
+              _polylines = {
+                Polyline(
+                  polylineId: const PolylineId('route'),
+                  points: decodedPoints,
+                  color: AppColors.primary,
+                  width: 5,
+                ),
+              };
+            });
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching directions: $e');
+    }
+
+    // Fallback to straight dashed line if request fails
+    if (mounted) {
+      setState(() {
+        _polylines = {
+          Polyline(
+            polylineId: const PolylineId('route'),
+            points: [deliveryPos, destinationPos],
+            color: AppColors.primary,
+            width: 4,
+            patterns: [
+              PatternItem.dash(20),
+              PatternItem.gap(8),
+            ],
+          ),
+        };
+      });
+    }
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> points = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      points.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+    return points;
   }
 
   Future<void> _moveCameraToFitBoth(LatLng a, LatLng b) async {

@@ -5,10 +5,11 @@ import { useEffect, useMemo } from "react";
 import { ErrorState } from "@/components/shared/error-state";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { listDeliveryTasks } from "@/lib/api/delivery-agent";
-import { 
-  Package, 
-  Map, 
-  ArrowLeft, 
+import { subscribeToSSE } from "@/lib/utils/sse-client";
+import {
+  Package,
+  Map,
+  ArrowLeft,
   Truck,
   Navigation,
   MapPin,
@@ -21,24 +22,20 @@ export default function DeliveryDashboard() {
   const { data, loading, error, refresh } = useAsyncData(() => listDeliveryTasks(), []);
 
   useEffect(() => {
-    // REAL-TIME SSE FOR DELIVERY AGENTS
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("🚚 Delivery dashboard update received via SSE:", payload.type);
-        
-        // Refresh when a new order is ready or status changes
-        if (['ORDER_PAID_PENDING_DELIVERY', 'ORDER_STATUS_CHANGED', 'NEW_BID'].includes(payload.type)) {
-          refresh();
-        }
-      } catch (err) {
-        console.error("SSE Delivery Dashboard Error:", err);
-      }
-    };
-
-    return () => eventSource.close();
+    // Shared SSE — refresh on order-ready or status-change events
+    const REFRESH_ON = new Set([
+      "ORDER_PAID_PENDING_DELIVERY",
+      "ORDER_STATUS_CHANGED",
+      "DELIVERY_ASSIGNED",
+      "DELIVERY_PICKED_UP",
+      "DELIVERY_DELIVERED",
+    ]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification") return;
+      const innerType = (payload.data as { type?: string } | null)?.type;
+      if (innerType && REFRESH_ON.has(innerType)) refresh();
+    });
+    return unsubscribe;
   }, [refresh]);
 
   const stats = useMemo(
@@ -171,13 +168,12 @@ export default function DeliveryDashboard() {
 
         {/* Empty State */}
         {!loading && !error && stats.available === 0 && stats.myTasks === 0 ? (
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/20 p-12 text-center overflow-hidden relative">
-             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50"></div>
-             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400 relative z-10">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/20 p-12 text-center">
+             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
                <Package size={32} />
              </div>
-             <h3 className="text-lg font-bold text-slate-900 mb-2 relative z-10">مفيش مشواير جديدة</h3>
-             <p className="text-sm font-medium text-slate-500 relative z-10">ريّح شوية دلوقتى، هنبلغك أول ما يظهر أوردر جديد في منطقتك.</p>
+             <h3 className="text-lg font-bold text-slate-900 mb-2">مفيش مشواير جديدة</h3>
+             <p className="text-sm font-medium text-slate-500">ريّح شوية دلوقتى، هنبلغك أول ما يظهر أوردر جديد في منطقتك.</p>
           </div>
         ) : null}
 

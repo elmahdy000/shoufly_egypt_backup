@@ -1,179 +1,226 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/components/shoofly/button";
 import { ErrorState } from "@/components/shared/error-state";
-import { StatusBadge } from "@/components/shoofly/status-badge";
+import { OfferCard } from "@/components/requests/offer-card";
 import { acceptClientOffer, listClientForwardedOffers } from "@/lib/api/bids";
-import { formatCurrency } from "@/lib/formatters";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import { FiTag, FiCheckCircle, FiShield, FiAlertTriangle, FiStar } from "react-icons/fi";
-import { Sparkles } from "lucide-react";
+import {
+  IconTag,
+  IconCircleCheck,
+  IconAlertTriangle,
+  IconSparkles,
+  IconCurrencyDollar,
+  type Icon,
+} from "@tabler/icons-react";
+
+type SortKey = "AI_SCORE" | "PRICE";
+
+const SORT_OPTIONS: { value: SortKey; label: string; icon: Icon }[] = [
+  { value: "AI_SCORE", label: "ترتيب ذكي (AI)", icon: IconSparkles },
+  { value: "PRICE", label: "أقل سعر", icon: IconCurrencyDollar },
+];
 
 function OffersContent({ requestId }: { requestId: number }) {
   const router = useRouter();
-  const { data, loading, error } = useAsyncData(() => listClientForwardedOffers(requestId), [requestId]);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const { data, loading, error } = useAsyncData(
+    () => listClientForwardedOffers(requestId),
+    [requestId]
+  );
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [submittingId, setSubmittingId] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<'PRICE' | 'AI_SCORE'>('AI_SCORE');
+  const [sortBy, setSortBy] = useState<SortKey>("AI_SCORE");
 
-  const sortedOffers = (data ?? []).slice().sort((a: { clientPrice?: number | null; netPrice?: number | null; aiScore?: number | null }, b: { clientPrice?: number | null; netPrice?: number | null; aiScore?: number | null }) => {
-    if (sortBy === 'PRICE') {
-      return (a.clientPrice ?? a.netPrice ?? 0) - (b.clientPrice ?? b.netPrice ?? 0);
-    } else {
-      return (b.aiScore ?? 0) - (a.aiScore ?? 0);
-    }
-  });
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
+
+  const sortedOffers = (data ?? [])
+    .slice()
+    .sort(
+      (
+        a: { clientPrice?: number | null; netPrice?: number | null; aiScore?: number | null },
+        b: { clientPrice?: number | null; netPrice?: number | null; aiScore?: number | null }
+      ) => {
+        if (sortBy === "PRICE") {
+          return (
+            (a.clientPrice ?? a.netPrice ?? 0) - (b.clientPrice ?? b.netPrice ?? 0)
+          );
+        }
+        return (b.aiScore ?? 0) - (a.aiScore ?? 0);
+      }
+    );
 
   async function accept(bidId: number) {
     try {
       setSubmittingId(bidId);
       setFeedback(null);
       await acceptClientOffer(bidId);
-      setFeedback({ type: 'success', text: `تم اعتماد العرض رقم #${bidId} بنجاح! سيتم توجيهك لصفحة الدفع...` });
-      
-      // Auto-redirect to the request details to finalize payment
-      setTimeout(() => {
+      setFeedback({
+        type: "success",
+        text: `تم اعتماد العرض رقم #${bidId} بنجاح! سيتم توجيهك لصفحة الدفع...`,
+      });
+
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = setTimeout(() => {
         router.push(`/client/requests/${requestId}`);
       }, 2500);
-      
     } catch (err) {
-      setFeedback({ type: 'error', text: err instanceof Error ? err.message : "حدث خطأ أثناء محاولة اعتماد العرض." });
+      setFeedback({
+        type: "error",
+        text:
+          err instanceof Error
+            ? err.message
+            : "حدث خطأ أثناء محاولة اعتماد العرض.",
+      });
       setSubmittingId(null);
     }
   }
 
+  const offersCount = data?.length ?? 0;
+
   return (
-    <div className="p-6 lg:p-10 max-w-4xl mx-auto space-y-8 pb-32 text-right">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border pb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <FiTag className="text-primary" /> العروض المتاحة
+    <div className="mx-auto max-w-4xl space-y-6 px-1 pb-32 sm:space-y-8" dir="rtl">
+      {/* Header */}
+      <header className="flex flex-col gap-4 border-b border-border pb-5 md:flex-row md:items-center md:justify-between md:pb-6">
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <span
+              className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary sm:h-11 sm:w-11"
+              aria-hidden="true"
+            >
+              <IconTag size={20} stroke={1.7} />
+            </span>
+            <span>العروض المتاحة</span>
           </h1>
-          <p className="text-muted text-sm mt-1">قارن بين الأسعار المطروحة لاختيار الأنسب لطلبك رقم REQ-{requestId}</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            قارن بين العروض المعتمدة لاختيار الأنسب لطلبك رقم{" "}
+            <span className="font-bold text-slate-700">REQ-{requestId}</span>
+          </p>
         </div>
 
-        {/* 🪄 Sorting Controls */}
-        <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-xl">
-           <button 
-             onClick={() => setSortBy('AI_SCORE')}
-             className={`px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all ${sortBy === 'AI_SCORE' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-           >
-              <Sparkles size={14} /> ترتيب ذكي (AI)
-           </button>
-           <button 
-             onClick={() => setSortBy('PRICE')}
-             className={`px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all ${sortBy === 'PRICE' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-           >
-              أقل سعر
-           </button>
-        </div>
-      </div>
+        {offersCount > 1 && (
+          <div
+            role="tablist"
+            aria-label="ترتيب العروض"
+            className="flex shrink-0 items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1"
+          >
+            {SORT_OPTIONS.map((opt) => {
+              const Icon = opt.icon;
+              const isActive = sortBy === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setSortBy(opt.value)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all sm:text-sm ${
+                    isActive
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <Icon size={14} stroke={1.8} />
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </header>
 
+      {/* Feedback banner */}
       {feedback && (
-        <div className={`p-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 ${feedback.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
-          {feedback.type === 'success' ? <FiCheckCircle size={20} /> : <FiAlertTriangle size={20} />}
-          {feedback.text}
+        <div
+          role="status"
+          aria-live="polite"
+          className={`flex items-start gap-2.5 rounded-xl border p-4 text-sm font-bold shadow-sm ${
+            feedback.type === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-rose-200 bg-rose-50 text-rose-700"
+          }`}
+        >
+          {feedback.type === "success" ? (
+            <IconCircleCheck size={20} stroke={1.8} className="shrink-0" />
+          ) : (
+            <IconAlertTriangle size={20} stroke={1.8} className="shrink-0" />
+          )}
+          <span>{feedback.text}</span>
         </div>
       )}
 
+      {/* Loading */}
       {loading && (
-        <div className="flex flex-col items-center justify-center py-20 text-muted animate-pulse">
-           <FiTag size={40} className="mb-4 opacity-30" />
-           <p className="font-bold">جاري فتح المظاريف والعروض...</p>
+        <div className="grid gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="animate-pulse rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
+            >
+              <div className="flex flex-col gap-4 md:flex-row md:gap-6">
+                <div className="h-28 w-full rounded-2xl bg-slate-100 md:w-56" />
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-slate-100" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3.5 w-1/3 rounded-full bg-slate-100" />
+                      <div className="h-3 w-1/4 rounded-full bg-slate-100" />
+                    </div>
+                  </div>
+                  <div className="h-3 w-full rounded-full bg-slate-100" />
+                  <div className="h-3 w-5/6 rounded-full bg-slate-100" />
+                  <div className="h-3 w-2/3 rounded-full bg-slate-100" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {error ? <ErrorState message={error} /> : null}
 
-      {!loading && !error && (data?.length ?? 0) === 0 ? (
-        <div className="shoofly-card bg-slate-50/50 p-12 text-center flex flex-col items-center justify-center">
-           <div className="w-16 h-16 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center mb-4">
-             <FiTag size={24} />
-           </div>
-           <h3 className="text-xl font-bold mb-2">لا توجد عروض معتمدة بعد</h3>
-           <p className="text-muted">لم تقم الإدارة بتوجيه أي عروض لطلبك حتى الآن. يرجى الانتظار لحين الانتهاء من فرز الأسعار.</p>
+      {!loading && !error && offersCount === 0 ? (
+        <div className="surface-card flex flex-col items-center justify-center p-10 text-center sm:p-12">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/5 text-primary/40">
+            <IconTag size={26} stroke={1.6} />
+          </div>
+          <h3 className="mb-2 text-xl font-bold text-slate-900">
+            لا توجد عروض معتمدة بعد
+          </h3>
+          <p className="max-w-md text-sm text-muted-foreground">
+            لم تقم الإدارة بتوجيه أي عروض لطلبك حتى الآن. سيتم إخطارك فور ورود
+            أي عروض جديدة ومطابقتها.
+          </p>
         </div>
       ) : null}
 
-      <div className="grid gap-6">
-        {sortedOffers.map((offer: any) => {  
-          const isAccepted = offer.status === 'ACCEPTED_BY_CLIENT';
-          const isLoading = submittingId === offer.id;
-          
-          return (
-            <div key={offer.id} className={`shoofly-card bg-white p-6 relative overflow-hidden group transition-all flex flex-col md:flex-row md:items-center gap-6 border-2 ${isAccepted ? 'border-emerald-500 shadow-emerald-500/10' : 'border-border hover:border-primary/30'}`}>
-              
-              {/* Price Tag */}
-              <div className="w-full md:w-56 shrink-0 bg-slate-900 text-white p-6 rounded-2xl flex flex-col items-center justify-center shadow-lg">
-                 <p className="text-xs text-slate-400 font-bold mb-2">التكلفة الإجمالية</p>
-                 <p className="text-3xl font-black font-jakarta tracking-tight">
-                   {formatCurrency(offer.clientPrice ?? offer.netPrice)}
-                 </p>
-                 <div className="mt-3 text-[10px] bg-slate-800 text-slate-300 px-3 py-1 rounded-full flex items-center gap-1">
-                   <FiShield /> شامل الدعم والنقل
-                 </div>
-              </div>
-
-              {/* Details & Action */}
-              <div className="flex-1 flex flex-col gap-4">
-                <div>
-                   <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs border border-primary/20 shadow-sm overflow-hidden">
-                           {offer.vendor?.fullName?.charAt(0) || "V"}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                             {offer.vendor?.fullName || `مورّد رقم ${offer.vendorId}`}
-                             <FiCheckCircle className="text-emerald-500" title="مورد معتمد" />
-                          </p>
-                          <div className="flex gap-0.5 text-[10px] text-amber-500 items-center">
-                             <FiStar fill="currentColor" /> <FiStar fill="currentColor" /> <FiStar fill="currentColor" /> <FiStar fill="currentColor" /> <FiStar fill="currentColor" />
-                             {offer.aiScore && (
-                               <span className="mr-2 text-slate-400 font-medium">تقييم AI: {offer.aiScore}/100</span>
-                             )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">
-                          #{offer.id}
-                        </span>
-                        {offer.aiRecommendation === 'TOP_PICK' && (
-                          <div className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100 animate-pulse">
-                            <Sparkles size={10} /> أفضل اختيار
-                          </div>
-                        )}
-                      </div>
-                   </div>
-                  
-                  {isAccepted && <div className="mb-4"><StatusBadge status="completed" label="تم الاعتماد" /></div>}
-                  
-                  <h3 className="font-bold text-xs text-slate-400 uppercase tracking-widest mb-2">تقديم المورد:</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100 ">
-                    {offer.description || 'لم يتم إدراج تفاصيل إضافية لهذا العرض.'}
-                  </p>
-                </div>
-                
-                {!isAccepted && (
-                  <div className="flex justify-end pt-2">
-                    <Button 
-                      onClick={() => accept(offer.id)} 
-                      isLoading={isLoading}
-                      disabled={submittingId !== null && submittingId !== offer.id}
-                      className="px-8 shadow-md"
-                    >
-                      قبول هذا العرض
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* Offers list */}
+      {!loading && !error && offersCount > 0 && (
+        <div className="grid gap-4 sm:gap-5">
+          {sortedOffers.map((offer: any) => {
+            const isAccepted = offer.status === "ACCEPTED_BY_CLIENT";
+            const isLoading = submittingId === offer.id;
+            return (
+              <OfferCard
+                key={offer.id}
+                offer={offer}
+                isAccepted={isAccepted}
+                isLoading={isLoading}
+                isSubmittingAnother={submittingId !== null && !isLoading}
+                onAccept={accept}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

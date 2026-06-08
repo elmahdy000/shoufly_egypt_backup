@@ -177,8 +177,8 @@ const SidebarContent = memo(function SidebarContent({
                     onClick={() => { if (!isActive) onNavigate(item.href); }}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors group relative ${
                       isActive
-                        ? "bg-slate-50 text-primary font-bold border border-slate-100"
-                        : "text-slate-500 font-medium hover:bg-slate-50/50 hover:text-slate-900"
+                        ? "bg-orange-50 text-primary font-bold border border-orange-100"
+                        : "text-slate-500 font-medium border border-transparent hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     <Icon
@@ -186,7 +186,7 @@ const SidebarContent = memo(function SidebarContent({
                       className={
                         isActive
                           ? "text-primary"
-                          : "text-slate-400 group-hover:text-slate-700 transition-colors"
+                          : "text-slate-400 group-hover:text-slate-600 transition-colors"
                       }
                     />
                     <span className="flex-1 text-[13px] tracking-tight">{item.label}</span>
@@ -434,7 +434,7 @@ export default function AdminDashboardShell({ children }: { children: React.Reac
                   <p className="text-xs font-bold text-slate-900">{adminName}</p>
                   <p className="text-[10px] font-medium text-slate-400">Admin Account</p>
                 </div>
-                <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xs font-black shadow-sm ring-2 ring-slate-50">
+                <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-black shadow-sm ring-2 ring-slate-50">
                   {adminName.charAt(0) || "م"}
                 </div>
               </div>

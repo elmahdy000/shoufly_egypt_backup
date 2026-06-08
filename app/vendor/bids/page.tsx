@@ -7,6 +7,7 @@ import { BidCardSkeleton } from "@/components/shoofly/skeleton";
 import { listVendorBids } from "@/lib/api/bids";
 import { formatCurrency } from "@/lib/formatters";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import {
   FiTag, FiCheckCircle, FiClock, FiXCircle,
   FiPackage, FiRefreshCw, FiInbox, FiCalendar,
@@ -33,24 +34,19 @@ export default function VendorBidsPage() {
   const { data, loading, error, refresh } = useAsyncData(() => listVendorBids(), []);
 
   useEffect(() => {
-    // REAL-TIME SSE FOR BID UPDATES
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("🎟️ Bid update received via SSE:", payload.type);
-        
-        // Refresh when a bid is selected or status changed
-        if (['NEW_BID', 'ORDER_STATUS_CHANGED', 'OFFERS_FORWARDED'].includes(payload.type)) {
-          refresh();
-        }
-      } catch (err) {
-        console.error("SSE Bids Error:", err);
-      }
-    };
-
-    return () => eventSource.close();
+    // Shared SSE — refresh for any bid lifecycle event
+    const REFRESH_ON = new Set([
+      "NEW_BID",
+      "ORDER_STATUS_CHANGED",
+      "OFFERS_FORWARDED",
+      "BID_ACCEPTED",
+    ]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification") return;
+      const innerType = (payload.data as { type?: string } | null)?.type;
+      if (innerType && REFRESH_ON.has(innerType)) refresh();
+    });
+    return unsubscribe;
   }, [refresh]);
 
   const counts = useMemo(() => {

@@ -4,26 +4,12 @@ import { useState, useMemo } from "react";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { apiFetch } from "@/lib/api/client";
 import { formatDate } from "@/lib/formatters";
+import type { AuditAction } from "@/lib/services/admin/audit-log";
 import {
-  Search, RefreshCw, Filter, Shield, User, Package, Settings,
-  CheckCircle, XCircle, ArrowLeftRight, CreditCard, AlertTriangle,
-  ChevronLeft, ChevronRight, FileText, Clock
+  Search, RefreshCw, Shield, User, Package, Settings,
+  CheckCircle, XCircle, ArrowLeftRight, CreditCard,
+  ChevronLeft, ChevronRight, FileText, Clock, Scale
 } from "lucide-react";
-
-type AuditAction =
-  | 'REQUEST_APPROVED'
-  | 'REQUEST_REJECTED'
-  | 'OFFER_FORWARDED'
-  | 'USER_BLOCKED'
-  | 'USER_UNBLOCKED'
-  | 'USER_VERIFIED'
-  | 'USER_UNVERIFIED'
-  | 'WITHDRAWAL_APPROVED'
-  | 'WITHDRAWAL_REJECTED'
-  | 'REFUND_ISSUED'
-  | 'DISPUTE_RESOLVED'
-  | 'SETTINGS_UPDATED'
-  | 'REQUEST_DISPATCHED';
 
 interface AuditLog {
   id: number;
@@ -42,6 +28,7 @@ const ACTION_OPTIONS: { value: AuditAction | 'ALL'; label: string; icon: React.R
   { value: 'ALL', label: 'جميع الأحداث', icon: <Shield size={14} />, color: 'bg-slate-100 text-slate-700' },
   { value: 'REQUEST_APPROVED', label: 'موافقة طلب', icon: <CheckCircle size={14} />, color: 'bg-emerald-100 text-emerald-700' },
   { value: 'REQUEST_REJECTED', label: 'رفض طلب', icon: <XCircle size={14} />, color: 'bg-rose-100 text-rose-700' },
+  { value: 'REQUEST_CANCELLED', label: 'إلغاء طلب', icon: <XCircle size={14} />, color: 'bg-rose-100 text-rose-700' },
   { value: 'REQUEST_DISPATCHED', label: 'تسليم طلب', icon: <ArrowLeftRight size={14} />, color: 'bg-blue-100 text-blue-700' },
   { value: 'OFFER_FORWARDED', label: 'توجيه عرض', icon: <ArrowLeftRight size={14} />, color: 'bg-sky-100 text-sky-700' },
   { value: 'USER_BLOCKED', label: 'حظر مستخدم', icon: <XCircle size={14} />, color: 'bg-rose-100 text-rose-700' },
@@ -50,6 +37,7 @@ const ACTION_OPTIONS: { value: AuditAction | 'ALL'; label: string; icon: React.R
   { value: 'WITHDRAWAL_APPROVED', label: 'موافقة سحب', icon: <CreditCard size={14} />, color: 'bg-emerald-100 text-emerald-700' },
   { value: 'WITHDRAWAL_REJECTED', label: 'رفض سحب', icon: <CreditCard size={14} />, color: 'bg-rose-100 text-rose-700' },
   { value: 'REFUND_ISSUED', label: 'استرداد مبلغ', icon: <CreditCard size={14} />, color: 'bg-amber-100 text-amber-700' },
+  { value: 'DISPUTE_RESOLVED', label: 'حل نزاع', icon: <Scale size={14} />, color: 'bg-violet-100 text-violet-700' },
   { value: 'SETTINGS_UPDATED', label: 'تحديث إعدادات', icon: <Settings size={14} />, color: 'bg-slate-100 text-slate-700' },
 ];
 
@@ -61,8 +49,18 @@ export default function AdminAuditLogsPage() {
   const [page, setPage] = useState(1);
 
   const { data, loading, refresh } = useAsyncData<{ logs: AuditLog[]; total: number }>(
-    () => apiFetch(`/api/admin/audit-logs?limit=${ITEMS_PER_PAGE}&offset=${(page - 1) * ITEMS_PER_PAGE}`, "ADMIN"),
-    [page]
+    () => {
+      const params = new URLSearchParams();
+      params.set("limit", String(ITEMS_PER_PAGE));
+      params.set("offset", String((page - 1) * ITEMS_PER_PAGE));
+      if (actionFilter !== "ALL") params.set("action", actionFilter);
+      if (search.trim()) params.set("search", search.trim());
+      return apiFetch(
+        `/api/admin/audit-logs?${params.toString()}`,
+        "ADMIN",
+      );
+    },
+    [page, actionFilter, search]
   );
 
   const filteredLogs = useMemo(() => {
@@ -98,10 +96,10 @@ export default function AdminAuditLogsPage() {
   };
 
   return (
-    <div className="admin-page admin-page--spacious" dir="rtl">
+    <div className="min-h-screen bg-[#f8fafc] font-cairo text-right antialiased" dir="rtl">
       {/* Header */}
       <section className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="px-6 lg:px-10 py-8">
+        <div className="max-w-[1500px] mx-auto px-6 lg:px-10 py-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -131,8 +129,8 @@ export default function AdminAuditLogsPage() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {ACTION_OPTIONS.slice(0, 6).map((opt) => (
+            <div className="flex flex-wrap gap-2 overflow-x-auto pb-2">
+              {ACTION_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setActionFilter(opt.value as AuditAction | 'ALL')}
@@ -152,7 +150,7 @@ export default function AdminAuditLogsPage() {
       </section>
 
       {/* Content */}
-      <div className="px-6 lg:px-10 py-8">
+      <div className="max-w-[1500px] mx-auto px-6 lg:px-10 py-8">
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-right min-w-[800px]">
@@ -259,12 +257,11 @@ export default function AdminAuditLogsPage() {
         </div>
 
         {/* Stats Summary */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: 'إجمالي الأحداث', value: data?.total || 0, icon: FileText, color: 'bg-blue-50 text-blue-600' },
-            { label: 'الطلبات المعالجة', value: data?.logs?.filter(l => l.targetType === 'REQUEST').length || 0, icon: Package, color: 'bg-emerald-50 text-emerald-600' },
-            { label: 'عمليات المستخدمين', value: data?.logs?.filter(l => l.targetType === 'USER').length || 0, icon: User, color: 'bg-amber-50 text-amber-600' },
-            { label: 'عمليات مالية', value: data?.logs?.filter(l => ['WITHDRAWAL', 'REFUND_ISSUED'].includes(l.targetType)).length || 0, icon: CreditCard, color: 'bg-purple-50 text-purple-600' },
+            { label: 'إجمالي الأحداث المسجلة', value: data?.total || 0, icon: FileText, color: 'bg-blue-50 text-blue-600' },
+            { label: 'المعروض بالصفحة الحالية', value: filteredLogs.length, icon: Package, color: 'bg-emerald-50 text-emerald-600' },
+            { label: 'إجمالي الصفحات', value: totalPages, icon: User, color: 'bg-amber-50 text-amber-600' },
           ].map((stat, i) => (
             <div key={i} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>

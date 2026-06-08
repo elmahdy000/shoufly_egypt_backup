@@ -29,7 +29,9 @@ export async function apiFetch<T>(
   retryCount = 0,
 ): Promise<T> {
   const method = options?.method ?? "GET";
-  const cacheKey = `${method}:${path}`;
+  // Dedupe key includes role so two different roles don't share a response
+  // (e.g. admin impersonating a client, or multi-tab role switches).
+  const cacheKey = `${role}:${method}:${path}`;
 
   // Deduplicate GET requests
   if (method === "GET" && pendingRequests.has(cacheKey)) {

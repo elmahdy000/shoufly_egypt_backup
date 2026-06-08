@@ -8,11 +8,12 @@ import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { listVendorBids } from "@/lib/api/bids";
 import { listVendorTransactions } from "@/lib/api/transactions";
 import { StatSkeleton, RequestSkeleton } from "@/components/shoofly/skeleton";
+import { subscribeToSSE } from "@/lib/utils/sse-client";
 import {
   FiPackage,
   FiTrendingUp, FiPlusCircle,
   FiCheckCircle, FiInbox,
-  FiActivity, FiSearch, FiChevronLeft, FiStar, FiClock, FiZap
+  FiActivity, FiSearch, FiChevronLeft, FiStar, FiClock
 } from "react-icons/fi";
 import { ShooflyLoader } from "@/components/shoofly/loader";
 
@@ -26,30 +27,28 @@ export default function VendorHomePage() {
   };
 
   useEffect(() => {
-    // REAL-TIME SSE FOR VENDOR DASHBOARD
-    const eventSource = new EventSource("/api/notifications/stream");
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("📈 Vendor dashboard update received via SSE:", payload.type);
-        
-        // Refresh everything for any relevant event
-        if (['NEW_BID', 'ORDER_STATUS_CHANGED', 'PAYMENT', 'SETTLEMENT', 'WITHDRAWAL'].includes(payload.type)) {
-          refreshAll();
-        }
-      } catch (err) {
-        console.error("SSE Vendor Dashboard Error:", err);
-      }
-    };
-
-    return () => eventSource.close();
+    // Shared SSE — refresh for any bid/financial event
+    const REFRESH_ON = new Set([
+      "NEW_BID",
+      "ORDER_STATUS_CHANGED",
+      "PAYMENT_RECEIVED",
+      "PAYMENT_FAILED",
+      "VENDOR_PAYOUT",
+      "WITHDRAWAL",
+      "REFUND_TO_VENDOR",
+    ]);
+    const unsubscribe = subscribeToSSE((payload) => {
+      if (payload.type !== "notification") return;
+      const innerType = (payload.data as { type?: string } | null)?.type;
+      if (innerType && REFRESH_ON.has(innerType)) refreshAll();
+    });
+    return unsubscribe;
   }, [refreshBids, refreshTxs]);
 
   const totalEarnings = useMemo(() => {
     return (txData ?? [])
-      .filter((tx: any) => tx.type === "VENDOR_PAYOUT" || tx.type === "REFUND_TO_VENDOR" || tx.type === "SETTLEMENT")
-      .reduce((sum: number, tx: any) => sum + Number(tx.amount), 0);
+      .filter((tx: { type: string }) => tx.type === "VENDOR_PAYOUT" || tx.type === "REFUND")
+      .reduce((sum: number, tx: { amount: unknown }) => sum + Number(tx.amount), 0);
   }, [txData]);
 
   const activeBidsCount = useMemo(() => {
@@ -266,16 +265,16 @@ export default function VendorHomePage() {
            </div>
 
            {/* Tip Card */}
-           <div className="bg-slate-900 p-4 rounded-xl text-white">
+           <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                  <FiActivity size={14} className="text-primary" />
-                 <p className="text-xs font-bold">نصيحة في السريع</p>
+                 <p className="text-xs font-bold text-slate-900">نصيحة في السريع</p>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                 الزباين بيحبوا التفاصيل، ويفضل تديهم ضمان مابيقلوش عن 3 شهور.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                 الزباين بيحبوا التفاصيل، ويفضل تديهم ضمان مابيقلش عن 3 شهور.
               </p>
            </div>
-        </div>
+         </div>
       </div>
     </div>
     </div>

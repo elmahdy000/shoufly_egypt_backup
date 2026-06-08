@@ -8,11 +8,9 @@ import {
   ClipboardList,
   Home,
   LogOut,
-  MessageSquare,
   Package,
   ShoppingBag,
   TrendingUp,
-  User,
   Wallet,
   Zap,
 } from "lucide-react";
@@ -88,20 +86,30 @@ export function AppHeader({ title, subtitle, actions }: AppHeaderProps) {
   }
 
   return (
-    <header className="relative sticky top-0 z-50 overflow-hidden border-b border-white/70 bg-white/90 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.45)] backdrop-blur-xl">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-      <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 dir-rtl">
-        <div className="flex min-w-0 items-center gap-4 group">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transition-transform group-hover:rotate-12">
-            <Zap size={22} strokeWidth={2.5} />
+    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+      <div className="mx-auto flex h-14 sm:h-16 max-w-[1600px] items-center justify-between gap-3 px-3 sm:px-6 lg:px-8 dir-rtl">
+        {/* Brand */}
+        <Link
+          href={navConfig.profileHref.replace(/\/profile$/, "") || "/"}
+          className="flex min-w-0 items-center gap-2.5 group"
+          aria-label="شوفلي"
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm shadow-primary/20 transition-transform group-active:scale-95">
+            <Zap size={18} strokeWidth={2.4} />
           </div>
-          <div className="min-w-0 space-y-0.5">
-            <h1 className="truncate text-lg font-black leading-none text-slate-900 sm:text-xl tracking-tight">{title}</h1>
-            {subtitle && <p className="truncate text-[10px] font-black text-slate-400 uppercase tracking-widest">{subtitle}</p>}
+          <div className="min-w-0 leading-tight">
+            <h1 className="truncate text-[15px] sm:text-base font-bold text-slate-900">{title}</h1>
+            {subtitle && (
+              <p className="hidden sm:block truncate text-[11px] font-medium text-slate-500">{subtitle}</p>
+            )}
           </div>
-        </div>
+        </Link>
 
-        <nav className="hidden xl:flex items-center gap-1.5 rounded-[22px] border border-slate-200/80 bg-white/70 p-1.5 shadow-sm backdrop-blur-sm">
+        {/* Desktop nav */}
+        <nav
+          aria-label="التنقل الرئيسي"
+          className="hidden xl:flex items-center gap-1 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-1"
+        >
           {navConfig.items.map((item) => {
             const Icon = item.icon;
             const active = isActivePath(pathname, item.href);
@@ -109,80 +117,56 @@ export function AppHeader({ title, subtitle, actions }: AppHeaderProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`inline-flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-xs font-black transition-all ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-colors ${
                   active
-                    ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-                    : "text-slate-500 hover:bg-slate-50 hover:shadow-sm hover:text-slate-900"
+                    ? "bg-white text-primary shadow-sm"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                 }`}
+                aria-current={active ? "page" : undefined}
               >
-                {Icon && React.createElement(Icon, { size: 16 })}
+                {Icon && React.createElement(Icon, { size: 15, strokeWidth: active ? 2.2 : 1.8 })}
                 <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="flex items-center gap-2.5">
-          <div className="hidden sm:flex items-center gap-2.5">
-            <Link
-              href="/messages"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-400 transition-all hover:border-primary/30 hover:text-primary hover:shadow-lg hover:shadow-primary/5 active:scale-90"
-              title="الرسائل"
+        {/* Actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden sm:flex items-center gap-1.5">
+            <NotificationDropdown />
+            <button
+              onClick={handleLogout}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 active:scale-95"
+              title="تسجيل الخروج"
+              aria-label="تسجيل الخروج"
             >
-              <MessageSquare size={18} />
-            </Link>
+              <LogOut size={16} />
+            </button>
+          </div>
 
+          {/* On mobile we only show the notification bell. Profile is reached from the bottom nav. */}
+          <div className="sm:hidden">
             <NotificationDropdown />
           </div>
 
           <Link
             href={navConfig.profileHref}
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border-2 transition-all active:scale-90 ${
+            className={`hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-colors active:scale-95 ${
               isActivePath(pathname, navConfig.profileHref)
-                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                : "border-slate-200 bg-white text-slate-400 hover:border-primary/30 hover:text-primary"
+                ? "border-primary bg-primary text-white"
+                : "border-slate-200 bg-white text-slate-500 hover:border-primary/30 hover:text-primary"
             }`}
             title="الملف الشخصي"
+            aria-label="الملف الشخصي"
           >
-            <User size={18} />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
           </Link>
 
-          <button
-            onClick={handleLogout}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-500 transition-all hover:bg-rose-500 hover:text-white hover:shadow-lg hover:shadow-rose-100 active:scale-90"
-            title="تسجيل الخروج"
-          >
-            <LogOut size={18} />
-          </button>
-
           {actions}
-        </div>
-      </div>
-
-      {/* Mobile Sub-Nav: High Fidelity Glass */}
-      <div className="xl:hidden border-t border-white/60 bg-white/60 px-4 py-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {navConfig.items.map((item) => {
-            const Icon = item.icon;
-            const active = isActivePath(pathname, item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-[11px] font-black transition-all ${
-                  active
-                    ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
-                    : "bg-white border border-slate-200 text-slate-500"
-                }`}
-              >
-                {Icon && React.createElement(Icon, { size: 14 })}
-                {item.label}
-              </Link>
-            );
-          })}
-          <div className="mr-auto pl-2">
-            <NotificationDropdown />
-          </div>
         </div>
       </div>
     </header>
