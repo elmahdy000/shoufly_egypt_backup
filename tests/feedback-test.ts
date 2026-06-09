@@ -53,6 +53,10 @@ async function testFeedback() {
 
     if (!request) throw new Error('No closed request found and failed to create dummy.');
 
+    // Cleanup existing review and complaint for this request to make test idempotent
+    await prisma.review.deleteMany({ where: { requestId: request.id } });
+    await prisma.complaint.deleteMany({ where: { requestId: request.id } });
+
     // 2. Client leaves a Review
     console.log(`--- Step 1: Client (#${request.clientId}) leaving a 5-star Review ---`);
     const review = await createReview({
