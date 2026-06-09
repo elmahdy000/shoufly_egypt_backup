@@ -33,10 +33,10 @@ import {
   Pagination,
   SearchInput,
   StatusBadge,
-  DetailPanel,
-  type DetailPanelField,
-  type StatusTone,
   ConfirmDialog,
+  DetailsDrawer,
+  DetailRow,
+  type StatusTone,
 } from "@/components/admin/primitives";
 
 interface UserData {
@@ -316,262 +316,263 @@ export default function AdminUsersPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Users Table */}
-          <div className="lg:col-span-8 space-y-3">
-            <TableCard flush>
-              <DataTable
-                columns={columns}
-                rows={filtered}
-                rowKey={(u) => u.id}
-                minWidth={800}
-                loading={loading}
-                onRowClick={(user) => setSelectedUser(user)}
-                mobileCard={(user) => (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedUser(user)}
-                    className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
-                      selectedUser?.id === user.id
-                        ? "border-orange-300 bg-orange-50/30"
-                        : "border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
-                          {user.fullName.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-bold text-slate-900 truncate">{user.fullName}</p>
-                          <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
-                        </div>
+        <div className="space-y-3">
+          <TableCard flush>
+            <DataTable
+              columns={columns}
+              rows={filtered}
+              rowKey={(u) => u.id}
+              minWidth={800}
+              loading={loading}
+              onRowClick={(user) => setSelectedUser(user)}
+              mobileCard={(user) => (
+                <button
+                  type="button"
+                  onClick={() => setSelectedUser(user)}
+                  className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
+                    selectedUser?.id === user.id
+                      ? "border-orange-300 bg-orange-50/30"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
+                        {user.fullName.charAt(0)}
                       </div>
-                      <div className="shrink-0">
-                        <StatusIndicator
-                          tone={user.isBlocked ? "rose" : user.isActive ? "emerald" : "slate"}
-                          label={user.isBlocked ? "محظور" : user.isActive ? "نشط" : "خامل"}
-                        />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-900 truncate">{user.fullName}</p>
+                        <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
-                      <span className="font-bold text-slate-700">{formatCurrency(Number(user.walletBalance))}</span>
-                      <StatusBadge
-                        tone={(ROLE_META[user.role] ?? { tone: "slate" }).tone}
-                        label={(ROLE_META[user.role] ?? { label: user.role }).label}
-                        size="xs"
+                    <div className="shrink-0">
+                      <StatusIndicator
+                        tone={user.isBlocked ? "rose" : user.isActive ? "emerald" : "slate"}
+                        label={user.isBlocked ? "محظور" : user.isActive ? "نشط" : "خامل"}
                       />
                     </div>
-                  </button>
-                )}
-                empty={
-                  <EmptyState
-                    icon={Users}
-                    title="لا يوجد مستخدمين"
-                    description="حاول تعديل معايير البحث"
-                  />
-                }
-              />
-
-              {totalPages > 1 && (
-                <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
-                  <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    totalItems={totalItems}
-                    onPageChange={setPage}
-                  />
-                </div>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <span className="font-bold text-slate-700">{formatCurrency(Number(user.walletBalance))}</span>
+                    <StatusBadge
+                      tone={(ROLE_META[user.role] ?? { tone: "slate" }).tone}
+                      label={(ROLE_META[user.role] ?? { label: user.role }).label}
+                      size="xs"
+                    />
+                  </div>
+                </button>
               )}
-            </TableCard>
-          </div>
+              empty={
+                <EmptyState
+                  icon={Users}
+                  title="لا يوجد مستخدمين"
+                  description="حاول تعديل معايير البحث"
+                />
+              }
+            />
 
-          {/* User Inspector */}
-          <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-4">
-            {selectedUser ? (
-              <DetailPanel
-                title={selectedUser.fullName}
-                subtitle={
-                  <StatusBadge
-                    tone={(ROLE_META[selectedUser.role] ?? { tone: "slate" }).tone}
-                    label={(ROLE_META[selectedUser.role] ?? { label: selectedUser.role }).label}
-                    size="xs"
-                  />
-                }
-                onClose={() => setSelectedUser(null)}
-                summaryGrid={[
-                  { label: "طلبات", value: selectedUser._count?.clientRequests ?? 0 },
-                  { label: "عروض", value: selectedUser._count?.vendorBids ?? 0 },
-                  { label: "معاملات", value: selectedUser._count?.transactions ?? 0 },
-                  { label: "بلاغات", value: selectedUser._count?.complaints ?? 0 },
-                ]}
-                fields={
-                  [
-                    { label: "البريد الإلكتروني", value: selectedUser.email, icon: Mail },
-                    { label: "رقم الهاتف", value: selectedUser.phone || "غير مسجل", icon: Phone },
-                    {
-                      label: "رصيد المحفظة",
-                      value: formatCurrency(Number(selectedUser.walletBalance)),
-                      icon: Wallet,
-                      highlight: true,
-                    },
-                    { label: "تاريخ الانضمام", value: formatDate(selectedUser.createdAt), icon: Calendar },
-                    ...(selectedUser.trustScore != null
-                      ? [
-                          {
-                            label: "درجة الثقة",
-                            value: (
-                              <span
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                  selectedUser.trustScore < 30
-                                    ? "bg-rose-100 text-rose-700"
-                                    : selectedUser.trustScore < 60
-                                      ? "bg-amber-100 text-amber-700"
-                                      : "bg-emerald-100 text-emerald-700"
-                                }`}
-                              >
-                                <Shield size={12} />
-                                {selectedUser.trustScore}
-                              </span>
-                            ),
-                            icon: ShieldCheck,
-                          },
-                        ]
-                      : []),
-                    ...(selectedUser.suspendedUntil &&
-                    new Date(selectedUser.suspendedUntil) > new Date()
-                      ? [
-                          {
-                            label: "معلق حتى",
-                            value: new Date(selectedUser.suspendedUntil).toLocaleDateString("ar-EG"),
-                            icon: Calendar,
-                          },
-                        ]
-                      : []),
-                  ] as DetailPanelField[]
-                }
-                actions={
-                  <>
-                    {selectedUser.isBlocked ? (
-                      <AdminButton
-                        variant="success"
-                        size="md"
-                        fullWidth
-                        leadingIcon={CheckCircle2}
-                        isLoading={actionLoading === "unblock"}
-                        onClick={async () => {
-                          setActionLoading("unblock");
-                          try {
-                            await apiFetch(`/api/admin/users/${selectedUser.id}/moderation`, "ADMIN", {
-                              method: "PATCH",
-                              body: { action: "UNBLOCK" },
-                            });
-                            setSelectedUser((prev) => (prev ? { ...prev, isBlocked: false } : null));
-                            refresh();
-                          } catch (err) {
-                            console.error("Unblock failed:", err);
-                          } finally { setActionLoading(null); }
-                        }}
-                      >
-                        فك الحظر عن الحساب
-                      </AdminButton>
-                    ) : (
-                      <AdminButton
-                        variant="danger"
-                        size="md"
-                        fullWidth
-                        leadingIcon={Ban}
-                        isLoading={actionLoading === "block"}
-                        onClick={async () => {
-                          setActionLoading("block");
-                          try {
-                            await apiFetch(`/api/admin/users/${selectedUser.id}/moderation`, "ADMIN", {
-                              method: "PATCH",
-                              body: { action: "BLOCK" },
-                            });
-                            setSelectedUser((prev) => (prev ? { ...prev, isBlocked: true } : null));
-                            refresh();
-                          } catch (err) {
-                            console.error("Block failed:", err);
-                          } finally { setActionLoading(null); }
-                        }}
-                      >
-                        حظر هذا المستخدم
-                      </AdminButton>
-                    )}
-                    {!selectedUser.isVerified && selectedUser.role !== "CLIENT" && (
-                      <AdminButton
-                        variant="primary"
-                        size="md"
-                        fullWidth
-                        leadingIcon={ShieldCheck}
-                        isLoading={actionLoading === "verify"}
-                        onClick={async () => {
-                          setActionLoading("verify");
-                          try {
-                            await apiFetch(`/api/admin/users/${selectedUser.id}/moderation`, "ADMIN", {
-                              method: "PATCH",
-                              body: { action: "VERIFY" },
-                            });
-                            setSelectedUser((prev) => (prev ? { ...prev, isVerified: true } : null));
-                            refresh();
-                          } catch (err) {
-                            console.error("Verify failed:", err);
-                          } finally { setActionLoading(null); }
-                        }}
-                      >
-                        توثيق الحساب يدوياً
-                      </AdminButton>
-                    )}
-                    {selectedUser.role !== "ADMIN" && (
-                      <>
-                        {!selectedUser.suspendedUntil ||
-                        new Date(selectedUser.suspendedUntil) <= new Date() ? (
-                          <AdminButton
-                            variant="outline"
-                            size="md"
-                            fullWidth
-                            leadingIcon={Ban}
-                            className="!text-amber-700 !border-amber-200 hover:!bg-amber-50"
-                            onClick={() => {
-                              setSuspendDays("7");
-                              setSuspendReason("إيقاف مؤقت من الإدارة");
-                              setSuspendError("");
-                              setSuspendDialogOpen(true);
-                            }}
-                          >
-                            إيقاف مؤقت
-                          </AdminButton>
-                        ) : (
-                          <AdminButton
-                            variant="success"
-                            size="md"
-                            fullWidth
-                            leadingIcon={CheckCircle2}
-                            onClick={() => setReinstateDialogOpen(true)}
-                          >
-                            رفع الإيقاف
-                          </AdminButton>
-                        )}
-                      </>
-                    )}
-                    <AdminButton variant="soft" size="md" fullWidth leadingIcon={MoreVertical}>
-                      المزيد من الإجراءات
-                    </AdminButton>
-                  </>
-                }
-              />
-            ) : (
-              <DetailPanel
-                title="اختر مستخدماً"
-                subtitle="حدد مستخدماً من القائمة لعرض إحصائياته وإدارة صلاحيات الوصول"
-                onClose={() => {}}
-                fields={[]}
-              />
+            {totalPages > 1 && (
+              <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  onPageChange={setPage}
+                />
+              </div>
             )}
-          </div>
+          </TableCard>
         </div>
       </div>
+
+      {/* Details Drawer */}
+      <DetailsDrawer
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        title={selectedUser?.fullName || ""}
+        subtitle={
+          selectedUser && (
+            <StatusBadge
+              tone={(ROLE_META[selectedUser.role] ?? { tone: "slate" }).tone}
+              label={(ROLE_META[selectedUser.role] ?? { label: selectedUser.role }).label}
+              size="xs"
+            />
+          )
+        }
+      >
+        {selectedUser && (
+          <div className="space-y-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "طلبات", value: selectedUser._count?.clientRequests ?? 0 },
+                { label: "عروض", value: selectedUser._count?.vendorBids ?? 0 },
+                { label: "معاملات", value: selectedUser._count?.transactions ?? 0 },
+                { label: "بلاغات", value: selectedUser._count?.complaints ?? 0 },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-center"
+                >
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                    {item.label}
+                  </p>
+                  <p className="text-sm font-black text-slate-900 leading-tight">
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Profile Fields */}
+            <div className="space-y-2">
+              <DetailRow label="البريد الإلكتروني" value={selectedUser.email} icon={Mail} />
+              <DetailRow label="رقم الهاتف" value={selectedUser.phone || "غير مسجل"} icon={Phone} />
+              <DetailRow
+                label="رصيد المحفظة"
+                value={formatCurrency(Number(selectedUser.walletBalance))}
+                icon={Wallet}
+                highlight
+              />
+              <DetailRow label="تاريخ الانضمام" value={formatDate(selectedUser.createdAt)} icon={Calendar} />
+              {selectedUser.trustScore != null && (
+                <DetailRow
+                  label="درجة الثقة"
+                  value={
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        selectedUser.trustScore < 30
+                          ? "bg-rose-100 text-rose-700"
+                          : selectedUser.trustScore < 60
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-emerald-100 text-emerald-700"
+                      }`}
+                    >
+                      <Shield size={12} />
+                      {selectedUser.trustScore}
+                    </span>
+                  }
+                  icon={ShieldCheck}
+                />
+              )}
+              {selectedUser.suspendedUntil && new Date(selectedUser.suspendedUntil) > new Date() && (
+                <DetailRow
+                  label="معلق حتى"
+                  value={new Date(selectedUser.suspendedUntil).toLocaleDateString("ar-EG")}
+                  icon={Calendar}
+                />
+              )}
+            </div>
+
+            {/* Moderation Actions */}
+            <div className="pt-4 border-t border-slate-100 space-y-2">
+              {selectedUser.isBlocked ? (
+                <AdminButton
+                  variant="success"
+                  size="md"
+                  fullWidth
+                  leadingIcon={CheckCircle2}
+                  isLoading={actionLoading === "unblock"}
+                  onClick={async () => {
+                    setActionLoading("unblock");
+                    try {
+                      await apiFetch(`/api/admin/users/${selectedUser.id}/moderation`, "ADMIN", {
+                        method: "PATCH",
+                        body: { action: "UNBLOCK" },
+                      });
+                      setSelectedUser((prev) => (prev ? { ...prev, isBlocked: false } : null));
+                      refresh();
+                    } catch (err) {
+                      console.error("Unblock failed:", err);
+                    } finally { setActionLoading(null); }
+                  }}
+                >
+                  فك الحظر عن الحساب
+                </AdminButton>
+              ) : (
+                <AdminButton
+                  variant="danger"
+                  size="md"
+                  fullWidth
+                  leadingIcon={Ban}
+                  isLoading={actionLoading === "block"}
+                  onClick={async () => {
+                    setActionLoading("block");
+                    try {
+                      await apiFetch(`/api/admin/users/${selectedUser.id}/moderation`, "ADMIN", {
+                        method: "PATCH",
+                        body: { action: "BLOCK" },
+                      });
+                      setSelectedUser((prev) => (prev ? { ...prev, isBlocked: true } : null));
+                      refresh();
+                    } catch (err) {
+                      console.error("Block failed:", err);
+                    } finally { setActionLoading(null); }
+                  }}
+                >
+                  حظر هذا المستخدم
+                </AdminButton>
+              )}
+              {!selectedUser.isVerified && selectedUser.role !== "CLIENT" && (
+                <AdminButton
+                  variant="primary"
+                  size="md"
+                  fullWidth
+                  leadingIcon={ShieldCheck}
+                  isLoading={actionLoading === "verify"}
+                  onClick={async () => {
+                    setActionLoading("verify");
+                    try {
+                      await apiFetch(`/api/admin/users/${selectedUser.id}/moderation`, "ADMIN", {
+                        method: "PATCH",
+                        body: { action: "VERIFY" },
+                      });
+                      setSelectedUser((prev) => (prev ? { ...prev, isVerified: true } : null));
+                      refresh();
+                    } catch (err) {
+                      console.error("Verify failed:", err);
+                    } finally { setActionLoading(null); }
+                  }}
+                >
+                  توثيق الحساب يدوياً
+                </AdminButton>
+              )}
+              {selectedUser.role !== "ADMIN" && (
+                <>
+                  {!selectedUser.suspendedUntil ||
+                  new Date(selectedUser.suspendedUntil) <= new Date() ? (
+                    <AdminButton
+                      variant="outline"
+                      size="md"
+                      fullWidth
+                      leadingIcon={Ban}
+                      className="!text-amber-700 !border-amber-200 hover:!bg-amber-50"
+                      onClick={() => {
+                        setSuspendDays("7");
+                        setSuspendReason("إيقاف مؤقت من الإدارة");
+                        setSuspendError("");
+                        setSuspendDialogOpen(true);
+                      }}
+                    >
+                      إيقاف مؤقت
+                    </AdminButton>
+                  ) : (
+                    <AdminButton
+                      variant="success"
+                      size="md"
+                      fullWidth
+                      leadingIcon={CheckCircle2}
+                      onClick={() => setReinstateDialogOpen(true)}
+                    >
+                      رفع الإيقاف
+                    </AdminButton>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </DetailsDrawer>
 
       {/* Suspend Confirm Dialog */}
       <ConfirmDialog

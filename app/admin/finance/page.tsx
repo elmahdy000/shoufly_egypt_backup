@@ -30,7 +30,8 @@ import {
   Pagination,
   SearchInput,
   StatusBadge,
-  DetailPanel,
+  DetailsDrawer,
+  DetailRow,
   TX_TYPE_META,
 } from "@/components/admin/primitives";
 
@@ -241,135 +242,131 @@ export default function AdminFinancePage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Ledger Entries */}
-          <div className="lg:col-span-8 space-y-3">
-            <TableCard
-              flush
-              title={
-                <span className="flex items-center gap-2">
-                  <History size={20} />
-                  سجل المعاملات
-                </span>
-              }
-              description={filteredTransactions.length > 0 ? `${filteredTransactions.length} عملية` : "Audit Trail Active"}
-            >
-              <DataTable
-                columns={columns}
-                rows={paginatedTransactions}
-                rowKey={(tx) => tx.id}
-                minWidth={800}
-                loading={loading}
-                onRowClick={(tx) => setSelected(tx)}
-                mobileCard={(tx) => {
-                  const isIn = IN_TYPES.includes(tx.type);
-                  const meta = TX_TYPE_META[tx.type] ?? { label: tx.type, tone: "slate" as const };
-                  return (
-                    <button
-                      type="button"
-                      onClick={() => setSelected(tx)}
-                      className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
-                        selected?.id === tx.id
-                          ? "border-emerald-300 bg-emerald-50/30"
-                          : "border-slate-200 hover:border-slate-300"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <StatusBadge tone={meta.tone} label={meta.label} size="xs" />
-                          <span className="text-[10px] text-slate-400 font-jakarta whitespace-nowrap">
-                            {formatDate(tx.createdAt)}
-                          </span>
-                        </div>
-                        <span
-                          className={`text-sm font-bold font-jakarta ${
-                            isIn ? "text-emerald-600" : "text-rose-600"
-                          }`}
-                        >
-                          {isIn ? "+" : "-"}
-                          {formatCurrency(tx.amount)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-600 truncate">{tx.description}</p>
-                    </button>
-                  );
-                }}
-                empty={
-                  <EmptyState
-                    icon={CreditCard}
-                    title="لا توجد حركات مالية مسجلة"
-                    description="عند إتمام أول معاملة ستظهر التفاصيل هنا"
-                  />
-                }
-              />
-
-              {totalPages > 1 && (
-                <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
-                  <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    totalItems={filteredTransactions.length}
-                    onPageChange={setPage}
-                  />
-                </div>
-              )}
-            </TableCard>
-          </div>
-
-          {/* Audit Inspector */}
-          <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-4">
-            {selected ? (
-              <DetailPanel
-                title={`القيد المالي #TX_${selected.id}`}
-                subtitle={
-                  <span
-                    className={`inline-flex items-center gap-1.5 text-[11px] font-bold ${
-                      IN_TYPES.includes(selected.type) ? "text-emerald-600" : "text-rose-600"
+        <div className="space-y-3">
+          <TableCard
+            flush
+            title={
+              <span className="flex items-center gap-2">
+                <History size={20} />
+                سجل المعاملات
+              </span>
+            }
+            description={filteredTransactions.length > 0 ? `${filteredTransactions.length} عملية` : "Audit Trail Active"}
+          >
+            <DataTable
+              columns={columns}
+              rows={paginatedTransactions}
+              rowKey={(tx) => tx.id}
+              minWidth={800}
+              loading={loading}
+              onRowClick={(tx) => setSelected(tx)}
+              mobileCard={(tx) => {
+                const isIn = IN_TYPES.includes(tx.type);
+                const meta = TX_TYPE_META[tx.type] ?? { label: tx.type, tone: "slate" as const };
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setSelected(tx)}
+                    className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
+                      selected?.id === tx.id
+                        ? "border-emerald-300 bg-emerald-50/30"
+                        : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
-                    {IN_TYPES.includes(selected.type) ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                    {IN_TYPES.includes(selected.type) ? "تحويل وارد" : "تحويل صادر"}
-                  </span>
-                }
-                onClose={() => setSelected(null)}
-                fields={[
-                  {
-                    label: "قيمة العملية",
-                    value: (
-                      <span className={`text-lg font-black ${IN_TYPES.includes(selected.type) ? "text-emerald-600" : "text-rose-600"}`}>
-                        {IN_TYPES.includes(selected.type) ? "+" : "-"}
-                        {formatCurrency(selected.amount)}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <StatusBadge tone={meta.tone} label={meta.label} size="xs" />
+                        <span className="text-[10px] text-slate-400 font-jakarta whitespace-nowrap">
+                          {formatDate(tx.createdAt)}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-sm font-bold font-jakarta ${
+                          isIn ? "text-emerald-600" : "text-rose-600"
+                        }`}
+                      >
+                        {isIn ? "+" : "-"}
+                        {formatCurrency(tx.amount)}
                       </span>
-                    ),
-                    icon: CreditCard,
-                    highlight: true,
-                    fullWidth: true,
-                  },
-                  { label: "تاريخ التنفيذ", value: formatDate(selected.createdAt), icon: Calendar },
-                  { label: "وصف القيد", value: selected.description, icon: FileText },
-                  { label: "حالة التدقيق", value: "عملية موثقة", icon: ShieldCheck },
-                ]}
-                actions={
-                  <button
-                    disabled
-                    title="قريباً"
-                    className="w-full h-11 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl font-bold text-xs cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    <Download size={16} /> استخراج الفاتورة
+                    </div>
+                    <p className="text-xs text-slate-600 truncate">{tx.description}</p>
                   </button>
-                }
-              />
-            ) : (
-              <DetailPanel
-                title="اختر عملية"
-                subtitle="حدد عملية من القائمة لعرض تفاصيل التدقيق"
-                onClose={() => {}}
-                fields={[]}
-              />
+                );
+              }}
+              empty={
+                <EmptyState
+                  icon={CreditCard}
+                  title="لا توجد حركات مالية مسجلة"
+                  description="عند إتمام أول معاملة ستظهر التفاصيل هنا"
+                />
+              }
+            />
+
+            {totalPages > 1 && (
+              <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  totalItems={filteredTransactions.length}
+                  onPageChange={setPage}
+                />
+              </div>
             )}
-          </div>
+          </TableCard>
         </div>
       </div>
+
+      {/* Details Drawer */}
+      <DetailsDrawer
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        title={`القيد المالي #TX_${selected?.id || ""}`}
+        subtitle={
+          selected && (
+            <span
+              className={`inline-flex items-center gap-1.5 text-[11px] font-bold ${
+                IN_TYPES.includes(selected.type) ? "text-emerald-600" : "text-rose-600"
+              }`}
+            >
+              {IN_TYPES.includes(selected.type) ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+              {IN_TYPES.includes(selected.type) ? "تحويل وارد" : "تحويل صادر"}
+            </span>
+          )
+        }
+      >
+        {selected && (
+          <div className="space-y-6">
+            {/* Info Fields */}
+            <div className="space-y-2">
+              <DetailRow
+                label="قيمة العملية"
+                value={
+                  <span className={`text-lg font-black ${IN_TYPES.includes(selected.type) ? "text-emerald-600" : "text-rose-600"}`}>
+                    {IN_TYPES.includes(selected.type) ? "+" : "-"}
+                    {formatCurrency(selected.amount)}
+                  </span>
+                }
+                icon={CreditCard}
+                highlight
+              />
+              <DetailRow label="تاريخ التنفيذ" value={formatDate(selected.createdAt)} icon={Calendar} />
+              <DetailRow label="وصف القيد" value={selected.description} icon={FileText} />
+              <DetailRow label="حالة التدقيق" value="عملية موثقة" icon={ShieldCheck} />
+            </div>
+
+            {/* Actions Panel */}
+            <div className="pt-4 border-t border-slate-100">
+              <button
+                disabled
+                title="قريباً"
+                className="w-full h-11 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl font-bold text-xs cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Download size={16} /> استخراج الفاتورة
+              </button>
+            </div>
+          </div>
+        )}
+      </DetailsDrawer>
     </div>
   );
 }

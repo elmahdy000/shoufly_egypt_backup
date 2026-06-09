@@ -45,7 +45,7 @@ export interface PageHeaderProps {
   /** Tiny pill above the title (e.g. "لوحة التحكم التشغيلية"). */
   eyebrow?: string;
   /** Status dot in the eyebrow (e.g. "online"). */
-  eyebrowTone?: "neutral" | "emerald" | "amber" | "rose" | "blue";
+  eyebrowTone?: "neutral" | "emerald" | "amber" | "rose" | "blue" | "orange";
   /** Right-side action area. */
   actions?: React.ReactNode;
   /** Optional metadata strip below title (e.g. date + online count). */
@@ -59,6 +59,7 @@ const dotClasses: Record<NonNullable<PageHeaderProps["eyebrowTone"]>, string> = 
   amber: "bg-amber-500",
   rose: "bg-rose-500",
   blue: "bg-blue-500",
+  orange: "bg-orange-500",
 };
 
 export function PageHeader({
@@ -78,11 +79,11 @@ export function PageHeader({
         sticky && "sticky top-0 z-30",
       )}
     >
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-5 lg:py-6">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-3.5 lg:py-4">
         {crumbs && crumbs.length > 0 && (
           <nav
             aria-label="مسار التنقل"
-            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 mb-3 flex-wrap"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 mb-2 flex-wrap"
           >
             {crumbs.map((c, i) => {
               const isLast = i === crumbs.length - 1;
@@ -118,10 +119,10 @@ export function PageHeader({
           </nav>
         )}
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
           <div className="min-w-0 flex-1">
             {eyebrow && (
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-2 mb-1">
                 <span
                   className={cn(
                     "w-1.5 h-1.5 rounded-full shrink-0",
@@ -133,15 +134,15 @@ export function PageHeader({
                 </span>
               </div>
             )}
-            <h1 className="text-xl lg:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-2xl lg:text-[28px] font-black text-slate-900 tracking-tight leading-tight">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
+              <p className="text-xs lg:text-sm text-slate-500 mt-1 leading-relaxed">
                 {subtitle}
               </p>
             )}
-            {meta && <div className="mt-3">{meta}</div>}
+            {meta && <div className="mt-2">{meta}</div>}
           </div>
           {actions && (
             <div className="flex items-center gap-2 flex-wrap shrink-0">
@@ -415,20 +416,20 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center py-14 px-6",
+        "flex flex-col items-center justify-center text-center py-8 px-4",
         className,
       )}
     >
-      <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center mb-4 shadow-sm">
-        <Icon size={26} />
+      <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center mb-3 shadow-sm">
+        <Icon size={18} />
       </div>
       <h3 className="text-sm font-bold text-slate-900">{title}</h3>
       {description && (
-        <p className="text-xs text-slate-500 mt-1.5 max-w-md leading-relaxed">
+        <p className="text-xs text-slate-500 mt-1 max-w-md leading-relaxed">
           {description}
         </p>
       )}
-      {action && <div className="mt-5">{action}</div>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
@@ -443,15 +444,15 @@ export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center py-14 px-6",
+        "flex flex-col items-center justify-center text-center py-8 px-4",
         className,
       )}
     >
-      <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mb-4">
-        <AlertTriangle size={26} />
+      <div className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100 text-rose-500 flex items-center justify-center mb-3">
+        <AlertTriangle size={18} />
       </div>
       <h3 className="text-sm font-bold text-slate-900">حصل مشكلة</h3>
-      <p className="text-xs text-slate-500 mt-1.5 max-w-md leading-relaxed">
+      <p className="text-xs text-slate-500 mt-1 max-w-md leading-relaxed">
         {message}
       </p>
       {onRetry && (
@@ -546,13 +547,13 @@ export function DataTable<T>({
           className={cn("w-full text-right border-collapse", className)}
           style={{ minWidth }}
         >
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
+          <thead className="sticky top-0 z-10 bg-slate-50 shadow-[inset_0_-1px_0_0_#e2e8f0]">
+            <tr className="border-b border-slate-100">
               {columns.map((c) => (
                 <th
                   key={c.key}
                   className={cn(
-                    "px-4 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest",
+                    "px-4 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-50",
                     c.thClassName ?? c.className,
                   )}
                 >
@@ -641,11 +642,43 @@ export function StatCard({
   const inner = (
     <div
       className={cn(
-        "bg-white border border-slate-200 rounded-2xl px-5 py-4 shadow-sm flex items-center gap-3",
+        "bg-white border border-slate-200 rounded-2xl px-4.5 py-3.5 shadow-sm flex items-center justify-between gap-3 h-24",
         href && "hover:border-slate-300 hover:shadow-md transition-all",
         className,
       )}
     >
+      <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
+        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">
+            {label}
+          </p>
+          {badge && (
+            <span
+              className={cn(
+                "shrink-0 px-1 py-0.5 rounded text-[8px] font-bold uppercase",
+                badgeTone[badge.tone ?? "neutral"],
+              )}
+            >
+              {badge.label}
+            </span>
+          )}
+        </div>
+        <div className="flex items-baseline gap-1.5">
+          <p className="text-lg lg:text-xl font-black text-slate-900 tracking-tight leading-tight">
+            {value}
+          </p>
+          {trend && (
+            <span
+              className={cn(
+                "text-[10px] font-bold shrink-0",
+                trend.up ? "text-emerald-600" : "text-amber-600",
+              )}
+            >
+              {trend.up ? "▲" : "▼"} {trend.value}
+            </span>
+          )}
+        </div>
+      </div>
       {Icon && (
         <div
           className={cn(
@@ -656,38 +689,6 @@ export function StatCard({
           <Icon size={20} />
         </div>
       )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest truncate">
-            {label}
-          </p>
-          {badge && (
-            <span
-              className={cn(
-                "shrink-0 px-1.5 py-0.5 rounded text-[8px] font-black uppercase",
-                badgeTone[badge.tone ?? "neutral"],
-              )}
-            >
-              {badge.label}
-            </span>
-          )}
-        </div>
-        <div className="flex items-baseline gap-2">
-          <p className="text-lg lg:text-xl font-black text-slate-900 tracking-tight leading-tight">
-            {value}
-          </p>
-          {trend && (
-            <span
-              className={cn(
-                "text-[10px] font-bold",
-                trend.up ? "text-emerald-600" : "text-amber-600",
-              )}
-            >
-              {trend.up ? "▲" : "▼"} {trend.value}
-            </span>
-          )}
-        </div>
-      </div>
     </div>
   );
   if (href) {
@@ -1076,14 +1077,14 @@ export function SectionTitle({
 }) {
   return (
     <div className={cn("flex items-center justify-between gap-3 flex-wrap", className)}>
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center gap-2.5 min-w-0 text-right">
         {Icon && (
-          <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
-            <Icon size={15} />
+          <div className="w-9 h-9 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+            <Icon size={18} />
           </div>
         )}
         <div className="min-w-0">
-          <h2 className="text-sm font-bold text-slate-900 truncate">{title}</h2>
+          <h2 className="text-lg lg:text-[20px] font-black text-slate-900 truncate">{title}</h2>
           {description && (
             <p className="text-xs text-slate-500 mt-0.5">{description}</p>
           )}
@@ -1182,7 +1183,7 @@ export function DetailPanel({
   );
 }
 
-function DetailRow({
+export function DetailRow({
   label,
   value,
   icon: Icon,
@@ -1234,5 +1235,81 @@ export function TableSkeleton({ rows = 5, className }: TableSkeletonProps) {
   );
 }
 
+/* ─── 15. DetailsDrawer — Sliding sidebar overlay ────────────────────── */
+
+export interface DetailsDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: React.ReactNode;
+  children: React.ReactNode;
+}
+
+export function DetailsDrawer({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+}: DetailsDrawerProps) {
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 overflow-hidden font-cairo"
+      aria-labelledby="slide-over-title"
+      role="dialog"
+      aria-modal="true"
+      dir="rtl"
+    >
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Overlay */}
+        <div
+          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+          onClick={onClose}
+        />
+
+        {/* Drawer container (sliding from left in RTL layout) */}
+        <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full">
+          <div className="pointer-events-auto w-screen max-w-md bg-white shadow-2xl border-r border-slate-100 flex flex-col h-full">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="min-w-0 flex-1 text-right">
+                <h2 className="text-base font-black text-slate-900 truncate">
+                  {title}
+                </h2>
+                {subtitle && <div className="mt-0.5">{subtitle}</div>}
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0 mr-3"
+                aria-label="إغلاق"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="relative flex-1 overflow-y-auto p-6 text-right">
+              {children}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* Re-export FileText so consumers don't have to import it for placeholders */
 export { FileText };
+

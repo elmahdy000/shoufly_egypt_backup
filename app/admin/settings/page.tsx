@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { AlertTriangle, CheckCircle, DollarSign, Loader2, Navigation, Save, Shield } from "lucide-react";
 import { apiFetch } from "@/lib/api/client";
+import { PageHeader } from "@/components/admin/primitives";
 
 export default function AdminSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
@@ -111,19 +112,13 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-7xl mx-auto space-y-10 font-cairo antialiased min-h-screen bg-slate-50" dir="rtl">
-      
-      {/* 🌟 PREMIUM HEADER */}
-      <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
-            <span className="text-[10px] font-black tracking-widest text-primary bg-primary/5 px-3 py-1 rounded-full border border-primary/10 uppercase">النظام المركزي v4.0</span>
-          </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">إعدادات المنصة</h1>
-          <p className="text-base text-slate-500 font-medium">التحكم الكامل في الضوابط التشغيلية، السياسات المالية، وبروتوكولات الأمان.</p>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f8fafc] font-cairo text-right antialiased" dir="rtl">
+      <PageHeader
+        eyebrow="النظام المركزي v4.0"
+        eyebrowTone="orange"
+        title="إعدادات المنصة"
+        subtitle="التحكم الكامل في الضوابط التشغيلية، السياسات المالية، وبروتوكولات الأمان."
+      />
 
       {/* Loading State */}
       {isLoading && (
@@ -136,22 +131,23 @@ export default function AdminSettingsPage() {
       )}
 
       {/* Error State */}
-      {error && !isLoading && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 flex items-center gap-3 mb-6">
-          <AlertTriangle size={20} />
-          <span>{error}</span>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mr-auto px-4 py-2 bg-rose-100 hover:bg-rose-200 rounded-lg text-sm font-bold transition-colors"
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      )}
-
       {!isLoading && (
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
-        <div className="lg:col-span-8 space-y-8">
+        <div className="max-w-[1500px] mx-auto p-4 lg:p-6">
+          {error && !isLoading && (
+            <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 flex items-center gap-3 mb-6">
+              <AlertTriangle size={20} />
+              <span>{error}</span>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mr-auto px-4 py-2 bg-rose-100 hover:bg-rose-200 rounded-lg text-sm font-bold transition-colors"
+              >
+                إعادة المحاولة
+              </button>
+            </div>
+          )}
+          
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
+            <div className="lg:col-span-8 space-y-8">
           
           {/* 💰 Financial Policies */}
           <section className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -295,16 +291,16 @@ export default function AdminSettingsPage() {
 
         {/* 💾 Sidebar Actions */}
         <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
-          <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
             
-            <div className="relative z-10 space-y-8">
+            <div className="relative z-10 space-y-6">
               <div>
-                <h3 className="text-lg font-black mb-1">ملخص التغييرات</h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Configuration Snapshot</p>
+                <h3 className="text-base font-black text-slate-900 mb-0.5">ملخص التغييرات</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Configuration Snapshot</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 py-2 border-t border-b border-slate-100">
                 <SummaryRow label="عمولة المنصة" val={`${commission}%`} />
                 <SummaryRow label="الضريبة المضافة" val={`${vat}%`} />
                 <SummaryRow label="نطاق التغطية" val={`${radius} كم`} />
@@ -314,14 +310,15 @@ export default function AdminSettingsPage() {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className={`w-full h-14 rounded-2xl flex items-center justify-center gap-3 text-sm font-black transition-all active:scale-95 shadow-lg ${success ? 'bg-emerald-500 shadow-emerald-500/20' : 'bg-primary hover:bg-orange-600 shadow-orange-500/20'} disabled:opacity-50`}
+                className={`w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-bold transition-all active:scale-95 shadow-md ${success ? 'bg-emerald-600 text-white shadow-emerald-600/10' : 'bg-primary hover:bg-orange-600 text-white shadow-orange-500/10'} disabled:opacity-50`}
               >
-                {isSaving ? <Loader2 size={20} className="animate-spin" /> : success ? <CheckCircle size={20} /> : <Save size={20} />}
+                {isSaving ? <Loader2 size={16} className="animate-spin" /> : success ? <CheckCircle size={16} /> : <Save size={16} />}
                 {isSaving ? "جاري مزامنة البيانات..." : success ? "تم الحفظ بنجاح" : "حفظ الضوابط الجديدة"}
               </button>
             </div>
           </div>
         </div>
+      </div>
       </div>
       )}
     </div>
@@ -359,9 +356,9 @@ function SettingToggle({
 
 function SummaryRow({ label, val }: { label: string; val: string }) {
   return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-xs font-medium uppercase tracking-widest text-slate-400">{label}</span>
-      <span className="text-sm font-semibold text-white tabular-nums">{val}</span>
+    <div className="flex items-center justify-between text-sm py-1">
+      <span className="text-xs font-semibold text-slate-500">{label}</span>
+      <span className="text-sm font-bold text-slate-800 tabular-nums">{val}</span>
     </div>
   );
 }

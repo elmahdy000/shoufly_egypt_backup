@@ -33,9 +33,9 @@ import {
   Pagination,
   SearchInput,
   StatusBadge,
-  DetailPanel,
-  type DetailPanelField,
   InlineToast,
+  DetailsDrawer,
+  DetailRow,
   type StatusTone,
 } from "@/components/admin/primitives";
 
@@ -350,158 +350,149 @@ export default function AdminVendorsPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Vendors Table */}
-          <div className="lg:col-span-8 space-y-3">
-            <TableCard flush>
-              <DataTable
-                columns={columns}
-                rows={filtered}
-                rowKey={(v) => v.id}
-                minWidth={800}
-                loading={loading}
-                onRowClick={(v) => setSelected(v)}
-                mobileCard={(v) => (
-                  <button
-                    type="button"
-                    onClick={() => setSelected(v)}
-                    className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
-                      selected?.id === v.id
-                        ? "border-orange-300 bg-orange-50/30"
-                        : "border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
-                          {v.fullName.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-bold text-slate-900 truncate">{v.fullName}</p>
-                          <p className="text-[10px] text-slate-400 truncate">{v.email}</p>
-                        </div>
+        <div className="space-y-3">
+          <TableCard flush>
+            <DataTable
+              columns={columns}
+              rows={filtered}
+              rowKey={(v) => v.id}
+              minWidth={800}
+              loading={loading}
+              onRowClick={(v) => setSelected(v)}
+              mobileCard={(v) => (
+                <button
+                  type="button"
+                  onClick={() => setSelected(v)}
+                  className={`w-full text-right bg-white border rounded-xl p-3 transition-colors ${
+                    selected?.id === v.id
+                      ? "border-orange-300 bg-orange-50/30"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
+                        {v.fullName.charAt(0)}
                       </div>
-                      <StatusBadge
-                        tone={v.isActive ? "emerald" : "rose"}
-                        label={v.isActive ? "نشط" : "محظور"}
-                        dot
-                        size="xs"
-                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-900 truncate">{v.fullName}</p>
+                        <p className="text-[10px] text-slate-400 truncate">{v.email}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
-                      <span className="font-bold text-slate-700">
-                        {formatCurrency(Number(v.walletBalance))}
-                      </span>
-                      <span className="text-[10px]">
-                        {v.vendorCategories?.length ?? 0} تصنيف
-                      </span>
-                    </div>
-                  </button>
-                )}
-                empty={
-                  <EmptyState
-                    icon={Store}
-                    title="لا توجد سجلات موردين مطابقة"
-                    description="حاول تعديل معايير الفلترة أو البحث"
-                  />
-                }
-              />
-
-              {totalPages > 1 && (
-                <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
-                  <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    totalItems={totalItems}
-                    onPageChange={setPage}
-                  />
-                </div>
-              )}
-            </TableCard>
-          </div>
-
-          {/* Vendor Inspector */}
-          <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-4">
-            {selected ? (
-              <DetailPanel
-                title={selected.fullName}
-                subtitle={
-                  <div className="flex items-center gap-1.5 flex-wrap">
                     <StatusBadge
-                      tone={selected.isActive ? "emerald" : "rose"}
-                      label={selected.isActive ? "نشط" : "محظور"}
+                      tone={v.isActive ? "emerald" : "rose"}
+                      label={v.isActive ? "نشط" : "محظور"}
                       dot
                       size="xs"
                     />
-                    {selected.isVerified && (
-                      <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">
-                        موثق
-                      </span>
-                    )}
                   </div>
-                }
-                onClose={() => setSelected(null)}
-                fields={
-                  [
-                    { label: "البريد الإلكتروني", value: selected.email, icon: Mail },
-                    { label: "رقم الهاتف", value: selected.phone || "غير مسجل", icon: Phone },
-                    {
-                      label: "رصيد المحفظة",
-                      value: formatCurrency(Number(selected.walletBalance)),
-                      icon: CreditCard,
-                      highlight: true,
-                    },
-                    { label: "تاريخ الانضمام", value: formatDate(selected.createdAt), icon: Clock },
-                    ...(selected.vendorCategories && selected.vendorCategories.length > 0
-                      ? [
-                          {
-                            label: "التصنيفات",
-                            value: selected.vendorCategories.map((c) => c.category.name).join("، "),
-                            icon: Store,
-                          },
-                        ]
-                      : []),
-                  ] as DetailPanelField[]
-                }
-                actions={
-                  <>
-                    <AdminButton
-                      variant={selected.isVerified ? "soft" : "primary"}
-                      size="md"
-                      fullWidth
-                      leadingIcon={selected.isVerified ? ShieldAlert : ShieldCheck}
-                      isLoading={vendorActionLoading === (selected.isVerified ? "unverify" : "verify")}
-                      onClick={() => handleAction(selected.id, selected.isVerified ? "unverify" : "verify")}
-                    >
-                      {selected.isVerified ? "إلغاء التوثيق" : "توثيق المتجر"}
-                    </AdminButton>
-                    <AdminButton
-                      variant={selected.isActive ? "danger" : "success"}
-                      size="md"
-                      fullWidth
-                      leadingIcon={selected.isActive ? Ban : CheckCircle2}
-                      isLoading={vendorActionLoading === (selected.isActive ? "block" : "unblock")}
-                      onClick={() => handleAction(selected.id, selected.isActive ? "block" : "unblock")}
-                    >
-                      {selected.isActive ? "إيقاف الحساب" : "تفعيل الحساب"}
-                    </AdminButton>
-                    <AdminButton variant="soft" size="md" fullWidth leadingIcon={ExternalLink}>
-                      عرض سجل النشاط
-                    </AdminButton>
-                  </>
-                }
-              />
-            ) : (
-              <DetailPanel
-                title="اختر مورداً"
-                subtitle="حدد مورداً من القائمة لعرض تفاصيله وإدارة حالة التوثيق والحظر"
-                onClose={() => {}}
-                fields={[]}
-              />
+                  <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <span className="font-bold text-slate-700">
+                      {formatCurrency(Number(v.walletBalance))}
+                    </span>
+                    <span className="text-[10px]">
+                      {v.vendorCategories?.length ?? 0} تصنيف
+                    </span>
+                  </div>
+                </button>
+              )}
+              empty={
+                <EmptyState
+                  icon={Store}
+                  title="لا توجد سجلات موردين مطابقة"
+                  description="حاول تعديل معايير الفلترة أو البحث"
+                />
+              }
+            />
+
+            {totalPages > 1 && (
+              <div className="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  onPageChange={setPage}
+                />
+              </div>
             )}
-          </div>
+          </TableCard>
         </div>
       </div>
+
+      {/* Details Drawer */}
+      <DetailsDrawer
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        title={selected?.fullName || ""}
+        subtitle={
+          selected && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <StatusBadge
+                tone={selected.isActive ? "emerald" : "rose"}
+                label={selected.isActive ? "نشط" : "محظور"}
+                dot
+                size="xs"
+              />
+              {selected.isVerified && (
+                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">
+                  موثق
+                </span>
+              )}
+            </div>
+          )
+        }
+      >
+        {selected && (
+          <div className="space-y-6">
+            {/* Info Fields */}
+            <div className="space-y-2">
+              <DetailRow label="البريد الإلكتروني" value={selected.email} icon={Mail} />
+              <DetailRow label="رقم الهاتف" value={selected.phone || "غير مسجل"} icon={Phone} />
+              <DetailRow
+                label="رصيد المحفظة"
+                value={formatCurrency(Number(selected.walletBalance))}
+                icon={CreditCard}
+                highlight
+              />
+              <DetailRow label="تاريخ الانضمام" value={formatDate(selected.createdAt)} icon={Clock} />
+              {selected.vendorCategories && selected.vendorCategories.length > 0 && (
+                <DetailRow
+                  label="التصنيفات"
+                  value={selected.vendorCategories.map((c) => c.category.name).join("، ")}
+                  icon={Store}
+                />
+              )}
+            </div>
+
+            {/* Actions Panel */}
+            <div className="pt-4 border-t border-slate-100 space-y-2">
+              <AdminButton
+                variant={selected.isVerified ? "soft" : "primary"}
+                size="md"
+                fullWidth
+                leadingIcon={selected.isVerified ? ShieldAlert : ShieldCheck}
+                isLoading={vendorActionLoading === (selected.isVerified ? "unverify" : "verify")}
+                onClick={() => handleAction(selected.id, selected.isVerified ? "unverify" : "verify")}
+              >
+                {selected.isVerified ? "إلغاء التوثيق" : "توثيق المتجر"}
+              </AdminButton>
+              <AdminButton
+                variant={selected.isActive ? "danger" : "success"}
+                size="md"
+                fullWidth
+                leadingIcon={selected.isActive ? Ban : CheckCircle2}
+                isLoading={vendorActionLoading === (selected.isActive ? "block" : "unblock")}
+                onClick={() => handleAction(selected.id, selected.isActive ? "block" : "unblock")}
+              >
+                {selected.isActive ? "إيقاف الحساب" : "تفعيل الحساب"}
+              </AdminButton>
+              <AdminButton variant="soft" size="md" fullWidth leadingIcon={ExternalLink}>
+                عرض سجل النشاط
+              </AdminButton>
+            </div>
+          </div>
+        )}
+      </DetailsDrawer>
 
       {/* Toast */}
       {toast && (
