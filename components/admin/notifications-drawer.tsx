@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import {
   FiBell, FiX, FiCheck, FiCheckCircle,
-  FiPackage, FiDollarSign, FiUser, FiAlertCircle,
-  FiTruck, FiRefreshCw, FiInfo
+  FiRefreshCw, FiExternalLink
 } from "react-icons/fi";
 import {
   listAllNotifications,
@@ -17,26 +17,7 @@ import { subscribeToSSE } from "@/lib/utils/sse-client";
 import type { ApiNotification } from "@/lib/types/api";
 import { useToast } from "@/components/providers/toast-provider";
 import { playNotificationSound } from "@/lib/utils/sounds";
-
-const TYPE_META: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
-  NEW_BID:          { icon: <FiPackage size={14} />,     color: "text-blue-600",    bg: "bg-blue-50" },
-  BID_ACCEPTED:     { icon: <FiCheckCircle size={14} />, color: "text-emerald-600", bg: "bg-emerald-50" },
-  BID_REJECTED:     { icon: <FiAlertCircle size={14} />, color: "text-rose-600",    bg: "bg-rose-50" },
-  PAYMENT:          { icon: <FiDollarSign size={14} />,  color: "text-violet-600",  bg: "bg-violet-50" },
-  WITHDRAWAL:       { icon: <FiDollarSign size={14} />,  color: "text-amber-600",   bg: "bg-amber-50" },
-  ORDER_ASSIGNED:   { icon: <FiTruck size={14} />,       color: "text-indigo-600",  bg: "bg-indigo-50" },
-  ORDER_DELIVERED:  { icon: <FiCheckCircle size={14} />, color: "text-emerald-600", bg: "bg-emerald-50" },
-  NEW_USER:         { icon: <FiUser size={14} />,        color: "text-slate-600",   bg: "bg-slate-100" },
-  DISPUTE_RAISED:   { icon: <FiAlertCircle size={14} />, color: "text-rose-500",    bg: "bg-rose-50" },
-  DISPUTE_RESOLVED: { icon: <FiCheckCircle size={14} />, color: "text-blue-600",    bg: "bg-blue-50" },
-  REQUEST_DISPATCHED: { icon: <FiPackage size={14} />,   color: "text-orange-600",  bg: "bg-orange-50" },
-  KYC_APPROVED:     { icon: <FiCheckCircle size={14} />, color: "text-emerald-600", bg: "bg-emerald-50" },
-  KYC_REJECTED:     { icon: <FiAlertCircle size={14} />, color: "text-rose-600",    bg: "bg-rose-50" },
-};
-
-function getTypeMeta(type: string) {
-  return TYPE_META[type] ?? { icon: <FiInfo size={14} />, color: "text-slate-500", bg: "bg-slate-100" };
-}
+import { getNotificationMeta } from "@/lib/utils/notifications-meta";
 
 interface Props {
   isOpen: boolean;
@@ -45,6 +26,7 @@ interface Props {
 }
 
 export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Props) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<ApiNotification[]>([]);
   const [loading, setLoading] = useState(false);
   const [markingAll, setMarkingAll] = useState(false);
@@ -99,16 +81,21 @@ export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Pr
     return () => document.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  async function handleMarkOne(id: number) {
+  async function handleMarkOne(id: number, route: string) {
     const notif = notifications.find((n) => n.id === id);
-    if (!notif || notif.isRead) return;
-    try {
-      await markNotificationRead("ADMIN", id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-      );
-    } catch {
-      // silent
+    if (notif && !notif.isRead) {
+      try {
+        await markNotificationRead("ADMIN", id);
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+        );
+      } catch {
+        // silent
+      }
+    }
+    if (route && route !== "/") {
+      router.push(route);
+      onClose();
     }
   }
 
@@ -131,7 +118,7 @@ export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Pr
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-black/30"
+        className="fixed inset-0 z-50 bg-black/30 animate-fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -139,7 +126,7 @@ export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Pr
       {/* Drawer — right side (RTL start side, near sidebar) */}
       <div
         ref={drawerRef}
-        className="fixed inset-y-0 right-0 z-50 w-[380px] max-w-[95vw] bg-white shadow-2xl flex flex-col"
+        className="fixed inset-y-0 right-0 z-50 w-[380px] max-w-[95vw] bg-white shadow-2xl flex flex-col animate-slide-in-right"
         dir="rtl"
       >
         {/* Header */}
@@ -199,11 +186,11 @@ export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Pr
           ) : (
             <div className="divide-y divide-slate-50">
               {notifications.map((n) => {
-                const meta = getTypeMeta(n.type);
+                const meta = getNotificationMeta(n.type, n.requestId, "ADMIN");
                 return (
                   <button
                     key={n.id}
-                    onClick={() => handleMarkOne(n.id)}
+                    onClick={() => handleMarkOne(n.id, meta.route)}
                     className={`w-full text-right px-5 py-4 flex gap-3 hover:bg-slate-50 transition-colors ${
                       !n.isRead ? "border-r-[3px] border-amber-400 bg-amber-50/30" : ""
                     }`}
@@ -215,21 +202,28 @@ export function NotificationsDrawer({ isOpen, onClose, onUnreadCountChange }: Pr
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm leading-snug ${!n.isRead ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`}>
-                        {n.title}
-                      </p>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <p className={`text-sm leading-snug ${!n.isRead ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`}>
+                          {n.title}
+                        </p>
+                        {!n.isRead && (
+                          <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        )}
+                      </div>
                       <p className={`text-xs mt-0.5 leading-relaxed ${!n.isRead ? "text-slate-600" : "text-slate-400"}`}>
                         {n.message}
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-1.5">
-                        {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: ar })}
-                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-[11px] text-slate-400">
+                          {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: ar })}
+                        </p>
+                        {meta.route && meta.route !== "/" && (
+                          <span className="text-[10px] font-bold text-primary hover:text-orange-600 flex items-center gap-0.5">
+                            {meta.action} <FiExternalLink size={10} />
+                          </span>
+                        )}
+                      </div>
                     </div>
-
-                    {/* Unread dot */}
-                    {!n.isRead && (
-                      <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0 mt-2" />
-                    )}
                   </button>
                 );
               })}

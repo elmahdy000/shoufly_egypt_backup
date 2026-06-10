@@ -110,6 +110,7 @@ export type ApiNotification = {
   message: string;
   isRead: boolean;
   createdAt: string;
+  requestId?: number | null;
 };
 
 export type ApiWithdrawal = {

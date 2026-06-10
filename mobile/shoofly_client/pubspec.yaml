@@ -33,6 +33,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   shoofly_core:
     path: ../shoofly_core
+  dartz: ^0.10.1
   flutter_bloc: ^9.1.0
   equatable: ^2.0.5
   get_it: ^8.0.3

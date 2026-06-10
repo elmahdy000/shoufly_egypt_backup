@@ -41,7 +41,7 @@ abstract class RequestsMapState extends Equatable {
 
   const RequestsMapState({
     this.markers = const {},
-    this.currentLocation = const LatLng(30.0444, 31.2357),
+    this.currentLocation = const LatLng(30.5877, 31.5020),
     this.isInitialLoading = false,
   });
 
@@ -157,8 +157,6 @@ class RequestsMapCubit extends Cubit<RequestsMapState> {
   void onMapCreated(GoogleMapController controller) {
     _mapController = controller;
     _isMapCreated = true;
-    // Apply Talabat-style map theme
-    controller.setMapStyle(kTalabatMapStyle);
   }
 
   Future<void> loadRequestsForMap({bool isRefresh = false}) async {
@@ -334,7 +332,7 @@ class RequestsMapCubit extends Cubit<RequestsMapState> {
             ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)
             : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         onTap: () => selectRequest(r),
-        zIndex: isSelected ? 1.0 : 0.0,
+        zIndexInt: isSelected ? 1 : 0,
       );
     }).toSet();
   }

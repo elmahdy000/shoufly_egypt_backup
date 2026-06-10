@@ -144,8 +144,9 @@ class _SubmitBidModalState extends State<SubmitBidModal> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildQuickTemplates() {
     final templates = [

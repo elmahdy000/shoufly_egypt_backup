@@ -16,7 +16,7 @@ abstract class VendorRequestsMapState extends Equatable {
 
   const VendorRequestsMapState({
     this.markers = const {},
-    this.currentLocation = const LatLng(30.0444, 31.2357),
+    this.currentLocation = const LatLng(30.5877, 31.5020),
     this.isLoading = false,
     this.error,
   });
@@ -196,8 +196,8 @@ class VendorRequestsMapCubit extends Cubit<VendorRequestsMapState> {
     // Fallback: cluster requests without coords around Cairo center with tiny offsets
     // so the map is never empty when there ARE requests
     if (withCoords.isEmpty && withoutCoords.isNotEmpty) {
-      const baseLat = 30.0444;
-      const baseLng = 31.2357;
+      const baseLat = 30.5877;
+      const baseLng = 31.5020;
       final rng = math.Random(42); // fixed seed → stable positions
       for (int i = 0; i < withoutCoords.length; i++) {
         final r = withoutCoords[i];

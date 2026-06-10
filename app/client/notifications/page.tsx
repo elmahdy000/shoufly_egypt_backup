@@ -8,206 +8,19 @@ import { useNotificationsStream } from "@/lib/hooks/use-notifications-stream";
 import { 
   FiBell, 
   FiCheckCircle, 
-  FiInfo, 
   FiArrowRight, 
   FiCheck,
   FiDollarSign,
   FiPackage,
   FiTruck,
-  FiStar,
   FiAlertCircle,
-  FiMessageSquare,
-  FiCheckSquare,
-  FiXCircle,
-  FiClock,
   FiExternalLink,
   FiChevronLeft,
-  FiCalendar
+  FiCalendar,
+  FiClock
 } from "react-icons/fi";
 
-// Notification type config with enhanced icons and colors
-const notificationConfig: Record<string, { 
-  icon: React.ElementType; 
-  bg: string; 
-  text: string; 
-  border: string;
-  label: string;
-  description: string;
-  action: string;
-  route?: (id?: number) => string;
-}> = {
-  'NEW_BID': { 
-    icon: FiDollarSign, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'عرض سعر جديد',
-    description: 'تاجر أرسل عرض سعر لطلبك',
-    action: 'عرض العرض',
-    route: (id) => `/client/offers/request/${id}`
-  },
-  'BID_ACCEPTED': { 
-    icon: FiCheckSquare, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تم قبول العرض',
-    description: 'تم قبول عرضك بنجاح',
-    action: 'عرض التفاصيل',
-    route: (id) => `/client/requests/${id}`
-  },
-  'REQUEST_CREATED': { 
-    icon: FiPackage, 
-    bg: 'bg-blue-50', 
-    text: 'text-blue-600',
-    border: 'border-blue-200',
-    label: 'طلب جديد',
-    description: 'تم إنشاء طلبك بنجاح',
-    action: 'تتبع الطلب',
-    route: (id) => `/client/requests/${id}`
-  },
-  'REQUEST_COMPLETED': { 
-    icon: FiCheckCircle, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تم إكمال الطلب',
-    description: 'تم توصيل طلبك بنجاح',
-    action: 'تقييم التجربة',
-    route: (id) => `/client/requests/${id}`
-  },
-  'REQUEST_CANCELLED': { 
-    icon: FiXCircle, 
-    bg: 'bg-rose-50', 
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    label: 'تم إلغاء الطلب',
-    description: 'تم إلغاء طلبك',
-    action: 'عرض التفاصيل',
-    route: (id) => `/client/requests/${id}`
-  },
-  'DELIVERY_ASSIGNED': { 
-    icon: FiTruck, 
-    bg: 'bg-amber-50', 
-    text: 'text-amber-600',
-    border: 'border-amber-200',
-    label: 'تم تعيين مندوب',
-    description: 'تم تعيين مندوب لتوصيل طلبك',
-    action: 'تتبع المندوب',
-    route: (id) => `/client/requests/${id}`
-  },
-  'DELIVERY_PICKED_UP': { 
-    icon: FiTruck, 
-    bg: 'bg-amber-50', 
-    text: 'text-amber-600',
-    border: 'border-amber-200',
-    label: 'تم استلام الطلب',
-    description: 'المندوب استلم طلبك',
-    action: 'تتبع المندوب',
-    route: (id) => `/client/requests/${id}`
-  },
-  'DELIVERY_DELIVERED': { 
-    icon: FiCheckCircle, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تم التوصيل',
-    description: 'تم توصيل طلبك بنجاح',
-    action: 'تأكيد الاستلام',
-    route: (id) => `/client/requests/${id}`
-  },
-  'NEW_MESSAGE': { 
-    icon: FiMessageSquare, 
-    bg: 'bg-indigo-50', 
-    text: 'text-indigo-600',
-    border: 'border-indigo-200',
-    label: 'رسالة جديدة',
-    description: 'لديك رسالة جديدة',
-    action: 'قراءة الرسالة',
-    route: () => `/messages`
-  },
-  'PAYMENT_RECEIVED': { 
-    icon: FiDollarSign, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تم استلام الدفع',
-    description: 'تم استلام دفعتك بنجاح',
-    action: 'عرض الإيصال',
-    route: (id) => `/client/requests/${id}`
-  },
-  'PAYMENT_FAILED': { 
-    icon: FiAlertCircle, 
-    bg: 'bg-rose-50', 
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    label: 'فشل الدفع',
-    description: 'حدث خطأ أثناء معالجة الدفع',
-    action: 'إعادة المحاولة',
-    route: (id) => `/client/requests/${id}`
-  },
-  'WALLET_TOPUP': { 
-    icon: FiDollarSign, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'شحن محفظة',
-    description: 'تم شحن رصيد محفظتك',
-    action: 'عرض المحفظة',
-    route: () => `/client/wallet`
-  },
-  'REVIEW_REQUEST': { 
-    icon: FiStar, 
-    bg: 'bg-yellow-50', 
-    text: 'text-yellow-600',
-    border: 'border-yellow-200',
-    label: 'طلب تقييم',
-    description: 'ساعدنا بتقييم تجربتك',
-    action: 'إضافة تقييم',
-    route: (id) => `/client/requests/${id}`
-  },
-  'REQUEST_REJECTED': {
-    icon: FiXCircle,
-    bg: 'bg-rose-50',
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    label: 'تم رفض طلبك',
-    description: 'تم رفض طلبك من قبل نظام التدقيق آلياً',
-    action: 'عرض الأسباب',
-    route: (id) => `/client/requests/${id}`
-  },
-  'REQUEST_NEEDS_REVISION': {
-    icon: FiAlertCircle,
-    bg: 'bg-amber-50',
-    text: 'text-amber-600',
-    border: 'border-amber-200',
-    label: 'مراجعة مطلوبة',
-    description: 'طلبك يحتاج لمراجعة إضافية من الإدارة',
-    action: 'عرض التفاصيل',
-    route: (id) => `/client/requests/${id}`
-  },
-  'SYSTEM': { 
-    icon: FiInfo, 
-    bg: 'bg-slate-50', 
-    text: 'text-slate-600',
-    border: 'border-slate-200',
-    label: 'إشعار نظام',
-    description: 'تحديثات وإشعارات مهمة',
-    action: 'عرض التفاصيل',
-  },
-};
-
-function getNotificationConfig(type: string) {
-  return notificationConfig[type] || { 
-    icon: FiBell, 
-    bg: 'bg-slate-50', 
-    text: 'text-slate-600',
-    border: 'border-slate-200',
-    label: type.split('_').join(' ').toLowerCase(),
-    description: 'إشعار جديد',
-    action: 'عرض التفاصيل',
-  };
-}
+import { getNotificationMeta } from "@/lib/utils/notifications-meta";
 
 type FilterType = 'all' | 'unread' | 'orders' | 'financial' | 'delivery';
 
@@ -242,7 +55,7 @@ export default function ClientNotificationsPage() {
 
   // Group notifications by local date (stable ISO key, formatted in ar-EG)
   const groupedNotifications = useMemo(() => {
-    return filteredNotifications.reduce((groups: Record<string, { createdAt: string }[]>, item: { createdAt: string }) => {
+    return filteredNotifications.reduce((groups: Record<string, { createdAt: string; type: string; id: number; message: string; isRead: boolean; requestId?: number }[]>, item: any) => {
       const d = new Date(item.createdAt);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       if (!groups[key]) groups[key] = [];
@@ -373,15 +186,15 @@ export default function ClientNotificationsPage() {
         {!loading && !error && (filteredNotifications?.length ?? 0) === 0 && (
           <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center shadow-sm">
              <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300">
-               <FiCheckCircle size={48} />
+                <FiCheckCircle size={48} />
              </div>
              <h3 className="text-xl font-bold text-slate-900 mb-2">
-               {filter === 'unread' ? 'لا توجد إشعارات جديدة' : 'لا توجد إشعارات'}
+                {filter === 'unread' ? 'لا توجد إشعارات جديدة' : 'لا توجد إشعارات'}
              </h3>
              <p className="text-sm text-slate-500 max-w-sm mx-auto">
-               {filter === 'unread' 
-                 ? 'تم قراءة جميع إشعاراتك. ستظهر هنا الإشعارات الجديدة فور وصولها'
-                 : 'ستظهر هنا جميع إشعاراتك المتعلقة بالطلبات والعروض والمدفوعات'}
+                {filter === 'unread' 
+                  ? 'تم قراءة جميع إشعاراتك. ستظهر هنا الإشعارات الجديدة فور وصولها'
+                  : 'ستظهر هنا جميع إشعاراتك المتعلقة بالطلبات والعروض والمدفوعات'}
              </p>
           </div>
         )}
@@ -392,102 +205,99 @@ export default function ClientNotificationsPage() {
             const [y, m, d] = dateKey.split('-').map(Number);
             const headerDate = new Date(y, m - 1, d);
             return (
-            <div key={dateKey} className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 flex items-center gap-2">
-                <FiCalendar size={14} />
-                {headerDate.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </h3>
-              
-              <div className="space-y-3">
-                {items.map((item: any) => {  
-                  const isUnread = !item.isRead;
-                  const config = getNotificationConfig(item.type);
-                  const Icon = config.icon;
-                  const notificationRoute = config.route?.(item.requestId);
-                  
-                  const handleClick = () => {
-                    if (isUnread) markRead(item.id);
-                  };
-                  
-                  const NotificationCard = (
-                    <div 
-                      className={`relative text-right rounded-2xl p-5 transition-all border-2 group ${
-                        isUnread 
-                          ? `bg-white ${config.border} shadow-sm hover:shadow-md` 
-                          : 'bg-white/50 border-slate-100 hover:bg-white hover:border-slate-200'
-                      }`}
-                    >
-                      {/* Unread indicator */}
-                      {isUnread && (
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                          <span className="w-2.5 h-2.5 bg-rose-500 rounded-full block" />
-                        </div>
-                      )}
-                      
-                      <div className={`flex items-start gap-4 ${isUnread ? 'pl-8' : ''}`}>
-                        {/* Icon */}
-                        <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${config.bg} ${config.text} border-2 border-white shadow-sm`}>
-                          <Icon size={22} />
-                        </div>
+              <div key={dateKey} className="space-y-4">
+                <h3 className="text-sm font-bold text-slate-400 flex items-center gap-2">
+                  <FiCalendar size={14} />
+                  {headerDate.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </h3>
+                
+                <div className="space-y-3">
+                  {items.map((item: any) => {  
+                    const isUnread = !item.isRead;
+                    const meta = getNotificationMeta(item.type, item.requestId, "CLIENT");
+                    
+                    const handleClick = () => {
+                      if (isUnread) markRead(item.id);
+                    };
+                    
+                    const NotificationCard = (
+                      <div 
+                        className={`relative text-right rounded-2xl p-5 transition-all border-2 group ${
+                          isUnread 
+                            ? `bg-white ${meta.border} shadow-sm hover:shadow-md` 
+                            : 'bg-white/50 border-slate-100 hover:bg-white hover:border-slate-200'
+                        }`}
+                      >
+                        {/* Unread indicator */}
+                        {isUnread && (
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                            <span className="w-2.5 h-2.5 bg-rose-500 rounded-full block" />
+                          </div>
+                        )}
                         
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-3 mb-2">
-                            <div className="flex items-center gap-2">
-                              <p className={`text-sm font-bold ${isUnread ? 'text-slate-900' : 'text-slate-700'}`}>
-                                {config.label}
-                              </p>
-                              {isUnread && (
-                                <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[10px] font-bold rounded-full">
-                                  جديد
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-xs text-slate-400 shrink-0 flex items-center gap-1">
-                              <FiClock size={12} />
-                              {formatDate(item.createdAt)}
-                            </span>
+                        <div className={`flex items-start gap-4 ${isUnread ? 'pl-8' : ''}`}>
+                          {/* Icon */}
+                          <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${meta.bg} ${meta.color} border-2 border-white shadow-sm`}>
+                            <span className="scale-125">{meta.icon}</span>
                           </div>
                           
-                          <p className={`text-sm leading-relaxed mb-3 ${isUnread ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
-                            {item.message}
-                          </p>
-                          
-                          {/* Action button */}
-                          <div className="flex items-center justify-between">
-                            <span className={`text-xs font-bold flex items-center gap-1.5 ${isUnread ? 'text-primary' : 'text-slate-400'}`}>
-                              {config.action}
-                              <FiExternalLink size={12} />
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-3 mb-2">
+                              <div className="flex items-center gap-2">
+                                <p className={`text-sm font-bold ${isUnread ? 'text-slate-900' : 'text-slate-700'}`}>
+                                  {meta.label}
+                                </p>
+                                {isUnread && (
+                                  <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[10px] font-bold rounded-full">
+                                    جديد
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-xs text-slate-400 shrink-0 flex items-center gap-1">
+                                <FiClock size={12} />
+                                {formatDate(item.createdAt)}
+                              </span>
+                            </div>
                             
-                            <FiChevronLeft size={18} className={`transition-colors ${isUnread ? 'text-primary' : 'text-slate-300'}`} />
+                            <p className={`text-sm leading-relaxed mb-3 ${isUnread ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
+                              {item.message}
+                            </p>
+                            
+                            {/* Action button */}
+                            <div className="flex items-center justify-between">
+                              <span className={`text-xs font-bold flex items-center gap-1.5 ${isUnread ? 'text-primary' : 'text-slate-400'}`}>
+                                {meta.action}
+                                <FiExternalLink size={12} />
+                              </span>
+                              
+                              <FiChevronLeft size={18} className={`transition-colors ${isUnread ? 'text-primary' : 'text-slate-300'}`} />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                
-                return notificationRoute ? (
-                    <Link 
-                      key={item.id} 
-                      href={notificationRoute}
-                      onClick={handleClick}
-                      className="block cursor-pointer"
-                    >
-                      {NotificationCard}
-                    </Link>
-                   ) : (
-                    <div key={item.id} onClick={handleClick} className="cursor-pointer">
-                      {NotificationCard}
-                    </div>
-                  );
-                })}
+                    );
+                  
+                    return meta.route && meta.route !== "/" ? (
+                      <Link 
+                        key={item.id} 
+                        href={meta.route}
+                        onClick={handleClick}
+                        className="block cursor-pointer"
+                      >
+                        {NotificationCard}
+                      </Link>
+                    ) : (
+                      <div key={item.id} onClick={handleClick} className="cursor-pointer">
+                        {NotificationCard}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
             );
           })}
         </div>
       </div>
-
     </div>
   );
 }

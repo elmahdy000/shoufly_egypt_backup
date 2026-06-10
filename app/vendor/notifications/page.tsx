@@ -9,116 +9,17 @@ import { useNotificationsStream } from "@/lib/hooks/use-notifications-stream";
 import { 
   FiBell, 
   FiCheckCircle, 
-  FiInfo, 
   FiArrowRight, 
   FiCheck,
   FiDollarSign,
   FiPackage,
-  FiTrendingUp,
-  FiAlertCircle,
-  FiMessageSquare,
   FiClock,
   FiExternalLink,
   FiChevronLeft,
-  FiCalendar,
-  FiZap,
-  FiFilter
+  FiCalendar
 } from "react-icons/fi";
 
-// Enhanced Notification type config for Vendor
-const notificationConfig: Record<string, { 
-  icon: React.ElementType; 
-  bg: string; 
-  text: string; 
-  border: string;
-  label: string;
-  description: string;
-  action: string;
-  route?: (id?: number) => string;
-}> = {
-  'NEW_REQUEST': { 
-    icon: FiZap, 
-    bg: 'bg-orange-50', 
-    text: 'text-primary',
-    border: 'border-primary/20',
-    label: 'فرصة عمل جديدة',
-    description: 'تمت الموافقة على طلب جديد في منطقتك',
-    action: 'تقديم عرض سعر',
-    route: (id) => `/vendor/requests/${id}`
-  },
-  'BID_ACCEPTED': { 
-    icon: FiCheckCircle, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'مبروك! تم قبول عرضك',
-    description: 'قام العميل بقبول عرض السعر الخاص بك',
-    action: 'بدء التنفيذ',
-    route: (id) => `/vendor/requests/${id}`
-  },
-  'PAYMENT_RECEIVED': { 
-    icon: FiDollarSign, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تم استلام دفعة',
-    description: 'تم إضافة مبلغ إلى محفظتك بنجاح',
-    action: 'عرض المحفظة',
-    route: () => `/vendor/earnings`
-  },
-  'DISPUTE_RAISED': { 
-    icon: FiAlertCircle, 
-    bg: 'bg-rose-50', 
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    label: 'نزاع مفتوح',
-    description: 'قام العميل بفتح نزاع بخصوص هذا الطلب',
-    action: 'مراجعة النزاع',
-    route: (id) => `/vendor/requests/${id}`
-  },
-  'DISPUTE_RESOLVED': { 
-    icon: FiCheckCircle, 
-    bg: 'bg-blue-50', 
-    text: 'text-blue-600',
-    border: 'border-blue-200',
-    label: 'تم إغلاق النزاع',
-    description: 'تم الفصل في النزاع وإغلاق الطلب',
-    action: 'عرض النتيجة',
-    route: (id) => `/vendor/requests/${id}`
-  },
-  'WITHDRAWAL_APPROVED': { 
-    icon: FiTrendingUp, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تمت الموافقة على السحب',
-    description: 'تمت الموافقة على طلب سحب رصيدك',
-    action: 'عرض الأرباح',
-    route: () => `/vendor/earnings`
-  },
-  'NEW_MESSAGE': { 
-    icon: FiMessageSquare, 
-    bg: 'bg-indigo-50', 
-    text: 'text-indigo-600',
-    border: 'border-indigo-200',
-    label: 'رسالة جديدة',
-    description: 'لديك رسالة جديدة من العميل',
-    action: 'فتح المحادثة',
-    route: (id) => `/vendor/chat/${id}`
-  }
-};
-
-function getNotificationConfig(type: string) {
-  return notificationConfig[type] || { 
-    icon: FiBell, 
-    bg: 'bg-slate-50', 
-    text: 'text-slate-600',
-    border: 'border-slate-200',
-    label: 'تنبيه جديد',
-    description: 'إشعار من منصة شوفلي',
-    action: 'عرض التفاصيل',
-  };
-}
+import { getNotificationMeta } from "@/lib/utils/notifications-meta";
 
 type FilterType = 'all' | 'unread' | 'requests' | 'earnings';
 
@@ -213,9 +114,9 @@ export default function VendorNotificationsPage() {
                 {tab.icon && <tab.icon size={14} />}
                 {tab.label}
                 {tab.count !== undefined && (
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-md ${filter === tab.id ? 'bg-white/20' : 'bg-slate-100 text-slate-400'}`}>
-                        {tab.count}
-                    </span>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded-md ${filter === tab.id ? 'bg-white/20' : 'bg-slate-100 text-slate-400'}`}>
+                    {tab.count}
+                  </span>
                 )}
               </button>
             ))}
@@ -237,7 +138,7 @@ export default function VendorNotificationsPage() {
         {!loading && filteredNotifications.length === 0 && (
           <div className="bg-white rounded-[32px] border border-slate-200 p-20 text-center shadow-sm">
              <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-slate-200 shadow-inner">
-               <FiCheckCircle size={56} />
+                <FiCheckCircle size={56} />
              </div>
              <h3 className="text-xl font-black text-slate-900 mb-2">السجل نظيف تماماً!</h3>
              <p className="text-sm text-slate-500 max-w-xs mx-auto font-medium">أنت مطلع على جميع تحديثات أعمالك. سيظهر أي جديد هنا فوراً.</p>
@@ -258,15 +159,13 @@ export default function VendorNotificationsPage() {
               
               <div className="space-y-3">
                 {items.map((item: any) => {
-                  const config = getNotificationConfig(item.type);
-                  const Icon = config.icon;
+                  const meta = getNotificationMeta(item.type, item.requestId, "VENDOR");
                   const isUnread = !item.isRead;
-                  const route = config.route?.(item.requestId);
 
                   const CardContent = (
                     <div className={`relative group rounded-[2rem] p-6 transition-all duration-300 border-2 ${
                       isUnread 
-                        ? `bg-white ${config.border} shadow-md shadow-slate-200/50 hover:shadow-xl cursor-pointer` 
+                        ? `bg-white ${meta.border} shadow-md shadow-slate-200/50 hover:shadow-xl cursor-pointer` 
                         : 'bg-white/40 border-slate-100 opacity-80 hover:bg-white hover:opacity-100 cursor-pointer'
                     }`}>
                       {isUnread && (
@@ -276,13 +175,13 @@ export default function VendorNotificationsPage() {
                       )}
                       
                       <div className={`flex items-start gap-5 ${isUnread ? 'pl-10' : ''}`}>
-                        <div className={`shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center ${config.bg} ${config.text} border-2 border-white shadow-sm transition-transform group-hover:scale-110`}>
-                          <Icon size={24} />
+                        <div className={`shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center ${meta.bg} ${meta.color} border-2 border-white shadow-sm transition-transform group-hover:scale-110`}>
+                          <span className="scale-125">{meta.icon}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                                <p className={`text-sm font-black ${isUnread ? 'text-slate-900' : 'text-slate-600'}`}>{config.label}</p>
+                                <p className={`text-sm font-black ${isUnread ? 'text-slate-900' : 'text-slate-600'}`}>{meta.label}</p>
                                 {isUnread && (
                                     <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[9px] font-black rounded-md">جديد</span>
                                 )}
@@ -295,7 +194,7 @@ export default function VendorNotificationsPage() {
                           
                           <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                             <span className={`text-[11px] font-black flex items-center gap-1.5 ${isUnread ? 'text-primary' : 'text-slate-400'}`}>
-                              {config.action} <FiExternalLink size={12} />
+                              {meta.action} <FiExternalLink size={12} />
                             </span>
                             <FiChevronLeft size={20} className={`transition-transform group-hover:translate-x-1 ${isUnread ? 'text-primary' : 'text-slate-300'}`} />
                           </div>
@@ -304,10 +203,10 @@ export default function VendorNotificationsPage() {
                     </div>
                   );
 
-                  return route ? (
+                  return meta.route && meta.route !== "/" ? (
                     <Link 
                       key={item.id} 
-                      href={route}
+                      href={meta.route}
                       onClick={() => isUnread && markRead(item.id)}
                       className="block"
                     >

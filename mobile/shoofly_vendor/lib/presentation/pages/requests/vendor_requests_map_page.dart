@@ -224,8 +224,8 @@ class _MapLayer extends StatefulWidget {
 class _MapLayerState extends State<_MapLayer> {
   GoogleMapController? _controller;
   Set<Marker> _currentMarkers = {};
-  static const _cairo = LatLng(30.0444, 31.2357);
-  LatLng _lastAnimatedLoc = _cairo;
+  static const _zagazig = LatLng(30.5877, 31.5020);
+  LatLng _lastAnimatedLoc = _zagazig;
 
   @override
   void dispose() {
@@ -244,7 +244,7 @@ class _MapLayerState extends State<_MapLayer> {
         setState(() => _currentMarkers = state.markers);
 
         // 🚀 Optimization: Only animate camera if position changed significantly (> 50m approx)
-        if (_controller != null && state.currentLocation != _cairo) {
+        if (_controller != null && state.currentLocation != _zagazig) {
           final latDiff = (state.currentLocation.latitude - _lastAnimatedLoc.latitude).abs();
           final lngDiff = (state.currentLocation.longitude - _lastAnimatedLoc.longitude).abs();
           
@@ -258,7 +258,7 @@ class _MapLayerState extends State<_MapLayer> {
       },
       child: GoogleMap(
         initialCameraPosition: const CameraPosition(
-          target: _cairo,
+          target: _zagazig,
           zoom: 12,
         ),
         markers: _currentMarkers,

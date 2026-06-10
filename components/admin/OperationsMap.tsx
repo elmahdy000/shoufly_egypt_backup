@@ -49,12 +49,14 @@ export function OperationsMap({ data, selectedOrder }: { data: MapObject[]; sele
   const [selected, setSelected] = useState<MapObject | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [directionsError, setDirectionsError] = useState<string | null>(null);
 
   const loaded = isLoadedState(isLoaded);
 
   useEffect(() => {
     if (!selectedOrder || typeof window === 'undefined' || !window.google || !window.google.maps) {
       setDirections(null);
+      setDirectionsError(null);
       return;
     }
 
@@ -67,6 +69,7 @@ export function OperationsMap({ data, selectedOrder }: { data: MapObject[]; sele
 
     if (!isFinite(vendorLat) || !isFinite(vendorLng) || !isFinite(clientLat) || !isFinite(clientLng)) {
       setDirections(null);
+      setDirectionsError(null);
       return;
     }
 
@@ -96,9 +99,15 @@ export function OperationsMap({ data, selectedOrder }: { data: MapObject[]; sele
       (result, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
           setDirections(result);
+          setDirectionsError(null);
         } else {
-          console.error(`Directions request failed: ${status}`);
+          console.warn(`Directions request failed: ${status}. Using straight-line fallback.`);
           setDirections(null);
+          if (status === 'REQUEST_DENIED') {
+            setDirectionsError('Google Maps Directions require billing. Showing straight-line routes.');
+          } else {
+            setDirectionsError(`Routing unavailable (${status}). Showing straight-line routes.`);
+          }
         }
       }
     );
@@ -404,9 +413,19 @@ export function OperationsMap({ data, selectedOrder }: { data: MapObject[]; sele
 
       {/* Route info indicator */}
       {hasSelectedOrder && (
-        <div className="absolute bottom-3 left-3 z-10 bg-white/90 backdrop-blur px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm text-[9px] font-bold text-slate-500 flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-          عرض مسار الطلب #{selectedOrder.id}
+        <div className="absolute bottom-3 left-3 z-10 flex flex-col gap-1.5 items-start">
+          <div className="bg-white/90 backdrop-blur px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm text-[9px] font-bold text-slate-500 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+            عرض مسار الطلب #{selectedOrder.id}
+          </div>
+          {directionsError && (
+            <div className="bg-amber-50/95 border border-amber-200 text-amber-800 backdrop-blur px-2.5 py-1.5 rounded-lg shadow-sm text-[9px] font-bold flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              {directionsError === 'Google Maps Directions require billing. Showing straight-line routes.' 
+                ? 'مفتاح الخريطة بحاجة لتفعيل الدفع (Billing). تم إظهار مسار خطي تقريبي.' 
+                : directionsError}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -54,7 +54,6 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage>
     if (!_controller.isCompleted) {
       _controller.complete(controller);
     }
-    await controller.setMapStyle(kTalabatMapStyle);
   }
 
   void _updateMapElements(LatLng deliveryPos, LatLng destinationPos) {

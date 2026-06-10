@@ -88,6 +88,7 @@ class _MapLayer extends StatelessWidget {
         prev.currentLocation != curr.currentLocation,
       builder: (context, state) {
         return GoogleMap(
+          style: kTalabatMapStyle,
           initialCameraPosition: CameraPosition(
             target: state.currentLocation,
             zoom: 12,

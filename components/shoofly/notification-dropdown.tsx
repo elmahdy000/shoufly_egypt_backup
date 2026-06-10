@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { FiBell, FiCheckCircle, FiInfo, FiAlertCircle, FiSettings, FiTrash2, FiExternalLink } from "react-icons/fi";
+import { FiBell, FiCheckCircle, FiExternalLink } from "react-icons/fi";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import Link from "next/link";
@@ -11,8 +11,8 @@ import { markAllNotificationsRead } from "@/lib/api/notifications";
 import { subscribeToSSE } from "@/lib/utils/sse-client";
 import { useToast } from "@/components/providers/toast-provider";
 import { playNotificationSound } from "@/lib/utils/sounds";
+import { getNotificationMeta, type UserRole } from "@/lib/utils/notifications-meta";
 
-// Types based on Prisma
 type Notification = {
   id: number;
   type: string;
@@ -23,8 +23,6 @@ type Notification = {
   requestId?: number;
 };
 
-type UserRole = "CLIENT" | "VENDOR" | "ADMIN" | "DELIVERY";
-
 function detectUserRoleFromPath(): UserRole {
   if (typeof window === "undefined") return "CLIENT";
   const path = window.location.pathname;
@@ -32,16 +30,6 @@ function detectUserRoleFromPath(): UserRole {
   if (path.startsWith("/delivery")) return "DELIVERY";
   if (path.startsWith("/vendor")) return "VENDOR";
   return "CLIENT";
-}
-
-function getRequestLink(role: UserRole | null, requestId: number): string {
-  if (!role) return `/client/requests/${requestId}`;
-  switch (role) {
-    case "ADMIN": return `/admin/requests/${requestId}`;
-    case "VENDOR": return `/vendor/requests/${requestId}`;
-    case "DELIVERY": return `/delivery/requests/${requestId}`;
-    default: return `/client/requests/${requestId}`;
-  }
 }
 
 function getNotificationsLink(role: UserRole | null): string {
@@ -57,14 +45,14 @@ function getNotificationsLink(role: UserRole | null): string {
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [userRole] = useState<UserRole>(detectUserRoleFromPath);
-    const { toast } = useToast();
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const { data: notifications, refresh, loading } = useAsyncData<Notification[]>(
-      () => apiFetch("/api/notifications", userRole || "CLIENT"), 
-      [userRole]
-    );
+  const { toast } = useToast();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { data: notifications, refresh, loading } = useAsyncData<Notification[]>(
+    () => apiFetch("/api/notifications", userRole || "CLIENT"), 
+    [userRole]
+  );
 
-    const unreadCount = (notifications ?? []).filter(n => !n.isRead).length;
+  const unreadCount = (notifications ?? []).filter(n => !n.isRead).length;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -164,54 +152,46 @@ export function NotificationDropdown() {
                  <p className="text-slate-400 text-sm">لا توجد إشعارات</p>
               </div>
             ) : (
-              notifications?.map((n) => (
-                <div 
-                  key={n.id} 
-                  className={`p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer relative group ${!n.isRead ? 'bg-orange-50/30' : ''}`}
-                  onClick={() => !n.isRead && markAsRead(n.id)}
-                >
-                  {!n.isRead && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full" />}
-                  <div className={`flex gap-3 ${!n.isRead ? 'pr-4' : ''}`}>
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                      n.type === 'BID_ACCEPTED' || n.type === 'DISPUTE_RESOLVED' || n.type === 'KYC_APPROVED' ? 'bg-emerald-100 text-emerald-600' :
-                      n.type === 'DISPUTE_RAISED' || n.type === 'PAYMENT_FAILED' || n.type === 'KYC_REJECTED' ? 'bg-rose-100 text-rose-600' :
-                      n.type === 'NEW_BID' || n.type === 'NEW_REQUEST' ? 'bg-blue-100 text-blue-600' :
-                      n.type === 'DELIVERY_UPDATE' ? 'bg-indigo-100 text-indigo-600' :
-                      'bg-orange-100 text-orange-600'
-                    }`}>
-                      {n.type === 'BID_ACCEPTED' || n.type === 'DISPUTE_RESOLVED' || n.type === 'KYC_APPROVED' ? <FiCheckCircle size={16} /> : 
-                       n.type === 'DISPUTE_RAISED' || n.type === 'KYC_REJECTED' ? <FiAlertCircle size={16} /> :
-                       n.type === 'PAYMENT_FAILED' ? <FiTrash2 size={16} /> :
-                       <FiInfo size={16} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className={`text-sm font-semibold leading-tight truncate ${n.isRead ? 'text-slate-600' : 'text-slate-900'}`}>
-                        {n.title}
-                      </h4>
-                      <p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-                        {n.message}
-                      </p>
-                      <div className="flex items-center justify-between pt-1.5">
-                         <span className="text-[10px] text-slate-400">
-                           {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: ar })}
-                         </span>
-                         {n.requestId && (
-                           <Link 
-                             href={getRequestLink(userRole, n.requestId)} 
-                             className="text-[10px] font-medium text-primary hover:text-orange-600 flex items-center gap-0.5"
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               setIsOpen(false);
-                             }}
-                           >
-                             عرض <FiExternalLink size={10} />
-                           </Link>
-                         )}
+              (notifications ?? []).map((n) => {
+                const meta = getNotificationMeta(n.type, n.requestId, userRole);
+                return (
+                  <div 
+                    key={n.id} 
+                    className={`p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer relative group ${!n.isRead ? 'bg-orange-50/30' : ''}`}
+                    onClick={() => !n.isRead && markAsRead(n.id)}
+                  >
+                    {!n.isRead && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full" />}
+                    <div className={`flex gap-3 ${!n.isRead ? 'pr-4' : ''}`}>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color}`}>
+                        {meta.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className={`text-sm font-semibold leading-tight truncate ${n.isRead ? 'text-slate-600' : 'text-slate-900'}`}>
+                          {n.title}
+                        </h4>
+                        <p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
+                          {n.message}
+                        </p>
+                        <div className="flex items-center justify-between pt-1.5">
+                          <span className="text-[10px] text-slate-400">
+                            {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: ar })}
+                          </span>
+                          <Link 
+                            href={meta.route} 
+                            className="text-[10px] font-medium text-primary hover:text-orange-600 flex items-center gap-0.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsOpen(false);
+                            }}
+                          >
+                            {meta.action} <FiExternalLink size={10} />
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 

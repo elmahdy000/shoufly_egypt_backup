@@ -37,7 +37,7 @@ class MapPickerPage extends StatefulWidget {
 
 class _MapPickerPageState extends State<MapPickerPage>
     with SingleTickerProviderStateMixin {
-  static const LatLng _cairoFallback = LatLng(30.0444, 31.2357);
+  static const LatLng _zagazigFallback = LatLng(30.5877, 31.5020);
 
   // Talabat-style clean bright map
   static const String _talabatMapStyle = '''
@@ -70,7 +70,7 @@ class _MapPickerPageState extends State<MapPickerPage>
 ''';
 
   final Completer<GoogleMapController> _controller = Completer();
-  LatLng _selectedLocation = _cairoFallback;
+  LatLng _selectedLocation = _zagazigFallback;
   LatLng? _lastResolvedLocation;
 
   // Address parts — displayed separately like Talabat
@@ -95,9 +95,6 @@ class _MapPickerPageState extends State<MapPickerPage>
   String? _pendingCityName;
   bool _hasManuallyChosenGovernorate = false;
   bool _hasManuallyChosenCity = false;
-
-  // Bottom sheet expansion
-  bool _sheetExpanded = false;
 
   @override
   void initState() {
@@ -320,7 +317,7 @@ class _MapPickerPageState extends State<MapPickerPage>
                 child: GoogleMap(
                   style: _talabatMapStyle,
                   initialCameraPosition: const CameraPosition(
-                    target: _cairoFallback,
+                    target: _zagazigFallback,
                     zoom: 13,
                   ),
                   onMapCreated: (ctrl) {

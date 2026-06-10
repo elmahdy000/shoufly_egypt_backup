@@ -44,7 +44,7 @@ class RequestsBottomSheet extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final request = state.visibleRequests[index];
                         return GestureDetector(
-                          onTap: () => context.read<RequestsMapCubit>().moveCameraToRequest(request),
+                          onTap: () => context.read<RequestsMapCubit>().selectRequest(request),
                           child: RequestPreviewCard(request: request),
                         );
                       },

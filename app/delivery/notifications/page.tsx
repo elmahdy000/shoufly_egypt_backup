@@ -11,81 +11,14 @@ import {
   FiCheckCircle, 
   FiArrowRight, 
   FiCheck,
-  FiPackage,
   FiTruck,
-  FiActivity,
   FiClock,
   FiExternalLink,
   FiChevronLeft,
-  FiCalendar,
-  FiMapPin,
-  FiAlertCircle
+  FiCalendar
 } from "react-icons/fi";
 
-// Notification type config for Delivery Agent
-const notificationConfig: Record<string, { 
-  icon: React.ElementType; 
-  bg: string; 
-  text: string; 
-  border: string;
-  label: string;
-  description: string;
-  action: string;
-  route?: (id?: number) => string;
-}> = {
-  'REQUEST_DISPATCHED': { 
-    icon: FiPackage, 
-    bg: 'bg-blue-50', 
-    text: 'text-blue-600',
-    border: 'border-blue-200',
-    label: 'مهمة توصيل جديدة',
-    description: 'طلب جديد متاح للاستلام والتوصيل',
-    action: 'عرض المهمة',
-    route: (id) => `/delivery/tasks/${id}`
-  },
-  'DELIVERY_UPDATE': { 
-    icon: FiActivity, 
-    bg: 'bg-indigo-50', 
-    text: 'text-indigo-600',
-    border: 'border-indigo-200',
-    label: 'تحديث حالة الشحنة',
-    description: 'تغيير في حالة الطلب المسند إليك',
-    action: 'تتبع المسار',
-    route: (id) => `/delivery/tasks/${id}`
-  },
-  'DELIVERY_FAILED': { 
-    icon: FiAlertCircle, 
-    bg: 'bg-rose-50', 
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    label: 'فشل التوصيل',
-    description: 'تم تسجيل فشل في عملية التوصيل',
-    action: 'عرض الأسباب',
-    route: (id) => `/delivery/tasks/${id}`
-  },
-  'PAYMENT_RECEIVED': { 
-    icon: FiCheckCircle, 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    label: 'تم تحويل العمولة',
-    description: 'تم إضافة عمولة التوصيل لمحفظتك',
-    action: 'عرض الأرباح',
-    route: () => `/delivery/profile`
-  },
-};
-
-function getNotificationConfig(type: string) {
-  return notificationConfig[type] || { 
-    icon: FiBell, 
-    bg: 'bg-slate-50', 
-    text: 'text-slate-600',
-    border: 'border-slate-200',
-    label: 'تنبيه جديد',
-    description: 'إشعار من منصة شوفلي',
-    action: 'عرض التفاصيل',
-  };
-}
+import { getNotificationMeta } from "@/lib/utils/notifications-meta";
 
 export default function DeliveryNotificationsPage() {
   const { data, loading, error, markRead } = useNotificationsStream("DELIVERY", 4000);
@@ -159,7 +92,7 @@ export default function DeliveryNotificationsPage() {
         {!loading && filteredNotifications.length === 0 && (
           <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center shadow-sm">
              <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-300">
-               <FiTruck size={40} />
+                <FiTruck size={40} />
              </div>
              <h3 className="text-lg font-bold text-slate-900 mb-2">مفيش إشعارات جديدة</h3>
              <p className="text-sm text-slate-500">خليك مستعد لأي مهمة توصيل جديدة.</p>
@@ -176,39 +109,47 @@ export default function DeliveryNotificationsPage() {
               
               <div className="space-y-3">
                 {items.map((item: any) => {
-                  const config = getNotificationConfig(item.type);
-                  const Icon = config.icon;
+                  const meta = getNotificationMeta(item.type, item.requestId, "DELIVERY");
                   const isUnread = !item.isRead;
-                  const route = config.route?.(item.requestId);
 
-                  return (
-                    <Link 
-                      key={item.id} 
-                      href={route || "#"}
-                      onClick={() => isUnread && markRead(item.id)}
-                      className={`block group relative rounded-2xl p-5 transition-all border-2 ${
-                        isUnread ? `bg-white ${config.border} shadow-sm` : 'bg-white/40 border-slate-100 opacity-80'
-                      }`}
-                    >
+                  const CardContent = (
+                    <div className={`relative group rounded-2xl p-5 transition-all border-2 ${
+                      isUnread ? `bg-white ${meta.border} shadow-sm cursor-pointer` : 'bg-white/40 border-slate-100 opacity-80 cursor-pointer'
+                    }`}>
                       <div className="flex items-start gap-4">
-                        <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${config.bg} ${config.text} border-2 border-white shadow-sm`}>
-                          <Icon size={22} />
+                        <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${meta.bg} ${meta.color} border-2 border-white shadow-sm`}>
+                          <span className="scale-125">{meta.icon}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <p className={`text-sm font-bold ${isUnread ? 'text-slate-900' : 'text-slate-600'}`}>{config.label}</p>
+                            <p className={`text-sm font-bold ${isUnread ? 'text-slate-900' : 'text-slate-600'}`}>{meta.label}</p>
                             <span className="text-xs text-slate-400">{formatDate(item.createdAt)}</span>
                           </div>
                           <p className={`text-sm leading-relaxed mb-4 ${isUnread ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>{item.message}</p>
                           <div className="flex items-center justify-between pt-3 border-t border-slate-50">
                             <span className={`text-xs font-bold flex items-center gap-1.5 ${isUnread ? 'text-primary' : 'text-slate-400'}`}>
-                              {config.action} <FiExternalLink size={12} />
+                              {meta.action} <FiExternalLink size={12} />
                             </span>
                             <FiChevronLeft size={18} className={isUnread ? 'text-primary' : 'text-slate-300'} />
                           </div>
                         </div>
                       </div>
+                    </div>
+                  );
+
+                  return meta.route && meta.route !== "/" ? (
+                    <Link 
+                      key={item.id} 
+                      href={meta.route}
+                      onClick={() => isUnread && markRead(item.id)}
+                      className="block"
+                    >
+                      {CardContent}
                     </Link>
+                  ) : (
+                    <div key={item.id} onClick={() => isUnread && markRead(item.id)} className="block">
+                      {CardContent}
+                    </div>
                   );
                 })}
               </div>
